@@ -1,0 +1,162 @@
+id: docker.q03
+track: docker
+title: Images και Dockerfile
+description: Γράψε Dockerfile, χτίσε images και κατάλαβε τα σφάλματα του build.
+level: intermediate
+order: 3
+skills: [docker.images]
+questions:
+  - id: from
+    type: multiple_choice
+    prompt: "Τι κάνει η γραμμή `FROM python:3.12-slim` σε ένα Dockerfile;"
+    explanation: "Το `FROM` ορίζει το βασικό image πάνω στο οποίο χτίζεται το δικό σου. Είναι (σχεδόν πάντα) η πρώτη εντολή."
+    citations: [{ source: "docker-docs", url: "https://docs.docker.com/reference/dockerfile/", doc_version: "Dockerfile reference 2026", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "base", text: "Ορίζει το βασικό image πάνω στο οποίο χτίζεται το νέο image.", correct: true }
+        - { id: "install", text: "Εγκαθιστά την Python στον υπολογιστή σου.", why: "Τίποτα από το Dockerfile δεν εγκαθίσταται στον host σου." }
+        - { id: "copy", text: "Αντιγράφει αρχεία από το python image.", why: "Αντιγραφή αρχείων γίνεται με `COPY`." }
+        - { id: "run", text: "Τρέχει ένα container python.", why: "Το Dockerfile περιγράφει πώς χτίζεται ένα image· δεν τρέχει container." }
+
+  - id: run-vs-cmd
+    type: multiple_choice
+    prompt: "Ποια είναι η διαφορά `RUN` και `CMD`;"
+    explanation: "Το `RUN` εκτελείται **κατά το build** και το αποτέλεσμα αποθηκεύεται στο image (π.χ. εγκατάσταση πακέτων). Το `CMD` δεν εκτελεί τίποτα στο build· ορίζει την εντολή που θα τρέξει **όταν ξεκινήσει** ένα container."
+    citations: [{ source: "docker-docs", url: "https://docs.docker.com/reference/dockerfile/", doc_version: "Dockerfile reference 2026", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "build-vs-start", text: "Το RUN τρέχει στο build· το CMD είναι η εντολή εκκίνησης του container.", correct: true }
+        - { id: "same", text: "Είναι συνώνυμα.", why: "Τρέχουν σε εντελώς διαφορετικές στιγμές." }
+        - { id: "reverse", text: "Το CMD τρέχει στο build· το RUN στην εκκίνηση.", why: "Είναι ακριβώς το ανάποδο." }
+        - { id: "shell", text: "Το RUN είναι για Linux, το CMD για Windows.", why: "Δεν σχετίζεται με λειτουργικό σύστημα." }
+
+  - id: cmd-fill
+    type: fill_in_command
+    prompt: "Συμπλήρωσε την εντολή του Dockerfile που ορίζει τι θα τρέξει όταν ξεκινήσει το container."
+    explanation: "Το `CMD` ορίζει την προεπιλεγμένη εντολή εκκίνησης. Αν υπάρχουν πολλά `CMD`, ισχύει μόνο το τελευταίο. (Οι εντολές του Dockerfile δεν κάνουν διάκριση πεζών-κεφαλαίων, αλλά η σύμβαση είναι κεφαλαία.)"
+    spec:
+      template: "____ [\"python\", \"app.py\"]"
+      blanks:
+        - accepted: ["CMD", "ENTRYPOINT"]
+          case_sensitive: false
+          known_mistakes:
+            - { id: "run", match: "RUN", feedback: "Το `RUN` θα έτρεχε το app.py *κατά το build* — όχι όταν ξεκινά το container." }
+            - { id: "start", match: "START", feedback: "Δεν υπάρχει εντολή `START` στο Dockerfile." }
+
+  - id: build-write
+    type: command_writing
+    cognitive_level: apply
+    prompt: "Χτίσε ένα image με όνομα `myapp` και tag `1.0`, από το Dockerfile του **τρέχοντος φακέλου**."
+    hints:
+      - "Το όνομα:tag δίνεται με -t."
+      - "Μην ξεχάσεις το build context στο τέλος."
+    explanation: "`docker build -t myapp:1.0 .` — το `-t` δίνει όνομα και tag, και η τελεία είναι το build context (ο τρέχων φάκελος)."
+    reference: docker-image-build
+    spec:
+      accepted: ["docker build -t myapp:1.0 .", "docker build -t myapp:1.0 ./"]
+      known_mistakes:
+        - { id: "no-context", match: "docker build -t myapp:1.0", feedback: "Λείπει το build context — η τελεία `.` στο τέλος." }
+        - { id: "no-t", match: "docker build myapp:1.0 .", feedback: "Το όνομα δίνεται με `-t`· χωρίς αυτό, το docker θεωρεί το «myapp:1.0» path." }
+        - { id: "no-tag", match: "docker build -t myapp .", feedback: "Λείπει το tag — θα γινόταν `myapp:latest`." }
+      test_cases:
+        accept: ["docker build -t myapp:1.0 .", "docker build . -t myapp:1.0", "docker image build --tag myapp:1.0 .", "docker buildx build -t myapp:1.0 .", "docker build --tag=myapp:1.0 ./"]
+        reject: ["docker build -t myapp:1.0", "docker build myapp:1.0 .", "docker build -t myapp .", "docker run -t myapp:1.0 .", "docker build -t myapp:1.0 .."]
+
+  - id: context-missing
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: Τι πήγε στραβά στο build;
+    explanation: "Το τελευταίο όρισμα (`frontend`) είναι το build context, και τέτοιος φάκελος δεν υπάρχει εκεί που βρίσκεσαι. Έλεγξε με `ls` ή δώσε τη σωστή διαδρομή."
+    reference: docker-image-build
+    spec:
+      command: docker build -t app frontend
+      output: |-
+        ERROR: failed to build: unable to prepare context: path "frontend" not found
+      captured_on: docker-29.5.2
+      options:
+        - { id: "context", text: "Ο φάκελος frontend (το build context) δεν υπάρχει.", correct: true }
+        - { id: "dockerfile", text: "Υπάρχει συντακτικό λάθος στο Dockerfile.", why: "Το build δεν έφτασε καν στο Dockerfile." }
+        - { id: "image", text: "Το image app δεν υπάρχει στο registry.", why: "Το `-t app` είναι το όνομα που *θα πάρει* το νέο image." }
+        - { id: "network", text: "Δεν υπάρχει σύνδεση internet.", why: "Το σφάλμα είναι τοπικό: «path … not found»." }
+
+  - id: copy-missing
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Το Dockerfile έχει τη γραμμή `COPY missing.txt /x`. Τι σημαίνει το σφάλμα;"
+    explanation: "Το `COPY` αντιγράφει από το **build context**. Το missing.txt δεν υπάρχει στον φάκελο που έδωσες στο build (ή εξαιρείται από το .dockerignore)."
+    reference: docker-image-build
+    spec:
+      command: docker build -t app .
+      output: |-
+        ERROR: failed to build: failed to solve: failed to compute cache key: failed to calculate checksum of ref ix6qw655f2e88ovhxgzcm1edn::oss7l27ja5aorddvf5lg7butu: "/missing.txt": not found
+      captured_on: docker-29.5.2
+      options:
+        - { id: "not-in-context", text: "Το missing.txt δεν υπάρχει μέσα στο build context.", correct: true }
+        - { id: "cache", text: "Η cache του Docker είναι χαλασμένη.", why: "Το «cache key» αναφέρεται επειδή το Docker υπολογίζει checksum των αρχείων — και το αρχείο δεν βρέθηκε." }
+        - { id: "dest", text: "Ο φάκελος /x δεν υπάρχει στο image.", why: "Το σφάλμα αφορά την *πηγή* (\"/missing.txt\": not found), όχι τον προορισμό." }
+        - { id: "perm", text: "Δεν έχεις δικαίωμα ανάγνωσης στο αρχείο.", why: "Το μήνυμα λέει not found, όχι permission denied." }
+
+  - id: dockerfile-order
+    type: ordering
+    cognitive_level: combine
+    prompt: Βάλε τις γραμμές αυτού του Dockerfile για μια εφαρμογή Python στη **σωστή σειρά** (αξιοποιώντας την cache του build).
+    explanation: "Πρώτα το βασικό image, μετά ο φάκελος εργασίας. Αντιγράφεις **πρώτα μόνο** το requirements.txt και εγκαθιστάς — έτσι, όταν αλλάζει μόνο ο κώδικας, το βήμα εγκατάστασης έρχεται από την cache. Μετά αντιγράφεις τον κώδικα και, τέλος, ορίζεις την εντολή εκκίνησης."
+    spec:
+      steps:
+        - { id: "from", text: "FROM python:3.12-slim" }
+        - { id: "workdir", text: "WORKDIR /app" }
+        - { id: "copy-req", text: "COPY requirements.txt ." }
+        - { id: "install", text: "RUN pip install -r requirements.txt" }
+        - { id: "copy-all", text: "COPY . ." }
+        - { id: "cmd", text: "CMD [\"python\", \"app.py\"]" }
+
+  - id: layer-cache
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: Γιατί αντιγράφουμε το `requirements.txt` και τρέχουμε `pip install` **πριν** από το `COPY . .`;
+    explanation: "Κάθε εντολή δημιουργεί layer που αποθηκεύεται στην cache. Αν αλλάξει ένα αρχείο, ξαναγίνονται τα βήματα από εκείνο το COPY και κάτω. Με αυτή τη σειρά, μια αλλαγή στον κώδικα δεν ξανατρέχει το (αργό) pip install."
+    spec:
+      options:
+        - { id: "cache", text: "Για να μην ξανατρέχει η εγκατάσταση πακέτων κάθε φορά που αλλάζει ο κώδικας.", correct: true }
+        - { id: "required", text: "Γιατί αλλιώς το build αποτυγχάνει.", why: "Θα δούλευε και με την άλλη σειρά — απλώς πιο αργά." }
+        - { id: "security", text: "Για λόγους ασφαλείας.", why: "Ο λόγος είναι η cache του build." }
+        - { id: "size", text: "Για να είναι το image μικρότερο.", why: "Το μέγεθος δεν αλλάζει ουσιαστικά· κερδίζεις χρόνο build." }
+
+  - id: expose
+    type: multiple_choice
+    prompt: "Το Dockerfile έχει `EXPOSE 80`. Είναι αρκετό για να ανοίξεις την εφαρμογή από τον browser σου;"
+    explanation: "Όχι. Το `EXPOSE` είναι τεκμηρίωση — δεν δημοσιεύει τη θύρα. Για πρόσβαση από τον host χρειάζεσαι `-p`, π.χ. `docker run -p 8080:80 myapp`."
+    citations: [{ source: "docker-docs", url: "https://docs.docker.com/reference/dockerfile/", doc_version: "Dockerfile reference 2026", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "no", text: "Όχι — χρειάζεται και -p στο docker run.", correct: true }
+        - { id: "yes", text: "Ναι, το EXPOSE ανοίγει τη θύρα στον host.", why: "Το EXPOSE «doesn't actually publish the port» — είναι τεκμηρίωση." }
+        - { id: "firewall", text: "Ναι, αλλά μόνο αν απενεργοποιήσεις το firewall.", why: "Το firewall δεν είναι το θέμα· η θύρα απλώς δεν έχει δημοσιευτεί." }
+        - { id: "root", text: "Μόνο αν τρέξεις το docker ως root.", why: "Τα δικαιώματα δεν αλλάζουν το τι κάνει το EXPOSE." }
+
+  - id: dockerignore
+    type: multiple_choice
+    prompt: "Τι κάνει ένα αρχείο `.dockerignore`;"
+    explanation: "Εξαιρεί αρχεία και φακέλους από το build context — π.χ. `.git`, `node_modules`, αρχεία με κωδικούς. Το build γίνεται πιο γρήγορο και δεν μπαίνουν κατά λάθος μυστικά στο image."
+    citations: [{ source: "docker-docs", url: "https://docs.docker.com/reference/dockerfile/", doc_version: "Dockerfile reference 2026", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "exclude", text: "Εξαιρεί αρχεία από το build context.", correct: true }
+        - { id: "git", text: "Λέει στο git να αγνοήσει τα αρχεία του Docker.", why: "Αυτό θα ήταν το `.gitignore`." }
+        - { id: "containers", text: "Λέει στο Docker ποια containers να αγνοήσει.", why: "Αφορά μόνο αρχεία του build context." }
+        - { id: "runtime", text: "Κρύβει αρχεία μέσα στο container όταν τρέχει.", why: "Επηρεάζει μόνο τι στέλνεται στο build." }
+
+  - id: run-rm-write
+    type: command_writing
+    cognitive_level: apply
+    prompt: "Τρέξε το image `myapp:1.0` έτσι ώστε το container να **διαγραφεί αυτόματα** όταν τερματίσει."
+    explanation: "`docker run --rm myapp:1.0` — το `--rm` καθαρίζει το container μόλις τελειώσει."
+    reference: docker-container-run
+    spec:
+      accepted: ["docker run --rm myapp:1.0"]
+      known_mistakes:
+        - { id: "after", match: "docker run myapp:1.0 --rm", feedback: "Το `--rm` μετά το image περνάει στο container ως όρισμα — πρέπει να μπει πριν." }
+        - { id: "no-tag", match: "docker run --rm myapp", feedback: "Χωρίς tag θα έτρεχε το `myapp:latest`, όχι το 1.0." }
+      test_cases:
+        accept: ["docker run --rm myapp:1.0", "docker container run --rm myapp:1.0"]
+        reject: ["docker run myapp:1.0 --rm", "docker run --rm myapp", "docker run -rm myapp:1.0", "docker rm myapp:1.0"]

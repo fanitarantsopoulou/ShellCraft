@@ -1,0 +1,10 @@
+id: linux.files
+track: linux
+title: Αρχεία και φάκελοι
+summary: Αντιγραφή, μετακίνηση και μετονομασία αρχείων χωρίς να χάνεις δεδομένα.
+order: 2
+level: beginner
+map: { x: 6, y: 4 }
+lessons:
+  - linux.files.copying
+  - linux.files.moving

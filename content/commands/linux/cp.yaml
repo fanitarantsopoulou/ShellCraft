@@ -1,0 +1,65 @@
+id: cp
+name: cp
+kind: external_utility
+provider: GNU coreutils
+platform: debian-13
+category: linux/file-management
+level: beginner
+summary: Αντιγράφει αρχεία και φακέλους.
+description: >
+  Το `cp` δημιουργεί αντίγραφο· το αρχικό αρχείο μένει ανέγγιχτο. Αν ο προορισμός
+  είναι υπάρχων φάκελος, το αντίγραφο μπαίνει μέσα σε αυτόν με το ίδιο όνομα.
+synopsis:
+  - "cp [OPTION]... [-T] SOURCE DEST"
+  - "cp [OPTION]... SOURCE... DIRECTORY"
+  - "cp [OPTION]... -t DIRECTORY SOURCE..."
+flag_grammar: gnu_getopt
+options:
+  - { flags: ["-r", "-R", "--recursive"], summary: Αντιγραφή φακέλων αναδρομικά (μαζί με όλο το περιεχόμενό τους). }
+  - { flags: ["-i", "--interactive"], summary: Ρωτάει πριν αντικαταστήσει υπάρχον αρχείο. }
+  - { flags: ["-v", "--verbose"], summary: Τυπώνει τι κάνει. }
+  - { flags: ["-a", "--archive"], summary: "Όπως -dR --preserve=all: αναδρομικά, διατηρώντας δικαιώματα, ιδιοκτήτη και χρόνους.", level: intermediate }
+  - { flags: ["-p"], summary: "Όπως --preserve=mode,ownership,timestamps.", level: intermediate }
+  - { flags: ["-n", "--no-clobber"], summary: "Δεν αντικαθιστά υπάρχοντα αρχεία (deprecated στο coreutils 9.7· προτίμησε --update=none).", level: intermediate }
+  - { flags: ["-u"], summary: "Αντιγράφει μόνο αν η πηγή είναι νεότερη (όπως --update=older).", level: intermediate }
+  - { flags: ["--update"], summary: Ελέγχει ποια υπάρχοντα αρχεία ενημερώνονται., value: optional, value_name: UPDATE, level: intermediate }
+  - { flags: ["-f", "--force"], summary: "Αν ο προορισμός δεν ανοίγει, τον διαγράφει και ξαναδοκιμάζει.", level: intermediate }
+  - { flags: ["-t", "--target-directory"], summary: Αντιγράφει όλες τις πηγές μέσα στον DIRECTORY., value: required, value_name: DIRECTORY, level: intermediate }
+  - { flags: ["-T", "--no-target-directory"], summary: Αντιμετωπίζει τον DEST ως κανονικό αρχείο., level: advanced }
+  - { flags: ["-l", "--link"], summary: Δημιουργεί hard links αντί για αντίγραφα., level: advanced }
+  - { flags: ["-s", "--symbolic-link"], summary: Δημιουργεί symbolic links αντί για αντίγραφα., level: advanced }
+  - { flags: ["-d"], summary: "Όπως --no-dereference --preserve=links.", level: advanced }
+  - { flags: ["-L", "--dereference"], summary: Ακολουθεί πάντα τα symbolic links της πηγής., level: advanced }
+  - { flags: ["-P", "--no-dereference"], summary: Δεν ακολουθεί symbolic links της πηγής., level: advanced }
+  - { flags: ["-b"], summary: Κρατά backup κάθε προορισμού που θα αντικατασταθεί., level: advanced }
+  - { flags: ["--backup"], summary: Κρατά backup κάθε προορισμού που θα αντικατασταθεί., value: optional, value_name: CONTROL, level: advanced }
+  - { flags: ["--preserve"], summary: Διατηρεί τα επιλεγμένα attributes., value: optional, value_name: ATTR_LIST, level: advanced }
+  - { flags: ["--parents"], summary: Χρησιμοποιεί την πλήρη διαδρομή της πηγής κάτω από τον DIRECTORY., level: advanced }
+  - { flags: ["-x", "--one-file-system"], summary: Μένει στο ίδιο σύστημα αρχείων., level: advanced }
+examples:
+  - cmd: cp old.txt new.txt
+    explain:
+      - { token: cp, meaning: η εντολή αντιγραφής }
+      - { token: old.txt, meaning: "η πηγή (SOURCE)" }
+      - { token: new.txt, meaning: "ο προορισμός (DEST)" }
+  - cmd: cp -r project project-backup
+    note: Για φακέλους χρειάζεται -r.
+  - cmd: cp report.txt archive/
+    note: Αν ο archive είναι φάκελος, δημιουργείται το archive/report.txt.
+common_mistakes:
+  - wrong: mv old.txt new.txt
+    why: Το mv μετονομάζει/μετακινεί το αρχείο — δεν δημιουργείται αντίγραφο και το old.txt παύει να υπάρχει.
+  - wrong: cp project project-backup
+    why: "Χωρίς -r το GNU cp αρνείται να αντιγράψει φάκελο: «cp: -r not specified; omitting directory 'project'»."
+  - wrong: cp new.txt old.txt
+    why: Πρώτα γράφεται η πηγή και μετά ο προορισμός. Με ανάποδη σειρά μπορεί να αντικαταστήσεις το αρχείο που ήθελες να κρατήσεις.
+when_not_to_use:
+  - Για συγχρονισμό μεγάλων δέντρων φακέλων ή αντιγραφή σε άλλο μηχάνημα — εκεί ταιριάζει το rsync.
+  - Για να αλλάξεις μόνο το όνομα ενός αρχείου — αυτό είναι δουλειά του mv.
+related:
+  - { id: mv, relation: confused_with }
+citations:
+  - source: gnu-coreutils
+    url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
+    doc_version: GNU coreutils 9.7 (Debian 13)
+    last_verified: 2026-10-06

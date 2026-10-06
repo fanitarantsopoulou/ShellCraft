@@ -1,0 +1,187 @@
+id: k8s.q03
+track: kubernetes
+title: Troubleshooting Pods
+description: Pending, ImagePullBackOff, containers που κρασάρουν — διάβασε τα σημάδια και βρες την αιτία.
+level: advanced
+order: 3
+skills: [k8s.troubleshooting]
+related_lessons: []
+questions:
+  - id: get-pods-diagnose
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Ποιο είναι το πρόβλημα του Pod `badimg`;"
+    explanation: "Το `ErrImagePull` / `ImagePullBackOff` σημαίνει ότι ο Node δεν μπορεί να κατεβάσει το image: λάθος όνομα ή tag, ιδιωτικό registry χωρίς credentials ή πρόβλημα δικτύου. Το `kubectl describe pod badimg` δείχνει το ακριβές μήνυμα."
+    reference: kubectl-get
+    citations: [{ source: "kubernetes-docs", url: "https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/", doc_version: "Kubernetes v1.37", last_verified: 2026-10-06 }]
+    spec:
+      command: kubectl get pods
+      output: |-
+        NAME                   READY   STATUS         RESTARTS      AGE
+        badimg                 0/1     ErrImagePull   0             51s
+        crash                  0/1     Error          3 (28s ago)   51s
+        hungry                 0/1     Pending        0             51s
+        web-6bd469df5c-4chnn   1/1     Running        0             52s
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "image", text: "Δεν μπορεί να κατεβεί το image του.", correct: true }
+        - { id: "crash", text: "Η εφαρμογή του κρασάρει.", why: "Το container δεν ξεκίνησε ποτέ (RESTARTS 0)· το πρόβλημα είναι πριν, στο pull." }
+        - { id: "memory", text: "Δεν υπάρχει αρκετή μνήμη στο cluster.", why: "Τότε θα ήταν Pending με FailedScheduling, όπως το hungry." }
+        - { id: "slow", text: "Απλώς ξεκινά αργά — θα γίνει Running σύντομα.", why: "Το ErrImagePull είναι σφάλμα· δεν θα διορθωθεί μόνο του." }
+
+  - id: pending-events
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Το Pod `hungry` μένει **Pending**. Τι λένε τα events;"
+    explanation: "Ο scheduler δεν βρίσκει Node με αρκετή ελεύθερη μνήμη για το **request** του Pod (εδώ 500Gi). Μείωσε το request ή πρόσθεσε χωρητικότητα."
+    reference: kubectl-describe
+    spec:
+      command: kubectl describe pod hungry
+      output: |-
+        Events:
+          Type     Reason            Age   From               Message
+          ----     ------            ----  ----               -------
+          Warning  FailedScheduling  50s   default-scheduler  0/1 nodes are available: 1 Insufficient memory. preemption: 0/1 nodes are available: 1 Preemption is not helpful for scheduling.
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "memory", text: "Κανένας Node δεν έχει αρκετή μνήμη για όσα ζητά το Pod.", correct: true }
+        - { id: "oom", text: "Η εφαρμογή ξεπέρασε τη μνήμη της και σκοτώθηκε (OOMKilled).", why: "Το Pod δεν ξεκίνησε καν — δεν έχει τοποθετηθεί σε Node." }
+        - { id: "image", text: "Το image είναι πολύ μεγάλο.", why: "Το μήνυμα λέει «Insufficient memory» για το scheduling, όχι για το image." }
+        - { id: "nodes", text: "Το cluster δεν έχει κανέναν Node.", why: "«0/1 nodes are available» — υπάρχει ένας Node, απλώς δεν χωράει το Pod." }
+
+  - id: crash-restarts
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Το Pod `api` δείχνει `Error` και ο αριθμός RESTARTS ανεβαίνει. Τι συμβαίνει;"
+    explanation: "Το container ξεκινά, τερματίζει με σφάλμα, και το Kubernetes το ξαναξεκινά με αυξανόμενη καθυστέρηση (back-off). Ανάλογα με τη στιγμή μπορεί να δεις STATUS `Error` ή `CrashLoopBackOff`. Το επόμενο βήμα είναι τα logs (`kubectl logs api --previous`)."
+    reference: kubectl-logs
+    spec:
+      command: kubectl get pod api
+      output: |-
+        NAME     READY   STATUS             RESTARTS      AGE
+        api      0/1     Error              3 (47s ago)   60s
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "crashloop", text: "Το container ξεκινά, αποτυγχάνει και ξαναξεκινά επανειλημμένα.", correct: true }
+        - { id: "image", text: "Το image δεν κατεβαίνει.", why: "Αν δεν κατέβαινε το image, δεν θα υπήρχαν επανεκκινήσεις — το container δεν θα ξεκινούσε ποτέ." }
+        - { id: "pending", text: "Το Pod περιμένει να τοποθετηθεί σε Node.", why: "Ένα Pod που περιμένει scheduling είναι Pending και δεν έχει restarts." }
+        - { id: "ok", text: "Όλα καλά — το Kubernetes κάνει τακτικές επανεκκινήσεις.", why: "Οι επανεκκινήσεις εδώ οφείλονται σε σφάλμα της εφαρμογής." }
+
+  - id: crash-logs
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Αυτά είναι τα logs του Pod `api`. Ποια είναι η πιθανότερη λύση;"
+    explanation: "Η εφαρμογή περιμένει αρχείο ρυθμίσεων που δεν υπάρχει στο container. Συνήθως λύνεται προσθέτοντας ένα ConfigMap ως volume στη διαδρομή `/etc/app`."
+    reference: kubectl-logs
+    spec:
+      command: kubectl logs api
+      output: "FATAL: cannot read /etc/app/config.yaml: no such file or directory"
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "config", text: "Να δοθεί το config.yaml στο container (π.χ. ConfigMap ως volume στο /etc/app).", correct: true }
+        - { id: "memory", text: "Να αυξηθεί η μνήμη του Pod.", why: "Το σφάλμα λέει ότι λείπει αρχείο, όχι μνήμη." }
+        - { id: "replicas", text: "Να αυξηθούν τα replicas.", why: "Περισσότερα αντίγραφα θα κρασάρουν όλα με τον ίδιο τρόπο." }
+        - { id: "delete", text: "Να διαγραφεί το Pod για να ξαναδημιουργηθεί.", why: "Το νέο Pod θα έχει την ίδια ρύθμιση — και το ίδιο σφάλμα." }
+
+  - id: describe-badimg-write
+    type: command_writing
+    cognitive_level: troubleshoot
+    prompt: "Το Pod `badimg` είναι σε `ImagePullBackOff`. Γράψε την εντολή που δείχνει τα **events** του, ώστε να δεις το ακριβές σφάλμα."
+    explanation: "`kubectl describe pod badimg` — στα Events θα δεις π.χ. «Failed to pull image … pull access denied, repository does not exist»."
+    reference: kubectl-describe
+    spec:
+      accepted: ["kubectl describe pod badimg", "kubectl describe pods badimg", "kubectl describe po badimg", "kubectl describe pod/badimg"]
+      known_mistakes:
+        - { id: "logs", match: "kubectl logs badimg", feedback: "Το container δεν ξεκίνησε ποτέ, άρα δεν έχει logs. Τα events είναι στο describe." }
+      test_cases:
+        accept: ["kubectl describe pod badimg", "kubectl describe po badimg", "kubectl describe pod/badimg"]
+        reject: ["kubectl logs badimg", "kubectl get pod badimg", "kubectl describe badimg", "kubectl describe pod"]
+
+  - id: imagepull-events
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Τι προκαλεί το ImagePullBackOff, σύμφωνα με τα events;"
+    explanation: "Το registry απάντησε ότι το repository `llquiz-no-such-image` δεν υπάρχει (ή απαιτεί πιστοποίηση). Το πιθανότερο: τυπογραφικό λάθος στο image. Διόρθωσε το image στο manifest και ξανακάνε apply."
+    reference: kubectl-describe
+    spec:
+      command: kubectl describe pod badimg
+      output: |-
+        Warning  Failed     12s (x3 over 49s)  kubelet  spec.containers{badimg}: Failed to pull image "llquiz-no-such-image:9.9": failed to pull and unpack image "docker.io/library/llquiz-no-such-image:9.9": failed to resolve reference "docker.io/library/llquiz-no-such-image:9.9": pull access denied, repository does not exist or may require authorization: server message: insufficient_scope: authorization failed
+        Warning  Failed     12s (x3 over 49s)  kubelet  spec.containers{badimg}: Error: ErrImagePull
+        Normal   BackOff    2s (x3 over 49s)   kubelet  spec.containers{badimg}: Back-off pulling image "llquiz-no-such-image:9.9"
+        Warning  Failed     2s (x3 over 49s)   kubelet  spec.containers{badimg}: Error: ImagePullBackOff
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "repo", text: "Το image δεν υπάρχει στο registry (ή χρειάζεται πιστοποίηση).", correct: true }
+        - { id: "disk", text: "Ο Node δεν έχει χώρο στον δίσκο.", why: "Το μήνυμα είναι «repository does not exist or may require authorization»." }
+        - { id: "network-policy", text: "Μια NetworkPolicy μπλοκάρει το Pod.", why: "Το pull το κάνει ο Node (kubelet), και το registry απάντησε κανονικά." }
+        - { id: "port", text: "Η θύρα του container είναι λάθος.", why: "Το container δεν έφτασε καν να ξεκινήσει." }
+
+  - id: notfound
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Είσαι σίγουρος ότι το Pod `api` υπάρχει, αλλά παίρνεις αυτό. Ποια είναι η πιθανότερη αιτία;"
+    explanation: "Το kubectl ψάχνει στο τρέχον namespace (εδώ default). Αν το Pod είναι σε άλλο namespace, δώσε `-n <namespace>` — ή βρες το με `kubectl get pods -A`."
+    reference: kubectl-get
+    spec:
+      command: kubectl logs api
+      output: 'error: error from server (NotFound): pods "api" not found in namespace "default"'
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "namespace", text: "Το Pod βρίσκεται σε άλλο namespace.", correct: true }
+        - { id: "crashed", text: "Το Pod κρασάρισε.", why: "Ένα Pod που κρασάρει εξακολουθεί να υπάρχει και να φαίνεται." }
+        - { id: "rbac", text: "Δεν έχεις δικαίωμα να δεις logs.", why: "Για δικαιώματα θα έβλεπες «Forbidden»." }
+        - { id: "server", text: "Ο API server δεν απαντά.", why: "Ο server απάντησε — με NotFound." }
+
+  - id: typo-resource
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: "Τι πήγε στραβά;"
+    explanation: "Το kubectl δεν αναγνωρίζει τον τύπο πόρου «pod5» — τυπογραφικό λάθος. Τα ονόματα πόρων (pods, po, deployments…) τα βλέπεις με `kubectl api-resources`."
+    reference: kubectl-get
+    spec:
+      command: kubectl get pod5
+      output: 'error: the server doesn''t have a resource type "pod5"'
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "typo", text: "Το «pod5» δεν είναι τύπος πόρου — τυπογραφικό λάθος.", correct: true }
+        - { id: "five", text: "Δεν υπάρχουν 5 Pods.", why: "Το kubectl δεν ερμηνεύει το 5 ως αριθμό." }
+        - { id: "named", text: "Δεν υπάρχει Pod με όνομα pod5.", why: "Για Pod με όνομα θα έγραφες `kubectl get pod pod5`· το μήνυμα θα ήταν NotFound." }
+        - { id: "crd", text: "Πρέπει να εγκαταστήσεις plugin.", why: "Απλώς γράφτηκε λάθος ο τύπος πόρου." }
+
+  - id: no-logs-imagepull
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: "Γιατί το `kubectl logs` δεν βοηθά σε ένα Pod με `ImagePullBackOff`;"
+    explanation: "Τα logs είναι η έξοδος του container. Αν το image δεν κατέβηκε, το container δεν ξεκίνησε ποτέ — δεν υπάρχει έξοδος. Η πληροφορία βρίσκεται στα events (`kubectl describe`)."
+    spec:
+      options:
+        - { id: "never-started", text: "Το container δεν ξεκίνησε ποτέ, άρα δεν έχει logs.", correct: true }
+        - { id: "deleted", text: "Τα logs διαγράφονται σε κάθε επανεκκίνηση.", why: "Δεν υπήρξε καν εκκίνηση." }
+        - { id: "perm", text: "Χρειάζεται admin για να δεις logs.", why: "Δεν είναι θέμα δικαιωμάτων." }
+        - { id: "flag", text: "Χρειάζεται --previous.", why: "Δεν υπάρχει ούτε προηγούμενη εκτέλεση." }
+
+  - id: troubleshoot-order
+    type: ordering
+    cognitive_level: scenario
+    prompt: "Ένα Pod δεν δουλεύει. Βάλε σε σειρά τα βήματα διερεύνησης και διόρθωσης."
+    explanation: "Πρώτα δες την κατάσταση (`get`), μετά τα events (`describe`), μετά την έξοδο της εφαρμογής (`logs`). Διόρθωσε το manifest, εφάρμοσέ το, και επιβεβαίωσε ότι έγινε Running."
+    spec:
+      steps:
+        - { id: "get", text: "kubectl get pods" }
+        - { id: "describe", text: "kubectl describe pod <όνομα>" }
+        - { id: "logs", text: "kubectl logs <όνομα> --previous" }
+        - { id: "apply", text: "Διορθώνεις το manifest και kubectl apply -f" }
+        - { id: "verify", text: "kubectl get pods (επιβεβαίωση: Running)" }
+
+  - id: delete-doesnt-fix
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: "Ένα Pod ενός Deployment κρασάρει συνεχώς λόγω λάθους στο config. Βοηθά να το διαγράψεις;"
+    explanation: "Όχι. Το Deployment θα δημιουργήσει νέο Pod από το **ίδιο** template — με το ίδιο λάθος. Η διόρθωση γίνεται στο manifest (ή στο ConfigMap) και εφαρμόζεται με `kubectl apply`."
+    spec:
+      options:
+        - { id: "no", text: "Όχι — το νέο Pod θα έχει την ίδια ρύθμιση και το ίδιο πρόβλημα.", correct: true }
+        - { id: "yes", text: "Ναι — το νέο Pod ξεκινά «καθαρό».", why: "Καθαρό, αλλά από το ίδιο template — άρα με το ίδιο λάθος." }
+        - { id: "lose", text: "Ναι, αλλά χάνεται όλο το Deployment.", why: "Διαγράφοντας Pod δεν χάνεται το Deployment." }
+        - { id: "forbidden", text: "Δεν επιτρέπεται να διαγράψεις Pod Deployment.", why: "Επιτρέπεται· απλώς δημιουργείται νέο." }

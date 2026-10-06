@@ -1,0 +1,361 @@
+id: linux.q03
+track: linux
+title: Διάβασμα αρχείων
+description: Δες τι γράφει ένα αρχείο — ολόκληρο, την αρχή, το τέλος — και μέτρησέ το. cat, head, tail, wc.
+level: beginner
+order: 3
+skills:
+- linux.text.read
+questions:
+- id: cat-select
+  type: command_selection
+  prompt: Θέλεις να τυπώσεις ολόκληρο το περιεχόμενο του μικρού αρχείου `notes.txt`. Ποια εντολή;
+  explanation: Το `cat` τυπώνει όλο το περιεχόμενο ενός αρχείου στην οθόνη.
+  reference: cat
+  commands:
+  - cat
+  - head
+  spec:
+    options:
+    - id: cat
+      text: cat notes.txt
+      correct: true
+    - id: type
+      text: type notes.txt
+      why: 'Το `type` είναι bash builtin που λέει *τι είδους εντολή* είναι κάτι — όχι τι περιέχει ένα αρχείο: «type:
+        notes.txt: not found».'
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: type
+    - id: echo
+      text: echo notes.txt
+      why: Το `echo` τυπώνει το κείμενο που του δίνεις — εδώ το *όνομα* «notes.txt», όχι το περιεχόμενο.
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: echo
+    - id: head1
+      text: head -n 1 notes.txt
+      why: Δείχνει μόνο την πρώτη γραμμή.
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: head
+- id: head-default
+  type: multiple_choice
+  prompt: Πόσες γραμμές δείχνει το `head app.log` χωρίς καμία επιλογή;
+  explanation: Και το `head` και το `tail` δείχνουν 10 γραμμές από προεπιλογή. Με `-n` αλλάζεις τον αριθμό.
+  reference: head
+  commands:
+  - head
+  spec:
+    options:
+    - id: ten
+      text: Τις 10 πρώτες.
+      correct: true
+    - id: one
+      text: Μόνο την πρώτη.
+      why: Για μία γραμμή θέλεις `head -n 1`.
+    - id: twenty
+      text: Τις 20 πρώτες.
+      why: Η προεπιλογή είναι 10.
+    - id: page
+      text: Μία οθόνη τη φορά.
+      why: Αυτό κάνει ένας pager όπως το `less`.
+- id: head-five-select
+  type: command_selection
+  prompt: Ποια εντολή δείχνει τις **5 πρώτες** γραμμές του `data.csv`;
+  explanation: Το `head -n 5` δείχνει τις 5 πρώτες γραμμές. (Η παλιά μορφή `head -5` κάνει το ίδιο.)
+  reference: head
+  commands:
+  - head
+  - tail
+  - cat
+  spec:
+    options:
+    - id: head-n
+      text: head -n 5 data.csv
+      correct: true
+    - id: tail
+      text: tail -n 5 data.csv
+      why: Το `tail` δείχνει τις *τελευταίες* γραμμές.
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: tail
+    - id: head-c
+      text: head -c 5 data.csv
+      why: Το `-c` μετράει *bytes*, όχι γραμμές — θα έβλεπες μόνο 5 χαρακτήρες.
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: head
+    - id: cat-n
+      text: cat -n 5 data.csv
+      why: 'Το `cat -n` αριθμεί τις γραμμές· το `5` θεωρείται όνομα αρχείου: «cat: 5: No such file or directory».'
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: cat
+- id: head-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δείξε τις **3 πρώτες** γραμμές του `data.csv`.
+  explanation: Το `head -n 3 data.csv` δείχνει τις 3 πρώτες γραμμές — π.χ. για να δεις τις στήλες ενός CSV.
+  reference: head
+  commands:
+  - head
+  spec:
+    accepted:
+    - head -n 3 data.csv
+    known_mistakes:
+    - id: tail
+      match: tail -n 3 data.csv
+      feedback: Το `tail` δείχνει το *τέλος* του αρχείου.
+    - id: default
+      match: head data.csv
+      feedback: Χωρίς `-n` το head δείχνει 10 γραμμές.
+    - id: bytes
+      match: head -c 3 data.csv
+      feedback: Το `-c` μετράει bytes, όχι γραμμές.
+    test_cases:
+      accept:
+      - head -n 3 data.csv
+      - head -n3 data.csv
+      - head -3 data.csv
+      - head --lines=3 data.csv
+      - head data.csv -n 3
+      reject:
+      - tail -n 3 data.csv
+      - head data.csv
+      - head -c 3 data.csv
+      - head -n 30 data.csv
+      - head -n 3
+- id: tail-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δείξε τις **20 τελευταίες** γραμμές του `app.log`.
+  hints:
+  - Ποια εντολή δείχνει το τέλος ενός αρχείου;
+  - Ο αριθμός γραμμών αλλάζει με `-n`.
+  explanation: Το `tail -n 20 app.log` δείχνει τις 20 τελευταίες γραμμές.
+  reference: tail
+  commands:
+  - tail
+  spec:
+    accepted:
+    - tail -n 20 app.log
+    known_mistakes:
+    - id: head
+      match: head -n 20 app.log
+      feedback: Το `head` δείχνει την *αρχή* του αρχείου.
+    - id: default
+      match: tail app.log
+      feedback: Χωρίς `-n` το `tail` δείχνει 10 γραμμές, όχι 20.
+    test_cases:
+      accept:
+      - tail -n 20 app.log
+      - tail -n20 app.log
+      - tail --lines=20 app.log
+      - tail -20 app.log
+      - tail app.log -n 20
+      reject:
+      - head -n 20 app.log
+      - tail app.log
+      - tail -n 2 app.log
+      - tail -c 20 app.log
+      - tail -n 20
+- id: tail-follow
+  type: command_selection
+  cognitive_level: apply
+  prompt: Θέλεις να βλέπεις τις νέες γραμμές του `app.log` **καθώς γράφονται**, σε πραγματικό χρόνο. Ποια εντολή;
+  explanation: Το `tail -f` (*follow*) μένει ανοιχτό και τυπώνει κάθε νέα γραμμή. Το σταματάς με Ctrl+C.
+  reference: tail
+  commands:
+  - tail
+  - head
+  - cat
+  spec:
+    options:
+    - id: tail-f
+      text: tail -f app.log
+      correct: true
+    - id: head-f
+      text: head -f app.log
+      why: 'Το `head` δεν έχει follow mode: «head: invalid option -- ''f''».'
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: head
+    - id: cat-f
+      text: cat -f app.log
+      why: 'Το `cat` δεν έχει `-f`: «cat: invalid option -- ''f''».'
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: cat
+    - id: tail-n
+      text: tail -n app.log
+      why: 'Το `-n` περιμένει αριθμό: «tail: invalid number of lines: ''app.log''».'
+      distractor:
+        existence: exists
+        issue: wrong_syntax
+        command: tail
+- id: wc-output
+  type: output_analysis
+  prompt: Τι σημαίνει το **6** σε αυτό το output;
+  explanation: Χωρίς επιλογές το `wc` τυπώνει με τη σειρά γραμμές, λέξεις και bytes, και μετά το όνομα. Άρα 3 γραμμές,
+    6 λέξεις, 28 bytes.
+  reference: wc
+  commands:
+  - wc
+  spec:
+    command: wc notes.txt
+    output: ' 3  6 28 notes.txt'
+    captured_on: debian-13.7
+    options:
+    - id: words
+      text: Το αρχείο έχει 6 λέξεις.
+      correct: true
+    - id: lines
+      text: Το αρχείο έχει 6 γραμμές.
+      why: Οι γραμμές είναι ο πρώτος αριθμός (3).
+    - id: bytes
+      text: Το αρχείο έχει 6 bytes.
+      why: Τα bytes είναι ο τρίτος αριθμός (28).
+    - id: chars
+      text: Η πρώτη γραμμή έχει 6 χαρακτήρες.
+      why: Το `wc` μετράει ολόκληρο το αρχείο, όχι μία γραμμή.
+- id: wc-lines-fill
+  type: fill_in_command
+  prompt: Συμπλήρωσε ώστε το `wc` να μετρήσει **μόνο γραμμές**.
+  explanation: Το `wc -l` (*lines*) τυπώνει μόνο τον αριθμό γραμμών — η πιο συχνή χρήση του wc.
+  reference: wc
+  commands:
+  - wc
+  spec:
+    template: wc ____ access.log
+    blanks:
+    - accepted:
+      - -l
+      - --lines
+      known_mistakes:
+      - id: c
+        match: -c
+        feedback: Το `-c` μετράει bytes.
+      - id: w
+        match: -w
+        feedback: Το `-w` μετράει λέξεις.
+      - id: n
+        match: -n
+        feedback: Το `wc` δεν έχει `-n`· οι γραμμές μετριούνται με `-l`.
+- id: wc-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Μέτρησε **πόσες γραμμές** έχει το `access.log`.
+  explanation: Το `wc -l access.log` τυπώνει τον αριθμό γραμμών και το όνομα του αρχείου (π.χ. `1520 access.log`).
+  reference: wc
+  commands:
+  - wc
+  spec:
+    accepted:
+    - wc -l access.log
+    - cat access.log | wc -l
+    - wc -l < access.log
+    allow:
+    - pipe
+    - redirect
+    known_mistakes:
+    - id: words
+      match: wc -w access.log
+      feedback: Το `-w` μετράει λέξεις.
+    - id: plain
+      match: wc access.log
+      feedback: Χωρίς επιλογή τυπώνει γραμμές, λέξεις *και* bytes — η άσκηση ζητά μόνο γραμμές.
+    test_cases:
+      accept:
+      - wc -l access.log
+      - wc --lines access.log
+      - cat access.log | wc -l
+      - wc -l < access.log
+      reject:
+      - wc -w access.log
+      - wc access.log
+      - wc -c access.log
+      - wc -l
+      - grep -c access.log
+- id: cat-missing
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Τι πήγε στραβά;
+  explanation: Δεν υπάρχει αρχείο με αυτό το όνομα στον τρέχοντα φάκελο. Έλεγξε με `ls` το όνομα (κεφαλαία/πεζά
+    μετράνε!) και με `pwd` πού βρίσκεσαι.
+  reference: cat
+  commands:
+  - cat
+  spec:
+    command: cat report.txt
+    output: 'cat: report.txt: No such file or directory'
+    captured_on: debian-13.7
+    options:
+    - id: missing
+      text: Δεν υπάρχει report.txt στον φάκελο όπου βρίσκομαι (ή το όνομα είναι λάθος).
+      correct: true
+    - id: empty
+      text: Το αρχείο είναι κενό.
+      why: Ένα κενό αρχείο απλώς δεν τυπώνει τίποτα — χωρίς σφάλμα.
+    - id: perm
+      text: Δεν έχω δικαίωμα ανάγνωσης.
+      why: Τότε θα έβλεπες «Permission denied».
+    - id: txt
+      text: Το cat δεν διαβάζει αρχεία .txt.
+      why: Το `cat` διαβάζει οποιοδήποτε αρχείο· στο Linux η κατάληξη δεν παίζει ρόλο.
+- id: cat-big-file
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Το `server.log` έχει 2 GB. Γιατί το `cat server.log` είναι κακή ιδέα;
+  explanation: Θα τυπώσει εκατομμύρια γραμμές στο τερματικό. Για μεγάλα αρχεία χρησιμοποίησε `tail`, `head`, `grep`
+    ή έναν pager όπως το `less`.
+  reference: cat
+  commands:
+  - cat
+  - tail
+  spec:
+    options:
+    - id: flood
+      text: Θα πλημμυρίσει το τερματικό με εκατομμύρια γραμμές που δεν μπορείς να διαβάσεις.
+      correct: true
+    - id: limit
+      text: Το cat δεν μπορεί να ανοίξει αρχεία πάνω από 2 GB.
+      why: Το `cat` δεν έχει τέτοιο όριο.
+    - id: modify
+      text: Θα αλλάξει το αρχείο.
+      why: Το `cat` μόνο διαβάζει.
+    - id: delete
+      text: Θα διαγράψει τις παλιές γραμμές.
+      why: Το `cat` δεν αλλάζει ποτέ το αρχείο που διαβάζει.
+- id: cat-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Τύπωσε ολόκληρο το περιεχόμενο του αρχείου `/etc/hostname` με την εντολή που τυπώνει αρχεία.
+  explanation: Το `cat /etc/hostname` τυπώνει το αρχείο — στο Debian περιέχει το όνομα του μηχανήματος.
+  reference: cat
+  commands:
+  - cat
+  spec:
+    accepted:
+    - cat /etc/hostname
+    known_mistakes:
+    - id: relative
+      match: cat etc/hostname
+      feedback: Χωρίς `/` στην αρχή ψάχνει φάκελο `etc` μέσα στον τρέχοντα φάκελο.
+    test_cases:
+      accept:
+      - cat /etc/hostname
+      - cat '/etc/hostname'
+      reject:
+      - cat etc/hostname
+      - cat /etc/hostnames
+      - cd /etc/hostname
+      - cat /etc /hostname

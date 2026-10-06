@@ -1,0 +1,14 @@
+id: kubernetes
+title: Kubernetes
+biome: helm-citadel
+order: 3
+summary: Pods, Deployments, Services — πώς τρέχουν εφαρμογές σε cluster.
+skills:
+  - id: k8s.concepts
+    title: Βασικές έννοιες Kubernetes
+  - id: k8s.kubectl
+    title: Χρήση kubectl
+    requires: [k8s.concepts]
+  - id: k8s.troubleshooting
+    title: Troubleshooting Pods
+    requires: [k8s.kubectl]

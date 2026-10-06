@@ -1,0 +1,47 @@
+name: linux-learning
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-linuxlearn}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-linuxlearn}
+      POSTGRES_DB: ${POSTGRES_DB:-linuxlearn}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/docker/api.Dockerfile
+      target: dev
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      APP_SECRET_KEY: ${APP_SECRET_KEY:-dev-only-secret-key-change-me}
+      APP_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-linuxlearn}:${POSTGRES_PASSWORD:-linuxlearn}@db:5432/${POSTGRES_DB:-linuxlearn}
+      APP_CONTENT_DIR: /content
+    volumes:
+      - ../backend:/app/backend
+      - ../content:/content:ro
+    depends_on:
+      db:
+        condition: service_healthy
+    # Not published: only reachable through the proxy.
+    expose: ["8000"]
+
+  proxy:
+    image: caddy:2-alpine
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../frontend:/srv:ro
+    depends_on: [api]
+
+volumes:
+  db-data:

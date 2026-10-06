@@ -1,0 +1,85 @@
+# Authoritative documentation sources. Citations must point to one of these domains.
+- id: gnu-coreutils
+  name: GNU Coreutils Manual
+  publisher: GNU Project
+  kind: official_manual
+  url: https://www.gnu.org/software/coreutils/manual/
+  allowed_domains: [gnu.org]
+- id: gnu-bash
+  name: GNU Bash Reference Manual
+  publisher: GNU Project
+  kind: official_manual
+  url: https://www.gnu.org/software/bash/manual/
+  allowed_domains: [gnu.org]
+- id: posix
+  name: POSIX.1 (The Open Group Base Specifications)
+  publisher: The Open Group / IEEE
+  kind: standard
+  url: https://pubs.opengroup.org/onlinepubs/9799919799/
+  allowed_domains: [pubs.opengroup.org]
+- id: man-pages
+  name: Linux man-pages project
+  publisher: man-pages project
+  kind: man_page
+  url: https://man7.org/linux/man-pages/
+  allowed_domains: [man7.org]
+- id: debian-manpages
+  name: Debian manpages
+  publisher: Debian Project
+  kind: man_page
+  url: https://manpages.debian.org/
+  allowed_domains: [manpages.debian.org]
+- id: kernel-docs
+  name: The Linux Kernel documentation
+  publisher: The kernel development community
+  kind: project_docs
+  url: https://docs.kernel.org/
+  allowed_domains: [docs.kernel.org]
+- id: gnu-grep
+  name: GNU grep Manual
+  publisher: GNU Project
+  kind: official_manual
+  url: https://www.gnu.org/software/grep/manual/
+  allowed_domains: [gnu.org]
+- id: docker-docs
+  name: Docker Docs
+  publisher: Docker Inc.
+  kind: official_manual
+  url: https://docs.docker.com/
+  allowed_domains: [docs.docker.com]
+- id: kubernetes-docs
+  name: Kubernetes Documentation
+  publisher: The Kubernetes Authors
+  kind: official_manual
+  url: https://kubernetes.io/docs/
+  allowed_domains: [kubernetes.io]
+- id: nist
+  name: NIST Computer Security Resource Center
+  publisher: National Institute of Standards and Technology
+  kind: standard
+  url: https://csrc.nist.gov/
+  allowed_domains: [csrc.nist.gov]
+- id: aws-docs
+  name: AWS Documentation
+  publisher: Amazon Web Services
+  kind: official_manual
+  url: https://docs.aws.amazon.com/
+  allowed_domains: [docs.aws.amazon.com, aws.amazon.com]
+- id: azure-docs
+  name: Microsoft Learn (Azure)
+  publisher: Microsoft
+  kind: official_manual
+  url: https://learn.microsoft.com/azure/
+  allowed_domains: [learn.microsoft.com]
+- id: gcp-docs
+  name: Google Cloud Documentation
+  publisher: Google
+  kind: official_manual
+  url: https://cloud.google.com/docs
+  allowed_domains: [cloud.google.com]
+- id: terraform-docs
+  name: Terraform Documentation
+  publisher: HashiCorp
+  kind: official_manual
+  url: https://developer.hashicorp.com/terraform
+  allowed_domains: [developer.hashicorp.com]

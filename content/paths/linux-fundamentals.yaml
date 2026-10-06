@@ -1,0 +1,6 @@
+id: linux-fundamentals
+title: Linux Fundamentals
+description: Από το πρώτο σου shell μέχρι τη διαχείριση αρχείων, δικαιωμάτων και διεργασιών.
+order: 1
+modules:
+  - linux.files

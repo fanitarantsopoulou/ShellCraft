@@ -1,0 +1,202 @@
+id: docker.q02
+track: docker
+title: Τρέχοντας containers
+description: run, ports, logs, exec, stop, rm — και τα πιο συνηθισμένα σφάλματα.
+level: beginner
+order: 2
+skills: [docker.containers]
+questions:
+  - id: run-web-write
+    type: command_writing
+    cognitive_level: apply
+    prompt: "Τρέξε το image `nginx` **στο παρασκήνιο**, με όνομα container `web`, ώστε η θύρα **8080** του υπολογιστή σου να οδηγεί στη θύρα **80** του container."
+    hints:
+      - "Χρειάζεσαι τρεις επιλογές: παρασκήνιο, θύρα, όνομα."
+      - "Η θύρα δίνεται ως HOST:CONTAINER."
+    explanation: "`docker run -d -p 8080:80 --name web nginx`. Οι επιλογές μπαίνουν **πριν** το image· ό,τι γράψεις μετά το image περνάει στο container."
+    reference: docker-container-run
+    spec:
+      accepted: ["docker run -d -p 8080:80 --name web nginx"]
+      known_mistakes:
+        - { id: "reversed-port", match: "docker run -d -p 80:8080 --name web nginx", feedback: "Η σειρά είναι HOST:CONTAINER — εδώ θέλεις 8080 (host) προς 80 (container)." }
+        - { id: "flags-after-image", match: "docker run nginx -d -p 8080:80 --name web", feedback: "Μετά το image, οι επιλογές περνούν στο container ως ορίσματα — το docker δεν τις βλέπει." }
+        - { id: "no-name", match: "docker run -d -p 8080:80 nginx", feedback: "Λείπει το όνομα `--name web` — το Docker θα έδινε τυχαίο όνομα." }
+        - { id: "no-d", match: "docker run -p 8080:80 --name web nginx", feedback: "Χωρίς `-d` το container τρέχει στο προσκήνιο και κρατά το τερματικό σου." }
+      test_cases:
+        accept:
+          - "docker run -d -p 8080:80 --name web nginx"
+          - "docker container run -d -p 8080:80 --name web nginx"
+          - "docker run --name web -d -p 8080:80 nginx"
+          - "docker run --name=web --detach --publish 8080:80 nginx"
+          - "docker run -dp 8080:80 --name web nginx"
+          - "docker run -p=8080:80 -d --name web nginx"
+        reject:
+          - "docker run -d -p 80:8080 --name web nginx"
+          - "docker run nginx -d -p 8080:80 --name web"
+          - "docker run -d -p 8080:80 nginx"
+          - "docker run -p 8080:80 --name web nginx"
+          - "docker start -d -p 8080:80 --name web nginx"
+          - "docker run -d -p 8080:80 --name web nginx:alpine"
+
+  - id: port-meaning
+    type: multiple_choice
+    prompt: "Τι σημαίνει το `-p 8080:80` στο `docker run`;"
+    explanation: "Η μορφή είναι `HOST:CONTAINER`. Ό,τι φτάνει στη θύρα 8080 του host προωθείται στη θύρα 80 μέσα στο container."
+    reference: docker-container-run
+    citations:
+      - { source: "docker-docs", url: "https://docs.docker.com/engine/network/port-publishing/", doc_version: "Docker docs 2026", last_verified: 2026-10-06 }
+    spec:
+      options:
+        - { id: "host-container", text: "Θύρα 8080 του host → θύρα 80 του container.", correct: true }
+        - { id: "reverse", text: "Θύρα 8080 του container → θύρα 80 του host.", why: "Ο host γράφεται πρώτος." }
+        - { id: "range", text: "Ανοίγει όλες τις θύρες από 80 έως 8080.", why: "Το `:` χωρίζει host και container, δεν δηλώνει εύρος." }
+        - { id: "proxy", text: "Το container θα γίνει proxy στη θύρα 8080 του internet.", why: "Το publish αφορά μόνο θύρες του host σου." }
+
+  - id: ps-output
+    type: output_analysis
+    prompt: "Σε ποια διεύθυνση ανοίγεις τη σελίδα του nginx από τον browser σου;"
+    explanation: "Η στήλη PORTS λέει `0.0.0.0:18080->80/tcp`: η θύρα 18080 του host οδηγεί στη 80 του container. Άρα http://localhost:18080."
+    reference: docker-container-ls
+    spec:
+      command: docker ps
+      output: |-
+        CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                  PORTS                                       NAMES
+        310bd9760abc   nginx:alpine   "/docker-entrypoint.…"   1 second ago   Up Less than a second   0.0.0.0:18080->80/tcp, [::]:18080->80/tcp   llquiz-web
+      captured_on: docker-29.5.2
+      options:
+        - { id: "18080", text: "http://localhost:18080", correct: true }
+        - { id: "80", text: "http://localhost:80", why: "Η 80 είναι η θύρα *μέσα* στο container· στον host έχει δημοσιευτεί η 18080." }
+        - { id: "id", text: "http://310bd9760abc", why: "Το CONTAINER ID δεν είναι διεύθυνση που ανοίγει ο browser σου." }
+        - { id: "zero", text: "http://0.0.0.0", why: "Το 0.0.0.0 σημαίνει «σε όλα τα interfaces του host» — χωρίς θύρα πας στη 80, όπου δεν ακούει τίποτα." }
+
+  - id: name-conflict
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: Τι σημαίνει αυτό το σφάλμα;
+    explanation: "Υπάρχει ήδη container με αυτό το όνομα — ίσως σταματημένο (φαίνεται με `docker ps -a`). Διάγραψέ το (`docker rm web`) ή δώσε άλλο όνομα."
+    reference: docker-container-run
+    spec:
+      command: docker run -d --name web nginx:alpine
+      output: |-
+        docker: Error response from daemon: Conflict. The container name "/web" is already in use by container "310bd9760abce0b8fa055e4d5ae6470614d05f40518312c68d302fa232613992". You have to remove (or rename) that container to be able to reuse that name.
+      captured_on: docker-29.5.2
+      options:
+        - { id: "exists", text: "Υπάρχει ήδη container με όνομα web (ίσως σταματημένο).", correct: true }
+        - { id: "image", text: "Το image nginx:alpine χρησιμοποιείται ήδη.", why: "Ένα image μπορεί να το χρησιμοποιούν όσα containers θέλεις." }
+        - { id: "port", text: "Η θύρα του web είναι πιασμένη.", why: "Το μήνυμα μιλά για το *όνομα* (container name), όχι για θύρα." }
+        - { id: "slash", text: "Το όνομα δεν πρέπει να ξεκινά με /.", why: "Η κάθετος είναι εσωτερική αναπαράσταση του Docker· εσύ έγραψες απλώς «web»." }
+
+  - id: port-allocated
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: Το δεύτερο container δεν ξεκίνησε. Γιατί;
+    explanation: "Η θύρα 18081 του host είναι ήδη δεσμευμένη (από άλλο container ή πρόγραμμα). Κάθε θύρα του host μπορεί να τη χρησιμοποιεί μόνο ένας. Διάλεξε άλλη θύρα host, π.χ. `-p 18082:80`."
+    reference: docker-container-run
+    spec:
+      command: docker run -d --name web2 -p 18081:80 nginx:alpine
+      output: |-
+        docker: Error response from daemon: failed to set up container networking: driver failed programming external connectivity on endpoint web2 (eaf42b1336ddb13f1ca14ed320b39f237f96448741f0b41a655ecea6de86304d): Bind for 0.0.0.0:18081 failed: port is already allocated
+      captured_on: docker-29.5.2
+      options:
+        - { id: "host-port", text: "Η θύρα 18081 του host χρησιμοποιείται ήδη.", correct: true }
+        - { id: "container-port", text: "Η θύρα 80 μέσα στο container είναι πιασμένη.", why: "Κάθε container έχει δικό του δίκτυο· πολλά containers μπορούν να ακούν στη δική τους 80." }
+        - { id: "internet", text: "Δεν υπάρχει σύνδεση στο internet.", why: "Το image υπήρχε ήδη· το σφάλμα είναι στο «Bind for 0.0.0.0:18081»." }
+        - { id: "name", text: "Το όνομα web2 υπάρχει ήδη.", why: "Τότε θα έβλεπες «Conflict. The container name … is already in use»." }
+
+  - id: logs-write
+    type: command_writing
+    cognitive_level: apply
+    prompt: "Δείξε την έξοδο (logs) του container `web` και **συνέχισε να βλέπεις** τις νέες γραμμές καθώς έρχονται."
+    explanation: "Το `docker logs -f web` δείχνει τα logs και τα ακολουθεί (follow), όπως το `tail -f`."
+    reference: docker-container-logs
+    spec:
+      accepted: ["docker logs -f web"]
+      known_mistakes:
+        - { id: "no-f", match: "docker logs web", feedback: "Αυτό δείχνει τα logs μέχρι τώρα και τερματίζει — χρειάζεται `-f` για να συνεχίσει." }
+      test_cases:
+        accept: ["docker logs -f web", "docker container logs -f web", "docker logs --follow web", "docker logs web -f"]
+        reject: ["docker logs web", "docker logs -t web", "docker log -f web", "tail -f web", "docker logs -f nginx"]
+
+  - id: exec-write
+    type: command_writing
+    cognitive_level: apply
+    prompt: "Άνοιξε ένα **διαδραστικό shell** (`sh`) μέσα στο container `web` που ήδη τρέχει."
+    hints:
+      - "Για υπάρχον container δεν χρησιμοποιείς run."
+      - "Για διαδραστικό τερματικό χρειάζεσαι -i και -t."
+    explanation: "`docker exec -it web sh`: το `exec` τρέχει εντολή σε υπάρχον container, το `-i` κρατά ανοιχτό το stdin και το `-t` δίνει τερματικό."
+    reference: docker-container-exec
+    spec:
+      accepted: ["docker exec -it web sh", "docker exec -it web /bin/sh"]
+      known_mistakes:
+        - { id: "run", match: "docker run -it web sh", feedback: "Το `run` θα προσπαθούσε να φτιάξει *νέο* container από image με όνομα «web»." }
+        - { id: "no-it", match: "docker exec web sh", feedback: "Χωρίς `-it` το sh δεν έχει είσοδο από το πληκτρολόγιο και τερματίζει αμέσως." }
+      test_cases:
+        accept: ["docker exec -it web sh", "docker exec -ti web sh", "docker exec -i -t web sh", "docker container exec -it web sh", "docker exec --interactive --tty web /bin/sh"]
+        reject: ["docker run -it web sh", "docker exec web sh", "docker exec -it sh web", "docker exec -it web", "docker attach web"]
+
+  - id: ps-a
+    type: multiple_choice
+    prompt: Ένα container κρασάρισε και δεν φαίνεται στο `docker ps`. Πώς το βλέπεις;
+    explanation: "Το `docker ps` δείχνει μόνο όσα τρέχουν. Το `docker ps -a` δείχνει και τα σταματημένα, π.χ. με STATUS «Exited (1) 2 minutes ago»."
+    reference: docker-container-ls
+    spec:
+      options:
+        - { id: "a", text: "docker ps -a", correct: true }
+        - { id: "images", text: "docker images", why: "Δείχνει images, όχι containers." }
+        - { id: "deleted", text: "Δεν γίνεται — όταν κρασάρει διαγράφεται αυτόματα.", why: "Μένει σε κατάσταση Exited, εκτός αν το ξεκίνησες με `--rm`." }
+        - { id: "logs", text: "docker logs --all", why: "Το `docker logs` θέλει συγκεκριμένο container· δεν τα απαριθμεί." }
+
+  - id: rm-running
+    type: output_analysis
+    cognitive_level: troubleshoot
+    prompt: Τι πρέπει να κάνεις;
+    explanation: "Ένα container που τρέχει δεν διαγράφεται. Σταμάτησέ το πρώτα (`docker stop web`) και μετά `docker rm web` — ή χρησιμοποίησε `docker rm -f web` αν το εννοείς."
+    reference: docker-container-rm
+    spec:
+      command: docker rm web
+      output: |-
+        Error response from daemon: cannot remove container "web": container is running: stop the container before removing or force remove
+      captured_on: docker-29.5.2
+      options:
+        - { id: "stop", text: "Να το σταματήσεις πρώτα (docker stop) ή να κάνεις force remove.", correct: true }
+        - { id: "sudo", text: "Να το τρέξεις με sudo.", why: "Δεν είναι θέμα δικαιωμάτων· το μήνυμα λέει ότι το container τρέχει." }
+        - { id: "rmi", text: "Να χρησιμοποιήσεις docker rmi.", why: "Το `rmi` διαγράφει images, όχι containers." }
+        - { id: "wait", text: "Να περιμένεις — θα διαγραφεί μόνο του.", why: "Ένα container δεν διαγράφεται μόνο του, εκτός αν ξεκίνησε με `--rm` και τερματίσει." }
+
+  - id: cleanup-order
+    type: ordering
+    cognitive_level: scenario
+    prompt: Θέλεις να διαγράψεις σωστά το container `web` που τρέχει. Βάλε τα βήματα σε σειρά.
+    explanation: "Βρίσκεις το container, το σταματάς, το διαγράφεις και επιβεβαιώνεις με `docker ps -a` ότι δεν υπάρχει πια."
+    spec:
+      steps:
+        - { id: "find", text: "docker ps" }
+        - { id: "stop", text: "docker stop web" }
+        - { id: "rm", text: "docker rm web" }
+        - { id: "verify", text: "docker ps -a" }
+
+  - id: rm-flag
+    type: multiple_choice
+    prompt: "Τι κάνει το `--rm` στο `docker run --rm alpine:3 echo bye`;"
+    explanation: "Με `--rm` το container διαγράφεται αυτόματα μόλις τερματίσει — ιδανικό για εντολές μίας χρήσης. Χωρίς αυτό θα έμενε στο `docker ps -a` ως Exited."
+    reference: docker-container-run
+    spec:
+      options:
+        - { id: "auto", text: "Διαγράφει αυτόματα το container όταν τερματίσει.", correct: true }
+        - { id: "image", text: "Διαγράφει το image μετά την εκτέλεση.", why: "Το image μένει· διαγράφεται μόνο το container." }
+        - { id: "readonly", text: "Τρέχει το container read-only.", why: "Αυτό είναι το `--read-only`." }
+        - { id: "remove-old", text: "Διαγράφει πρώτα παλιά containers με το ίδιο image.", why: "Δεν αγγίζει άλλα containers." }
+
+  - id: no-it
+    type: multiple_choice
+    cognitive_level: troubleshoot
+    prompt: Τρέχεις `docker run --rm alpine:3 sh` και επιστρέφεις αμέσως στο τερματικό σου, χωρίς shell. Γιατί;
+    explanation: "Χωρίς `-i` το stdin του container είναι κλειστό, οπότε το `sh` δεν έχει από πού να διαβάσει εντολές και τερματίζει αμέσως (exit 0). Για διαδραστικό shell: `docker run -it --rm alpine:3 sh`."
+    reference: docker-container-run
+    spec:
+      options:
+        - { id: "stdin", text: "Χωρίς -it το shell δεν έχει είσοδο και τερματίζει αμέσως.", correct: true }
+        - { id: "no-sh", text: "Το alpine δεν έχει sh.", why: "Το alpine έχει `sh` (BusyBox)· το `-it` λείπει." }
+        - { id: "crash", text: "Το container κρασάρισε.", why: "Τερμάτισε κανονικά με κωδικό 0." }
+        - { id: "rm", text: "Το --rm το σκότωσε.", why: "Το `--rm` διαγράφει το container *αφού* τερματίσει· δεν το τερματίζει." }

@@ -1,0 +1,342 @@
+id: linux.q06
+track: linux
+title: Δικαιώματα αρχείων
+description: Διάβασε τα rwx, κατάλαβε το «Permission denied» και άλλαξε δικαιώματα με chmod.
+level: intermediate
+order: 6
+skills:
+- linux.perms
+questions:
+- id: ls-l-type
+  type: output_analysis
+  prompt: Τι σημαίνει ο **πρώτος** χαρακτήρας (`-` και `d`) σε κάθε γραμμή;
+  explanation: Ο πρώτος χαρακτήρας δείχνει τον τύπο. `-` = κανονικό αρχείο, `d` = φάκελος (*directory*), `l` = symbolic
+    link.
+  reference: ls
+  commands:
+  - ls
+  spec:
+    command: ls -l
+    output: 'total 8
+
+      -rw-r--r-- 1 maria maria    6 Oct  6 17:22 a.txt
+
+      drwxr-xr-x 2 maria maria 4096 Oct  6 17:22 sub'
+    captured_on: debian-13.7
+    options:
+    - id: type
+      text: 'Τον τύπο: - είναι αρχείο, d είναι φάκελος.'
+      correct: true
+    - id: deleted
+      text: Το - σημαίνει ότι το αρχείο έχει διαγραφεί.
+      why: Τα διαγραμμένα αρχεία δεν εμφανίζονται καθόλου στο ls.
+    - id: perm
+      text: Αν ο ιδιοκτήτης μπορεί να το διαβάσει.
+      why: Τα δικαιώματα ξεκινούν από τον 2ο χαρακτήρα (rwx για τον ιδιοκτήτη).
+    - id: disk
+      text: Σε ποιον δίσκο βρίσκεται.
+      why: Το ls -l δεν δείχνει δίσκο· ο πρώτος χαρακτήρας είναι ο τύπος.
+- id: rwx-groups
+  type: multiple_choice
+  prompt: Στο `-rw-r-----`, ποιος μπορεί να **διαβάσει** το αρχείο;
+  explanation: 'Μετά τον τύπο ακολουθούν τρεις τριάδες: ιδιοκτήτης (`rw-`), ομάδα (`r--`), όλοι οι άλλοι (`---`).
+    Άρα διαβάζουν ο ιδιοκτήτης και η ομάδα.'
+  spec:
+    options:
+    - id: owner-group
+      text: Ο ιδιοκτήτης και τα μέλη της ομάδας του αρχείου.
+      correct: true
+    - id: owner
+      text: Μόνο ο ιδιοκτήτης.
+      why: Η δεύτερη τριάδα (`r--`) δίνει ανάγνωση και στην ομάδα.
+    - id: all
+      text: Όλοι οι χρήστες.
+      why: Η τρίτη τριάδα είναι `---` — οι υπόλοιποι δεν έχουν κανένα δικαίωμα.
+    - id: nobody
+      text: Κανείς, μόνο ο root.
+      why: Ο ιδιοκτήτης έχει `rw-`· μπορεί να διαβάσει και να γράψει.
+- id: rw-r-octal
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Ποιος αριθμός αντιστοιχεί στο `rw-r-----`;
+  explanation: r=4, w=2, x=1. Ιδιοκτήτης rw- = 4+2 = 6, ομάδα r-- = 4, άλλοι --- = 0. Άρα 640.
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    options:
+    - id: '640'
+      text: '640'
+      correct: true
+    - id: '644'
+      text: '644'
+      why: Το 644 είναι `rw-r--r--` — οι άλλοι θα μπορούσαν να διαβάσουν.
+    - id: '755'
+      text: '755'
+      why: Το 755 είναι `rwxr-xr-x` — περιέχει και εκτέλεση.
+    - id: '460'
+      text: '460'
+      why: 'Η σειρά είναι ιδιοκτήτης-ομάδα-άλλοι: 6, 4, 0.'
+- id: chmod-755
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Τι δικαιώματα θα έχει το `deploy.sh` μετά το `chmod 755 deploy.sh`;
+  explanation: '7 = rwx (4+2+1), 5 = r-x (4+1). Άρα `-rwxr-xr-x`: ο ιδιοκτήτης κάνει τα πάντα, οι υπόλοιποι διαβάζουν
+    και εκτελούν.'
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    options:
+    - id: o755
+      text: -rwxr-xr-x
+      correct: true
+    - id: o777
+      text: -rwxrwxrwx
+      why: Αυτό είναι το 777.
+    - id: o644
+      text: -rw-r--r--
+      why: Αυτό είναι το 644 — χωρίς εκτέλεση.
+    - id: o555
+      text: -r-xr-xr-x
+      why: Αυτό είναι το 555 — ο ιδιοκτήτης δεν θα μπορούσε να γράψει.
+- id: chmod-ux-fill
+  type: fill_in_command
+  cognitive_level: apply
+  prompt: Δώσε δικαίωμα **εκτέλεσης μόνο στον ιδιοκτήτη**, χωρίς να αλλάξει τίποτα άλλο.
+  explanation: 'Στη συμβολική μορφή: `u` = ιδιοκτήτης (*user*), `+` = πρόσθεσε, `x` = εκτέλεση. Άρα `chmod u+x`.'
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    template: chmod ____ deploy.sh
+    blanks:
+    - accepted:
+      - u+x
+      known_mistakes:
+      - id: plus-x
+        match: +x
+        feedback: Το `+x` δίνει εκτέλεση σε όλους (όσο επιτρέπει το umask — στο Debian ιδιοκτήτη, ομάδα και άλλους).
+      - id: '777'
+        match: '777'
+        feedback: Το 777 δίνει τα πάντα σε όλους — και αλλάζει και τα υπόλοιπα δικαιώματα.
+      - id: o
+        match: o+x
+        feedback: Το `o` είναι οι *άλλοι* (others), όχι ο ιδιοκτήτης (owner = `u`).
+- id: chmod-ux-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Κάνε το `deploy.sh` **εκτελέσιμο μόνο για τον ιδιοκτήτη**, χωρίς να αλλάξει τίποτα άλλο.
+  explanation: Το `chmod u+x deploy.sh` προσθέτει μόνο το x στον ιδιοκτήτη (u). Τα υπόλοιπα δικαιώματα μένουν όπως
+    ήταν.
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    accepted:
+    - chmod u+x deploy.sh
+    known_mistakes:
+    - id: plus-x
+      match: chmod +x deploy.sh
+      feedback: Το `+x` δίνει εκτέλεση σε όλους (όσο επιτρέπει το umask), όχι μόνο στον ιδιοκτήτη.
+    - id: '777'
+      match: chmod 777 deploy.sh
+      feedback: Το 777 αλλάζει *όλα* τα δικαιώματα και δίνει τα πάντα σε όλους.
+    test_cases:
+      accept:
+      - chmod u+x deploy.sh
+      - chmod u+x ./deploy.sh
+      reject:
+      - chmod +x deploy.sh
+      - chmod 777 deploy.sh
+      - chmod o+x deploy.sh
+      - chmod u+x
+      - chmod x deploy.sh
+- id: script-denied
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Έγραψες ένα script και προσπαθείς να το τρέξεις. Τι λείπει;
+  explanation: Για να τρέξει ένα αρχείο ως πρόγραμμα χρειάζεται δικαίωμα εκτέλεσης (`x`). Μετά το `chmod u+x run.sh`
+    το `./run.sh` δουλεύει.
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    command: ./run.sh
+    output: 'bash: ./run.sh: Permission denied'
+    captured_on: debian-13.7
+    options:
+    - id: x
+      text: Το αρχείο δεν έχει δικαίωμα εκτέλεσης (x).
+      correct: true
+    - id: sudo
+      text: Τα scripts τρέχουν μόνο με sudo.
+      why: Τα scripts τρέχουν κανονικά ως απλός χρήστης — αρκεί το δικαίωμα x.
+    - id: missing
+      text: Το αρχείο δεν υπάρχει.
+      why: Τότε το μήνυμα θα ήταν «No such file or directory».
+    - id: syntax
+      text: Υπάρχει συντακτικό λάθος στο script.
+      why: Το script δεν ξεκίνησε καν — το shell αρνήθηκε να το εκτελέσει.
+- id: chmod-600-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Κάνε το `secrets.txt` να μπορεί να το διαβάσει και να το γράψει **μόνο ο ιδιοκτήτης** (κανείς άλλος τίποτα).
+  hints:
+  - Ιδιοκτήτης rw- = 6, ομάδα --- = 0, άλλοι --- = 0.
+  explanation: 'Το `chmod 600 secrets.txt` δίνει `-rw-------`. Ισοδύναμα: `chmod u=rw,go= secrets.txt`.'
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    accepted:
+    - chmod 600 secrets.txt
+    - chmod 0600 secrets.txt
+    - chmod u=rw,go= secrets.txt
+    known_mistakes:
+    - id: '644'
+      match: chmod 644 secrets.txt
+      feedback: Το 644 αφήνει ομάδα και άλλους να διαβάζουν (`rw-r--r--`).
+    - id: '700'
+      match: chmod 700 secrets.txt
+      feedback: Το 700 δίνει και εκτέλεση στον ιδιοκτήτη — δεν χρειάζεται για ένα αρχείο κειμένου.
+    - id: swapped
+      match: chmod secrets.txt 600
+      feedback: Πρώτα το mode, μετά το αρχείο.
+    test_cases:
+      accept:
+      - chmod 600 secrets.txt
+      - chmod 0600 secrets.txt
+      - chmod u=rw,go= secrets.txt
+      - chmod 600 ./secrets.txt
+      reject:
+      - chmod 644 secrets.txt
+      - chmod 700 secrets.txt
+      - chmod secrets.txt 600
+      - chmod 600
+      - chmod 060 secrets.txt
+      - chown 600 secrets.txt
+- id: dir-x
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Τι επιτρέπει το δικαίωμα `x` σε έναν **φάκελο**;
+  explanation: 'Σε φάκελο, το `x` επιτρέπει να μπεις (`cd`) και να φτάσεις στα αρχεία του αν ξέρεις το όνομά τους.
+    Το `r` επιτρέπει να δεις τη λίστα (`ls`). Στο Debian, χωρίς `x` το `cd` αποτυγχάνει· με `x` αλλά χωρίς `r` μπορείς
+    να διαβάσεις γνωστό αρχείο, αλλά το `ls` βγάζει «Permission denied».
+
+    '
+  spec:
+    options:
+    - id: enter
+      text: Να μπεις στον φάκελο (cd) και να φτάσεις στα αρχεία του.
+      correct: true
+    - id: run
+      text: Να εκτελείς όλα τα αρχεία που περιέχει.
+      why: Η εκτέλεση ενός αρχείου εξαρτάται από το `x` του ίδιου του αρχείου.
+    - id: list
+      text: Να βλέπεις τη λίστα των αρχείων με ls.
+      why: Τη λίστα την ελέγχει το `r` του φακέλου.
+    - id: delete
+      text: Να διαγράψεις τον φάκελο.
+      why: Η διαγραφή αρχείων μέσα σε φάκελο απαιτεί `w` (και `x`) στον φάκελο.
+- id: ls-ld-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δείξε τα δικαιώματα του **ίδιου του φακέλου** `logs` (όχι των αρχείων μέσα του), σε αναλυτική μορφή.
+  hints:
+  - Το ls έχει επιλογή που δείχνει τον φάκελο αντί για το περιεχόμενό του.
+  explanation: Το `ls -ld logs` συνδυάζει `-l` (αναλυτικά) με `-d` (τον ίδιο τον φάκελο, όχι τα περιεχόμενα).
+  reference: ls
+  commands:
+  - ls
+  spec:
+    accepted:
+    - ls -ld logs
+    - ls -ld logs/
+    known_mistakes:
+    - id: no-d
+      match: ls -l logs
+      feedback: Αυτό δείχνει τα αρχεία *μέσα* στο logs. Για τον ίδιο τον φάκελο χρειάζεται και `-d`.
+    test_cases:
+      accept:
+      - ls -ld logs
+      - ls -dl logs
+      - ls -l -d logs
+      - ls -ld logs/
+      - ls --directory -l logs
+      reject:
+      - ls -l logs
+      - ls -d logs
+      - ls -la logs
+      - ls -ld
+- id: chmod-777
+  type: multiple_choice
+  prompt: Ένα πρόγραμμα δεν μπορεί να γράψει σε έναν φάκελο και κάποιος προτείνει «βάλε `chmod 777`». Γιατί είναι
+    κακή ιδέα;
+  explanation: Το 777 δίνει σε **κάθε** χρήστη του συστήματος δικαίωμα να διαβάσει, να αλλάξει και να διαγράψει.
+    Η σωστή λύση είναι να δώσεις μόνο το δικαίωμα που λείπει, μόνο σε όποιον το χρειάζεται (π.χ. αλλαγή ιδιοκτήτη
+    ή ομάδας).
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    options:
+    - id: everyone
+      text: Δίνει σε όλους τους χρήστες δικαίωμα να αλλάξουν ή να διαγράψουν τα πάντα εκεί.
+      correct: true
+    - id: slow
+      text: Κάνει τον φάκελο πιο αργό.
+      why: Τα δικαιώματα δεν επηρεάζουν την ταχύτητα.
+    - id: invalid
+      text: Το 777 δεν είναι έγκυρο mode.
+      why: Είναι έγκυρο (`rwxrwxrwx`) — απλώς επικίνδυνο.
+    - id: root
+      text: Μόνο ο root μπορεί να τρέξει chmod 777.
+      why: Ο ιδιοκτήτης ενός αρχείου μπορεί να αλλάξει τα δικαιώματά του, χωρίς root.
+- id: denied-read
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Η χρήστρια maria τρέχει την παρακάτω εντολή. Τι σημαίνει το μήνυμα;
+  explanation: Το αρχείο υπάρχει, αλλά τα δικαιώματά του (εδώ `-rw-------` με ιδιοκτήτη τον root) δεν επιτρέπουν
+    στη maria να το διαβάσει.
+  reference: cat
+  commands:
+  - cat
+  spec:
+    command: cat /root/secret.txt
+    output: 'cat: /root/secret.txt: Permission denied'
+    captured_on: debian-13.7
+    options:
+    - id: perm
+      text: Η maria δεν έχει δικαίωμα ανάγνωσης για αυτό το αρχείο.
+      correct: true
+    - id: missing
+      text: Το αρχείο δεν υπάρχει.
+      why: Τότε θα έβλεπες «No such file or directory».
+    - id: locked
+      text: Το αρχείο είναι ανοιχτό από άλλο πρόγραμμα.
+      why: Στο Linux ένα ανοιχτό αρχείο συνήθως διαβάζεται κανονικά από άλλους· το μήνυμα αφορά δικαιώματα.
+    - id: corrupt
+      text: Το αρχείο είναι κατεστραμμένο.
+      why: Ένα κατεστραμμένο αρχείο θα διαβαζόταν (με περίεργο περιεχόμενο) — δεν θα έβγαζε Permission denied.
+- id: go-w
+  type: multiple_choice
+  prompt: Τι κάνει το `chmod go-w report.txt`;
+  explanation: '`g` = ομάδα, `o` = άλλοι, `-w` = αφαίρεσε εγγραφή. Ο ιδιοκτήτης δεν επηρεάζεται.'
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    options:
+    - id: remove
+      text: Αφαιρεί το δικαίωμα εγγραφής από την ομάδα και τους άλλους.
+      correct: true
+    - id: owner
+      text: Αφαιρεί την εγγραφή από τον ιδιοκτήτη.
+      why: Ο ιδιοκτήτης είναι `u` — δεν περιλαμβάνεται στο `go`.
+    - id: add
+      text: Δίνει εγγραφή στην ομάδα και τους άλλους.
+      why: Το `-` αφαιρεί· για προσθήκη θα ήταν `go+w`.
+    - id: go
+      text: Το «go» είναι όνομα χρήστη.
+      why: 'Στο chmod τα γράμματα πριν το +/- είναι κατηγορίες: u, g, o, a.'

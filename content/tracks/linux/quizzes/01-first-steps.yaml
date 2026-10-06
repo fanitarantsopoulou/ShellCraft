@@ -1,0 +1,372 @@
+id: linux.q01
+track: linux
+title: Πρώτα βήματα στο shell
+description: Πού βρίσκομαι, τι υπάρχει εδώ και πώς πάω αλλού — pwd, ls, cd και διαδρομές.
+level: beginner
+order: 1
+skills:
+- linux.nav
+questions:
+- id: pwd-purpose
+  type: multiple_choice
+  prompt: Τι κάνει η εντολή `pwd`;
+  explanation: Το `pwd` (*print working directory*) τυπώνει την πλήρη διαδρομή του φακέλου στον οποίο βρίσκεσαι.
+  reference: pwd
+  commands:
+  - pwd
+  spec:
+    options:
+    - id: prints-dir
+      text: Τυπώνει τον φάκελο στον οποίο βρίσκομαι.
+      correct: true
+    - id: password
+      text: Αλλάζει τον κωδικό του χρήστη.
+      why: Αυτό το κάνει το `passwd` — μοιάζει στο όνομα, αλλά είναι άλλη εντολή.
+    - id: lists
+      text: Δείχνει τα αρχεία του τρέχοντος φακέλου.
+      why: Αυτό το κάνει το `ls`.
+    - id: home
+      text: Με πηγαίνει στον αρχικό μου φάκελο (home).
+      why: Αυτό το κάνει το `cd` χωρίς όρισμα.
+- id: pwd-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Γράψε την εντολή που δείχνει σε ποιον φάκελο βρίσκεσαι.
+  explanation: Το `pwd` τυπώνει την πλήρη διαδρομή του τρέχοντος φακέλου.
+  reference: pwd
+  commands:
+  - pwd
+  spec:
+    accepted:
+    - pwd
+    known_mistakes:
+    - id: passwd
+      match: passwd
+      feedback: Το `passwd` αλλάζει τον κωδικό σου — όχι αυτό που θέλουμε!
+    - id: cd
+      match: cd
+      feedback: Το `cd` χωρίς όρισμα σε μεταφέρει στο home σου, δεν τυπώνει πού είσαι.
+    test_cases:
+      accept:
+      - pwd
+      - '  pwd  '
+      reject:
+      - passwd
+      - cd
+      - ls
+      - PWD
+      - pwd /
+- id: ls-select
+  type: command_selection
+  prompt: Θέλεις να δεις ποια αρχεία υπάρχουν στον φάκελο όπου βρίσκεσαι. Ποια εντολή;
+  explanation: Το `ls` (*list*) δείχνει τα περιεχόμενα ενός φακέλου· χωρίς όρισμα, του τρέχοντος.
+  reference: ls
+  commands:
+  - ls
+  - pwd
+  spec:
+    options:
+    - id: ls
+      text: ls
+      correct: true
+    - id: pwd
+      text: pwd
+      why: Το `pwd` δείχνει *πού* βρίσκεσαι, όχι τι περιέχει ο φάκελος.
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: pwd
+    - id: cat-dot
+      text: cat .
+      why: 'Το `cat` διαβάζει αρχεία, όχι φακέλους: «cat: .: Is a directory».'
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: cat
+    - id: list
+      text: list
+      why: Δεν υπάρχει εντολή `list` στο Linux — η εντολή είναι το σύντομο `ls`.
+      distractor:
+        existence: nonexistent
+        command: list
+        note: 'Ελέγχθηκε σε Debian 13: «list: not found».'
+- id: cd-no-arg
+  type: multiple_choice
+  prompt: Γράφεις `cd` χωρίς τίποτα άλλο και πατάς Enter. Πού βρίσκεσαι μετά;
+  explanation: Το `cd` χωρίς όρισμα σε πηγαίνει στον αρχικό σου φάκελο (home), π.χ. `/home/maria`.
+  reference: cd
+  commands:
+  - cd
+  spec:
+    options:
+    - id: home
+      text: Στον αρχικό μου φάκελο (home).
+      correct: true
+    - id: root
+      text: Στη ρίζα του συστήματος, `/`.
+      why: Για τη ρίζα γράφεις `cd /`.
+    - id: same
+      text: Μένω στον ίδιο φάκελο.
+      why: Το `cd` χωρίς όρισμα *δεν* είναι «κάνε τίποτα» — πηγαίνει στο home.
+    - id: previous
+      text: Στον φάκελο που ήμουν πριν.
+      why: Αυτό το κάνει το `cd -`.
+- id: cd-dotdot
+  type: multiple_choice
+  prompt: Βρίσκεσαι στο `/home/maria/projects`. Πού θα βρεθείς μετά το `cd ..`;
+  explanation: Το `..` σημαίνει «ο γονικός φάκελος». Από το `/home/maria/projects` ανεβαίνεις στο `/home/maria`.
+  reference: cd
+  commands:
+  - cd
+  spec:
+    options:
+    - id: parent
+      text: /home/maria
+      correct: true
+    - id: root
+      text: /
+      why: Το `..` ανεβαίνει *ένα* επίπεδο, όχι μέχρι τη ρίζα.
+    - id: home
+      text: /home
+      why: Αυτό θα ήταν δύο επίπεδα πάνω — `cd ../..`.
+    - id: same
+      text: /home/maria/projects
+      why: Το `.` (μία τελεία) είναι ο τρέχων φάκελος· το `..` είναι ο γονικός.
+- id: cd-up-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Ανέβα **έναν** φάκελο πάνω από εκεί που βρίσκεσαι.
+  explanation: Το `..` είναι ο γονικός φάκελος, άρα `cd ..`.
+  reference: cd
+  commands:
+  - cd
+  spec:
+    accepted:
+    - cd ..
+    - cd ../
+    known_mistakes:
+    - id: nospace
+      match: cd..
+      feedback: 'Χρειάζεται κενό: `cd ..`. Το `cd..` το shell το ψάχνει ως μία (ανύπαρκτη) εντολή.'
+    - id: dot
+      match: cd .
+      feedback: Μία τελεία είναι ο *τρέχων* φάκελος — μένεις εκεί που είσαι.
+    - id: root
+      match: cd /
+      feedback: Αυτό πηγαίνει στη ρίζα, όχι έναν φάκελο πάνω.
+    test_cases:
+      accept:
+      - cd ..
+      - cd ../
+      - cd  ..
+      reject:
+      - cd..
+      - cd .
+      - cd /
+      - cd ../..
+      - cd ~
+      - cd -
+- id: absolute-path
+  type: multiple_choice
+  prompt: Ποια από αυτές είναι **απόλυτη** διαδρομή (δουλεύει ίδια από όποιον φάκελο κι αν βρίσκεσαι);
+  explanation: Οι απόλυτες διαδρομές ξεκινούν από τη ρίζα `/`. Όλες οι άλλες είναι σχετικές με τον τρέχοντα φάκελο.
+  spec:
+    options:
+    - id: abs
+      text: /var/log
+      correct: true
+    - id: rel
+      text: var/log
+      why: Χωρίς `/` στην αρχή, ψάχνει φάκελο `var` *μέσα* στον τρέχοντα φάκελο.
+    - id: dot
+      text: ./var/log
+      why: Το `./` σημαίνει «από εδώ που είμαι» — είναι σχετική διαδρομή.
+    - id: dotdot
+      text: ../log
+      why: Το `..` εξαρτάται από το πού βρίσκεσαι — σχετική διαδρομή.
+- id: tilde
+  type: multiple_choice
+  prompt: Τι σημαίνει το `~` σε μια διαδρομή όπως `~/notes.txt`;
+  explanation: Το shell αντικαθιστά το `~` με τον home φάκελο του χρήστη, π.χ. `/home/maria/notes.txt`.
+  spec:
+    options:
+    - id: home
+      text: Τον αρχικό (home) φάκελο του χρήστη μου.
+      correct: true
+    - id: root
+      text: Τη ρίζα του συστήματος.
+      why: Η ρίζα είναι το `/`.
+    - id: current
+      text: Τον τρέχοντα φάκελο.
+      why: Ο τρέχων φάκελος είναι το `.`.
+    - id: temp
+      text: Ένα προσωρινό αρχείο.
+      why: Στο shell το `~` στην αρχή μιας διαδρομής είναι το home· άλλα προγράμματα χρησιμοποιούν το `~` στο *τέλος*
+        ονομάτων για backup αρχεία (π.χ. `notes.txt~`).
+- id: ls-a
+  type: multiple_choice
+  prompt: Τι επιπλέον δείχνει το `ls -a` σε σχέση με το σκέτο `ls`;
+  explanation: Στο Linux, αρχεία που το όνομά τους ξεκινά με `.` είναι κρυφά. Το `-a` (*all*) τα δείχνει, μαζί με
+    τα ειδικά `.` και `..`.
+  reference: ls
+  commands:
+  - ls
+  spec:
+    options:
+    - id: hidden
+      text: Τα κρυφά αρχεία (όσα ξεκινούν με τελεία).
+      correct: true
+    - id: recursive
+      text: Και τα περιεχόμενα όλων των υποφακέλων.
+      why: Αυτό το κάνει το `ls -R` (*recursive*).
+    - id: details
+      text: Δικαιώματα, μέγεθος και ημερομηνία κάθε αρχείου.
+      why: Αυτό το κάνει το `ls -l` (*long*).
+    - id: dirs
+      text: Μόνο τους φακέλους.
+      why: Το `-a` δείχνει *περισσότερα*, όχι λιγότερα.
+- id: ls-long-fill
+  type: fill_in_command
+  prompt: Συμπλήρωσε ώστε το `ls` να δείξει αναλυτική λίστα (δικαιώματα, ιδιοκτήτη, μέγεθος, ημερομηνία).
+  explanation: Το `-l` (*long listing format*) δείχνει μία γραμμή ανά αρχείο με όλες τις λεπτομέρειες.
+  reference: ls
+  commands:
+  - ls
+  spec:
+    template: ls ____
+    blanks:
+    - accepted:
+      - -l
+      known_mistakes:
+      - id: big-l
+        match: -L
+        feedback: Το κεφαλαίο `-L` ακολουθεί symbolic links. Η αναλυτική λίστα είναι με μικρό `-l`.
+      - id: a
+        match: -a
+        feedback: Το `-a` δείχνει τα κρυφά αρχεία, όχι λεπτομέρειες.
+      - id: h
+        match: -h
+        feedback: Το `-h` κάνει τα μεγέθη ευανάγνωστα (π.χ. 4.0K), αλλά μόνο *μαζί* με το `-l`.
+- id: ls-la-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δείξε **όλα** τα αρχεία του τρέχοντος φακέλου, μαζί με τα κρυφά, σε **αναλυτική** μορφή.
+  hints:
+  - 'Συνδύασε δύο επιλογές του ls: μία για τα κρυφά, μία για την αναλυτική μορφή.'
+  explanation: Το `ls -la` (ή `ls -al`, `ls -l -a`) συνδυάζει το `-l` (αναλυτικά) με το `-a` (και τα κρυφά).
+  reference: ls
+  commands:
+  - ls
+  spec:
+    accepted:
+    - ls -la
+    - ls -lA
+    - ls -la .
+    - ls -lA .
+    known_mistakes:
+    - id: only-l
+      match: ls -l
+      feedback: Λείπουν τα κρυφά αρχεία — χρειάζεται και `-a`.
+    - id: only-a
+      match: ls -a
+      feedback: Λείπει η αναλυτική μορφή — χρειάζεται και `-l`.
+    test_cases:
+      accept:
+      - ls -la
+      - ls -al
+      - ls -l -a
+      - ls -a -l
+      - ls --all -l
+      - ls -lA
+      - ls -la .
+      reject:
+      - ls -l
+      - ls -a
+      - ls -lh
+      - ls -LA
+      - ls -R
+- id: cd-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Πήγαινε στον φάκελο `/var/log`, ώστε η εντολή να δουλεύει από όποιον φάκελο κι αν βρίσκεσαι.
+  hints:
+  - Χρειάζεσαι απόλυτη διαδρομή — ξεκινά με `/`.
+  explanation: Το `cd /var/log` χρησιμοποιεί απόλυτη διαδρομή, άρα δουλεύει από παντού.
+  reference: cd
+  commands:
+  - cd
+  spec:
+    accepted:
+    - cd /var/log
+    - cd /var/log/
+    known_mistakes:
+    - id: relative
+      match: cd var/log
+      feedback: Χωρίς `/` στην αρχή, η διαδρομή είναι σχετική — δουλεύει μόνο αν βρίσκεσαι ήδη στο `/`.
+    - id: ls
+      match: ls /var/log
+      feedback: Το `ls` δείχνει τι υπάρχει στον φάκελο, αλλά δεν σε μεταφέρει εκεί.
+    test_cases:
+      accept:
+      - cd /var/log
+      - cd /var/log/
+      - cd '/var/log'
+      reject:
+      - cd var/log
+      - cd /var/logs
+      - ls /var/log
+      - cd /var /log
+      - cd ~/var/log
+      - cd /var/log && ls
+- id: cd-not-dir
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Έτρεξες την παρακάτω εντολή και πήρες αυτό το μήνυμα. Τι σημαίνει;
+  explanation: Το «Not a directory» σημαίνει ότι το `notes.txt` υπάρχει, αλλά είναι αρχείο. Το `cd` πηγαίνει μόνο
+    σε φακέλους.
+  reference: cd
+  commands:
+  - cd
+  spec:
+    command: cd notes.txt
+    output: 'bash: cd: notes.txt: Not a directory'
+    captured_on: debian-13.7
+    options:
+    - id: file
+      text: Το notes.txt είναι αρχείο, όχι φάκελος.
+      correct: true
+    - id: missing
+      text: Το notes.txt δεν υπάρχει.
+      why: Αν δεν υπήρχε, το μήνυμα θα ήταν «No such file or directory».
+    - id: perm
+      text: Δεν έχω δικαίωμα πρόσβασης στο notes.txt.
+      why: Για δικαιώματα το μήνυμα θα ήταν «Permission denied».
+    - id: bash
+      text: Το bash δεν βρήκε την εντολή cd.
+      why: Τότε θα έβλεπες «command not found». Εδώ το cd έτρεξε κανονικά και διαμαρτυρήθηκε για το όρισμα.
+- id: cd-builtin
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Το `ls` είναι πρόγραμμα (`/usr/bin/ls`), αλλά το `cd` είναι ενσωματωμένο στο shell (*builtin*). Γιατί;
+  explanation: 'Κάθε εξωτερικό πρόγραμμα τρέχει σε δική του διεργασία. Αν το `cd` ήταν πρόγραμμα, θα άλλαζε τον
+    φάκελο της δικής του διεργασίας και μετά θα τερμάτιζε — το shell σου θα έμενε εκεί που ήταν.
+
+    '
+  reference: cd
+  commands:
+  - cd
+  - ls
+  spec:
+    options:
+    - id: process
+      text: Ένα ξεχωριστό πρόγραμμα δεν μπορεί να αλλάξει τον φάκελο του shell που το ξεκίνησε.
+      correct: true
+    - id: speed
+      text: Μόνο για ταχύτητα — θα μπορούσε άνετα να είναι και πρόγραμμα.
+      why: Η ταχύτητα δεν είναι ο λόγος· ένα εξωτερικό `cd` απλώς δεν θα λειτουργούσε.
+    - id: kernel
+      text: Επειδή το cd είναι μέρος του Linux kernel.
+      why: Ο kernel παρέχει την κλήση συστήματος `chdir`, αλλά η εντολή `cd` ανήκει στο shell (bash).
+    - id: security
+      text: Για λόγους ασφαλείας, ώστε να μην μπορεί να το αλλάξει κανείς.
+      why: Δεν σχετίζεται με ασφάλεια — σχετίζεται με το ότι κάθε διεργασία έχει δικό της τρέχοντα φάκελο.

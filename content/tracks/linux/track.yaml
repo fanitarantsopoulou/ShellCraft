@@ -1,0 +1,30 @@
+id: linux
+title: Linux
+biome: shell-woods
+order: 1
+summary: Το σύστημα αρχείων, το shell και τα βασικά εργαλεία ενός Linux συστήματος.
+skills:
+  - id: linux.nav
+    title: Πλοήγηση στο σύστημα αρχείων
+  - id: linux.files.create
+    title: Δημιουργία αρχείων και φακέλων
+  - id: linux.files.delete
+    title: Διαγραφή αρχείων και φακέλων
+  - id: linux.text.read
+    title: Ανάγνωση αρχείων
+  - id: linux.text.search
+    title: Αναζήτηση σε αρχεία
+    requires: [linux.text.read]
+  - id: linux.shell.pipes
+    title: Pipes και ανακατεύθυνση
+    requires: [linux.text.read]
+  - id: linux.perms
+    title: Δικαιώματα αρχείων
+    requires: [linux.nav]
+  - id: linux.files.copy
+    title: Αντιγραφή αρχείων
+  - id: linux.files.move
+    title: Μετακίνηση και μετονομασία αρχείων
+  - id: linux.files.safe-changes
+    title: Ασφαλείς αλλαγές σε αρχεία
+    requires: [linux.files.copy]

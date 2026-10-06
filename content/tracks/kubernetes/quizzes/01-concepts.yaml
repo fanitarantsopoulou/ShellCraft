@@ -1,0 +1,174 @@
+id: k8s.q01
+track: kubernetes
+title: Βασικές έννοιες Kubernetes
+description: Pods, Deployments, Services, Nodes και Namespaces — και η ιδέα της «επιθυμητής κατάστασης».
+level: beginner
+order: 1
+skills: [k8s.concepts]
+questions:
+  - id: pod
+    type: multiple_choice
+    prompt: Τι είναι ένα **Pod**;
+    explanation: "Το Pod είναι η μικρότερη μονάδα που διαχειρίζεται το Kubernetes: ένα ή περισσότερα containers που μοιράζονται δίκτυο (ίδια IP) και αποθηκευτικό χώρο και τρέχουν πάντα μαζί στον ίδιο Node."
+    citations: [{ source: "kubernetes-docs", url: "https://kubernetes.io/docs/concepts/workloads/pods/", doc_version: "Kubernetes v1.37", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "unit", text: "Η μικρότερη μονάδα που τρέχει: ένα ή περισσότερα containers που μοιράζονται δίκτυο και storage.", correct: true }
+        - { id: "server", text: "Ένας φυσικός server του cluster.", why: "Αυτό είναι ο Node." }
+        - { id: "image", text: "Ένα container image αποθηκευμένο στο cluster.", why: "Τα images βρίσκονται σε registries· το Pod *τρέχει* containers από αυτά." }
+        - { id: "cluster", text: "Ένα μικρό cluster μέσα στο cluster.", why: "Δεν υπάρχει τέτοια έννοια — το Pod τρέχει πάντα σε έναν Node." }
+
+  - id: deployment
+    type: multiple_choice
+    prompt: Γιατί τρέχουμε συνήθως Pods μέσω **Deployment** και όχι μόνα τους;
+    explanation: "Το Deployment κρατά τον αριθμό replicas που δήλωσες: αν ένα Pod χαθεί, δημιουργεί νέο. Κάνει επίσης ελεγχόμενα rolling updates όταν αλλάζεις έκδοση image."
+    citations: [{ source: "kubernetes-docs", url: "https://kubernetes.io/docs/concepts/workloads/controllers/deployment/", doc_version: "Kubernetes v1.37", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "replicas", text: "Κρατά πάντα τον επιθυμητό αριθμό Pods και κάνει ελεγχόμενες αναβαθμίσεις.", correct: true }
+        - { id: "faster", text: "Τα Pods μέσω Deployment τρέχουν πιο γρήγορα.", why: "Η ταχύτητα εκτέλεσης δεν αλλάζει." }
+        - { id: "network", text: "Μόνο τα Pods ενός Deployment αποκτούν IP.", why: "Κάθε Pod παίρνει IP, με ή χωρίς Deployment." }
+        - { id: "required", text: "Το Kubernetes δεν επιτρέπει Pods χωρίς Deployment.", why: "Επιτρέπει (π.χ. `kubectl run`), αλλά δεν θα ξαναδημιουργηθούν αν χαθούν." }
+
+  - id: service
+    type: multiple_choice
+    prompt: Τι πρόβλημα λύνει ένα **Service**;
+    explanation: "Τα Pods έρχονται και φεύγουν και αλλάζουν IP. Το Service δίνει ένα σταθερό όνομα/IP και μοιράζει την κίνηση στα Pods που ταιριάζουν στον selector του (μέσω labels)."
+    citations: [{ source: "kubernetes-docs", url: "https://kubernetes.io/docs/concepts/services-networking/service/", doc_version: "Kubernetes v1.37", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "stable", text: "Δίνει σταθερή διεύθυνση και μοιράζει κίνηση σε Pods που αλλάζουν.", correct: true }
+        - { id: "storage", text: "Δίνει μόνιμο αποθηκευτικό χώρο στα Pods.", why: "Αυτό αφορά volumes/PersistentVolumes." }
+        - { id: "restart", text: "Επανεκκινεί τα Pods όταν κρασάρουν.", why: "Τις επανεκκινήσεις τις κάνει το kubelet / ο controller, όχι το Service." }
+        - { id: "systemd", text: "Είναι το αντίστοιχο ενός systemd service μέσα στο Pod.", why: "Παρά το όνομα, δεν σχετίζεται με systemd· αφορά δικτύωση." }
+
+  - id: node
+    type: multiple_choice
+    prompt: Τι είναι ένας **Node**;
+    explanation: "Ένας Node είναι μια μηχανή (VM ή φυσική) του cluster όπου τρέχουν Pods. Πάνω του τρέχει το kubelet και ένας container runtime."
+    spec:
+      options:
+        - { id: "machine", text: "Μια μηχανή (VM ή φυσική) όπου τρέχουν Pods.", correct: true }
+        - { id: "nodejs", text: "Ένα Pod με Node.js.", why: "Δεν σχετίζεται με Node.js." }
+        - { id: "container", text: "Ένα container μέσα σε Pod.", why: "Ο Node είναι η μηχανή που φιλοξενεί Pods." }
+        - { id: "namespace", text: "Ένας λογικός διαχωρισμός πόρων.", why: "Αυτό είναι το Namespace." }
+
+  - id: namespace
+    type: multiple_choice
+    prompt: Σε τι χρησιμεύουν τα **Namespaces**;
+    explanation: "Χωρίζουν λογικά τους πόρους ενός cluster (π.χ. ανά ομάδα ή περιβάλλον). Τα ονόματα πρέπει να είναι μοναδικά μέσα σε ένα namespace, όχι σε όλο το cluster."
+    citations: [{ source: "kubernetes-docs", url: "https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/", doc_version: "Kubernetes v1.37", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "group", text: "Χωρίζουν λογικά τους πόρους του cluster σε ομάδες.", correct: true }
+        - { id: "linux", text: "Είναι τα Linux namespaces που απομονώνουν containers.", why: "Ίδιο όνομα, άλλη έννοια: τα Kubernetes namespaces είναι λογική οργάνωση πόρων." }
+        - { id: "dns", text: "Είναι τα DNS ονόματα των Services.", why: "Τα Services έχουν DNS ονόματα που *περιέχουν* το namespace, αλλά τα namespaces είναι ευρύτερη έννοια." }
+        - { id: "security", text: "Απομονώνουν πλήρως τα Pods μεταξύ τους στο δίκτυο.", why: "Από μόνα τους δεν περιορίζουν την κίνηση· γι' αυτό χρειάζονται NetworkPolicies." }
+
+  - id: declarative
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: "Δηλώνεις `replicas: 3`. Ένας Node χαλάει και χάνονται 2 Pods. Τι κάνει το Kubernetes;"
+    explanation: "Περιγράφεις την **επιθυμητή κατάσταση** και οι controllers συγκρίνουν συνεχώς με την πραγματική. Λείπουν 2 Pods, άρα δημιουργούνται 2 νέα σε άλλους Nodes."
+    spec:
+      options:
+        - { id: "reconcile", text: "Δημιουργεί 2 νέα Pods για να φτάσει ξανά τα 3.", correct: true }
+        - { id: "alert", text: "Στέλνει ειδοποίηση και περιμένει να το διορθώσεις.", why: "Η επαναφορά της επιθυμητής κατάστασης είναι αυτόματη." }
+        - { id: "lower", text: "Αλλάζει το replicas σε 1.", why: "Η δήλωσή σου δεν αλλάζει· η πραγματικότητα προσαρμόζεται σε αυτή." }
+        - { id: "stop", text: "Σταματά και το τρίτο Pod για ασφάλεια.", why: "Δεν υπάρχει τέτοια συμπεριφορά." }
+
+  - id: pods-fill
+    type: fill_in_command
+    prompt: "Συμπλήρωσε ώστε να εμφανιστούν τα Pods."
+    explanation: "Ο τύπος πόρου μπορεί να γραφτεί `pods`, `pod` ή με το short name `po`."
+    reference: kubectl-get
+    spec:
+      template: "kubectl get ____"
+      blanks:
+        - accepted: ["pods", "pod", "po"]
+          known_mistakes:
+            - { id: "containers", match: "containers", feedback: "Δεν υπάρχει πόρος «containers»: «the server doesn't have a resource type»." }
+            - { id: "deployments", match: "deployments", feedback: "Αυτό δείχνει τα Deployments, όχι τα Pods." }
+
+  - id: get-pods-write
+    type: command_writing
+    cognitive_level: apply
+    prompt: "Δείξε τα Pods του namespace `kube-system`."
+    explanation: "`kubectl get pods -n kube-system`. Χωρίς `-n` βλέπεις μόνο το τρέχον namespace (συνήθως `default`)."
+    reference: kubectl-get
+    spec:
+      accepted: ["kubectl get pods -n kube-system", "kubectl get pod -n kube-system", "kubectl get po -n kube-system", "kubectl -n kube-system get pods"]
+      known_mistakes:
+        - { id: "no-ns", match: "kubectl get pods", feedback: "Χωρίς `-n kube-system` βλέπεις το τρέχον namespace." }
+        - { id: "all", match: "kubectl get pods -A", feedback: "Το `-A` δείχνει *όλα* τα namespaces — εδώ ζητείται μόνο το kube-system." }
+      test_cases:
+        accept: ["kubectl get pods -n kube-system", "kubectl get po -n kube-system", "kubectl get pods --namespace kube-system", "kubectl get pods --namespace=kube-system", "kubectl get -n kube-system pods", "kubectl -n kube-system get pods"]
+        reject: ["kubectl get pods", "kubectl get pods -A", "kubectl get pods kube-system", "kubectl get ns kube-system", "kubectl describe pods -n kube-system"]
+
+  - id: deploy-ready
+    type: output_analysis
+    prompt: "Τι σημαίνει το `3/3` στη στήλη READY;"
+    explanation: "3 από τα 3 επιθυμητά Pods του Deployment είναι έτοιμα να δεχτούν κίνηση."
+    reference: kubectl-get
+    spec:
+      command: kubectl get deployments
+      output: |-
+        NAME   READY   UP-TO-DATE   AVAILABLE   AGE
+        web    3/3     3            3           54s
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "ready", text: "3 από τα 3 επιθυμητά Pods είναι έτοιμα.", correct: true }
+        - { id: "nodes", text: "Το Deployment τρέχει σε 3 από 3 Nodes.", why: "Η στήλη αφορά Pods, όχι Nodes." }
+        - { id: "restarts", text: "Τα Pods έχουν κάνει 3 επανεκκινήσεις.", why: "Οι επανεκκινήσεις φαίνονται στο `kubectl get pods`, στη στήλη RESTARTS." }
+        - { id: "version", text: "Τρέχει η 3η έκδοση του Deployment.", why: "Το READY δεν δείχνει έκδοση." }
+
+  - id: dry-run
+    type: output_analysis
+    cognitive_level: apply
+    prompt: "Τι έκανε αυτή η εντολή;"
+    explanation: "Με `--dry-run=client -o yaml` το kubectl **δεν δημιουργεί τίποτα** στο cluster· τυπώνει το YAML που θα έστελνε. Πολύ χρήσιμο για να ξεκινήσεις ένα manifest."
+    reference: kubectl-create-deployment
+    spec:
+      command: kubectl create deployment demo --image=nginx:alpine --replicas=2 --dry-run=client -o yaml
+      output: |-
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          labels:
+            app: demo
+          name: demo
+        spec:
+          replicas: 2
+          selector:
+            matchLabels:
+              app: demo
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                app: demo
+            spec:
+              containers:
+              - image: nginx:alpine
+                name: nginx
+                resources: {}
+        status: {}
+      captured_on: kubernetes-1.37.1
+      options:
+        - { id: "print", text: "Τύπωσε το YAML του Deployment χωρίς να το δημιουργήσει.", correct: true }
+        - { id: "created", text: "Δημιούργησε το Deployment και τύπωσε το YAML του.", why: "Το `--dry-run=client` σημαίνει ότι δεν στάλθηκε τίποτα στο cluster." }
+        - { id: "file", text: "Αποθήκευσε το YAML σε αρχείο demo.yaml.", why: "Τυπώθηκε στην οθόνη· για αρχείο θα χρειαζόταν `> demo.yaml`." }
+        - { id: "validate", text: "Έλεγξε αν υπάρχει ήδη Deployment demo.", why: "Δεν έγινε κανένας έλεγχος στο cluster." }
+
+  - id: pod-recreated
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: "Το Deployment `web` έχει 5 replicas. Διαγράφεις ένα από τα Pods του με `kubectl delete pod`. Πόσα Pods θα δεις λίγα δευτερόλεπτα μετά;"
+    explanation: "Πάλι 5. Το Deployment (μέσω του ReplicaSet του) βλέπει ότι λείπει ένα και δημιουργεί αμέσως νέο. Για να μειώσεις τα Pods, αλλάζεις τα replicas (`kubectl scale`)."
+    reference: kubectl-delete
+    spec:
+      options:
+        - { id: "five", text: "5 — δημιουργείται αμέσως νέο Pod.", correct: true }
+        - { id: "four", text: "4", why: "Το Deployment επαναφέρει τον αριθμό που δήλωσες." }
+        - { id: "zero", text: "0 — διαγράφεται όλο το Deployment.", why: "Διέγραψες μόνο ένα Pod· το Deployment μένει." }
+        - { id: "six", text: "6", why: "Δημιουργείται ακριβώς όσο χρειάζεται για να φτάσει τα 5." }

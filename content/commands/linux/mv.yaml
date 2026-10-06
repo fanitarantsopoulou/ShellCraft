@@ -1,0 +1,47 @@
+id: mv
+name: mv
+kind: external_utility
+provider: GNU coreutils
+platform: debian-13
+category: linux/file-management
+level: beginner
+summary: Μετακινεί ή μετονομάζει αρχεία και φακέλους.
+description: >
+  Το Linux δεν έχει ξεχωριστή βασική εντολή μετονομασίας: η μετονομασία είναι
+  μετακίνηση στον ίδιο φάκελο με νέο όνομα. Μετά το `mv` η πηγή δεν υπάρχει πια.
+synopsis:
+  - "mv [OPTION]... [-T] SOURCE DEST"
+  - "mv [OPTION]... SOURCE... DIRECTORY"
+  - "mv [OPTION]... -t DIRECTORY SOURCE..."
+flag_grammar: gnu_getopt
+options:
+  - { flags: ["-i", "--interactive"], summary: Ρωτάει πριν αντικαταστήσει υπάρχον αρχείο. }
+  - { flags: ["-n", "--no-clobber"], summary: Δεν αντικαθιστά υπάρχον αρχείο. }
+  - { flags: ["-v", "--verbose"], summary: Τυπώνει τι κάνει. }
+  - { flags: ["-f", "--force"], summary: Δεν ρωτάει πριν αντικαταστήσει., level: intermediate }
+  - { flags: ["-u"], summary: "Μετακινεί μόνο αν η πηγή είναι νεότερη (όπως --update=older).", level: intermediate }
+  - { flags: ["--update"], summary: Ελέγχει ποια υπάρχοντα αρχεία ενημερώνονται., value: optional, value_name: UPDATE, level: intermediate }
+  - { flags: ["-t", "--target-directory"], summary: Μετακινεί όλες τις πηγές μέσα στον DIRECTORY., value: required, value_name: DIRECTORY, level: intermediate }
+  - { flags: ["-T", "--no-target-directory"], summary: Αντιμετωπίζει τον DEST ως κανονικό αρχείο., level: advanced }
+  - { flags: ["-b"], summary: Κρατά backup κάθε προορισμού που θα αντικατασταθεί., level: advanced }
+  - { flags: ["--backup"], summary: Κρατά backup κάθε προορισμού που θα αντικατασταθεί., value: optional, value_name: CONTROL, level: advanced }
+examples:
+  - cmd: mv draft.txt final.txt
+    explain:
+      - { token: mv, meaning: η εντολή μετακίνησης/μετονομασίας }
+      - { token: draft.txt, meaning: "η πηγή (SOURCE) — μετά δεν θα υπάρχει" }
+      - { token: final.txt, meaning: "το νέο όνομα (DEST)" }
+  - cmd: mv report.txt archive/
+    note: Αν ο archive είναι φάκελος, το αρχείο μετακινείται μέσα του ως archive/report.txt.
+common_mistakes:
+  - wrong: cp draft.txt final.txt
+    why: Το cp δημιουργεί αντίγραφο — το draft.txt εξακολουθεί να υπάρχει, άρα δεν έγινε μετονομασία.
+  - wrong: mv final.txt draft.txt
+    why: Πρώτα γράφεται το τρέχον όνομα (πηγή) και μετά το νέο.
+related:
+  - { id: cp, relation: confused_with }
+citations:
+  - source: gnu-coreutils
+    url: https://www.gnu.org/software/coreutils/manual/html_node/mv-invocation.html
+    doc_version: GNU coreutils 9.7 (Debian 13)
+    last_verified: 2026-10-06

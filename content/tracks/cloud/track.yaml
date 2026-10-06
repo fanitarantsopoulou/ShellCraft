@@ -1,0 +1,11 @@
+id: cloud
+title: Cloud
+biome: sky-isles
+order: 4
+summary: Regions, δίκτυα, αποθήκευση και υπηρεσίες στο cloud.
+skills:
+  - id: cloud.concepts
+    title: Βασικές έννοιες cloud
+  - id: cloud.infra
+    title: Υποδομή και δίκτυα στο cloud
+    requires: [cloud.concepts]

@@ -1,0 +1,130 @@
+id: cloud.q01
+track: cloud
+title: Τι είναι το cloud
+description: Ο ορισμός του NIST, IaaS/PaaS/SaaS, regions και availability zones, και ποιος ευθύνεται για τι.
+level: beginner
+order: 1
+skills: [cloud.concepts]
+questions:
+  - id: nist-characteristic
+    type: multiple_choice
+    prompt: "Ποιο από αυτά **δεν** είναι ένα από τα πέντε βασικά χαρακτηριστικά του cloud κατά τον ορισμό του NIST;"
+    explanation: "Τα πέντε χαρακτηριστικά (NIST SP 800-145) είναι: on-demand self-service, broad network access, resource pooling, rapid elasticity, measured service. Οι πόροι **χρεώνονται** με βάση τη χρήση — δεν είναι δωρεάν."
+    citations: [{ source: "nist", url: "https://csrc.nist.gov/pubs/sp/800/145/final", doc_version: "NIST SP 800-145 (2011)", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "free", text: "Απεριόριστοι δωρεάν πόροι", correct: true }
+        - { id: "self-service", text: "On-demand self-service", why: "Είναι χαρακτηριστικό: παίρνεις πόρους μόνος σου, χωρίς ανθρώπινη μεσολάβηση από τον πάροχο." }
+        - { id: "elasticity", text: "Rapid elasticity", why: "Είναι χαρακτηριστικό: οι πόροι αυξάνονται/μειώνονται γρήγορα ανάλογα με τη ζήτηση." }
+        - { id: "measured", text: "Measured service", why: "Είναι χαρακτηριστικό: η χρήση μετριέται — και συνήθως χρεώνεται ανά χρήση." }
+
+  - id: iaas
+    type: multiple_choice
+    prompt: "Νοικιάζεις μια εικονική μηχανή, διαλέγεις λειτουργικό και εγκαθιστάς ό,τι θέλεις. Ποιο μοντέλο υπηρεσίας είναι αυτό;"
+    explanation: "Στο **IaaS** παίρνεις βασικούς πόρους (υπολογιστική ισχύ, αποθήκευση, δίκτυο) και ελέγχεις το λειτουργικό και τις εφαρμογές. Ο πάροχος διαχειρίζεται την υποκείμενη υποδομή."
+    citations: [{ source: "nist", url: "https://csrc.nist.gov/pubs/sp/800/145/final", doc_version: "NIST SP 800-145 (2011)", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "iaas", text: "IaaS (Infrastructure as a Service)", correct: true }
+        - { id: "paas", text: "PaaS (Platform as a Service)", why: "Στο PaaS δεν διαχειρίζεσαι λειτουργικό — ανεβάζεις μόνο την εφαρμογή σου." }
+        - { id: "saas", text: "SaaS (Software as a Service)", why: "Στο SaaS απλώς χρησιμοποιείς έτοιμη εφαρμογή, π.χ. webmail." }
+        - { id: "onprem", text: "On-premises", why: "On-premises σημαίνει δικοί σου servers, όχι νοικιασμένοι από πάροχο." }
+
+  - id: saas
+    type: multiple_choice
+    prompt: "Ποιο από αυτά είναι χαρακτηριστικό παράδειγμα **SaaS**;"
+    explanation: "Στο SaaS χρησιμοποιείς την εφαρμογή του παρόχου (π.χ. web-based email) χωρίς να διαχειρίζεσαι servers, λειτουργικό ή την ίδια την εφαρμογή — εκτός ίσως από ρυθμίσεις του λογαριασμού σου."
+    spec:
+      options:
+        - { id: "webmail", text: "Ένα web-based email που χρησιμοποιείς από τον browser.", correct: true }
+        - { id: "vm", text: "Μια εικονική μηχανή με Debian.", why: "Αυτό είναι IaaS." }
+        - { id: "runtime", text: "Μια υπηρεσία όπου ανεβάζεις τον κώδικά σου και τρέχει.", why: "Αυτό είναι PaaS." }
+        - { id: "disk", text: "Ένας εικονικός δίσκος για τον server σου.", why: "Αυτό είναι πόρος υποδομής (IaaS)." }
+
+  - id: paas-fill
+    type: fill_in_command
+    prompt: "Ανεβάζεις μόνο τον κώδικά σου· ο πάροχος διαχειρίζεται servers, λειτουργικό και runtime. Πώς λέγεται αυτό το μοντέλο; (συντομογραφία)"
+    explanation: "**PaaS** — Platform as a Service. Ελέγχεις την εφαρμογή (και ίσως ρυθμίσεις του περιβάλλοντος), όχι το λειτουργικό ή το δίκτυο."
+    spec:
+      template: "____"
+      blanks:
+        - accepted: ["PaaS", "Platform as a Service"]
+          case_sensitive: false
+          known_mistakes:
+            - { id: "iaas", match: "IaaS", feedback: "Στο IaaS διαχειρίζεσαι εσύ το λειτουργικό." }
+            - { id: "saas", match: "SaaS", feedback: "Στο SaaS δεν ανεβάζεις δικό σου κώδικα — χρησιμοποιείς έτοιμη εφαρμογή." }
+
+  - id: az
+    type: multiple_choice
+    prompt: "Τι είναι μια **Availability Zone**;"
+    explanation: "Μια Availability Zone είναι ένα ή περισσότερα data centers με ανεξάρτητη τροφοδοσία, δικτύωση και ψύξη, μέσα σε ένα region. Ένα region έχει πολλές AZs, φυσικά διαχωρισμένες."
+    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/global-infrastructure.html", doc_version: "AWS overview 2026", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "datacenters", text: "Ένα ή περισσότερα απομονωμένα data centers μέσα σε ένα region.", correct: true }
+        - { id: "region", text: "Μια γεωγραφική περιοχή, π.χ. Ευρώπη.", why: "Αυτό είναι το region· οι AZs βρίσκονται μέσα σε αυτό." }
+        - { id: "timezone", text: "Η ζώνη ώρας του server.", why: "Δεν σχετίζεται με ζώνες ώρας." }
+        - { id: "vpc", text: "Ένα ιδιωτικό δίκτυο.", why: "Αυτό είναι VPC/Virtual Network." }
+
+  - id: multi-az
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: "Γιατί βάζεις servers σε **δύο** Availability Zones αντί για μία;"
+    explanation: "Αν μια AZ πάθει βλάβη (ρεύμα, δίκτυο), η εφαρμογή συνεχίζει από την άλλη. Είναι η βασική τεχνική υψηλής διαθεσιμότητας στο cloud."
+    citations: [{ source: "azure-docs", url: "https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview", doc_version: "Azure docs 2026", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "ha", text: "Για να συνεχίσει η εφαρμογή αν μια AZ πέσει.", correct: true }
+        - { id: "cheaper", text: "Γιατί είναι φθηνότερο.", why: "Συνήθως κοστίζει περισσότερο (και μεταφορά δεδομένων μεταξύ AZs μπορεί να χρεώνεται)." }
+        - { id: "faster", text: "Για να είναι κάθε αίτημα πιο γρήγορο.", why: "Ο στόχος είναι η διαθεσιμότητα, όχι η ταχύτητα." }
+        - { id: "required", text: "Γιατί ο πάροχος δεν επιτρέπει μία AZ.", why: "Επιτρέπεται — απλώς δεν αντέχει βλάβη της AZ." }
+
+  - id: shared-responsibility
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: "Τρέχεις μια εικονική μηχανή (IaaS). Ποιος είναι υπεύθυνος για τα **security updates του λειτουργικού** της;"
+    explanation: "Στο μοντέλο κοινής ευθύνης, ο πάροχος προστατεύει την υποδομή (data centers, hardware, hypervisor). Ό,τι τρέχει **μέσα** στη VM — λειτουργικό, updates, εφαρμογές, firewall ρυθμίσεις — είναι δική σου ευθύνη."
+    citations: [{ source: "aws-docs", url: "https://aws.amazon.com/compliance/shared-responsibility-model/", doc_version: "AWS shared responsibility 2026", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "customer", text: "Εσύ, ο πελάτης.", correct: true }
+        - { id: "provider", text: "Ο πάροχος cloud.", why: "Ο πάροχος δεν μπαίνει στο λειτουργικό της VM σου." }
+        - { id: "nobody", text: "Κανείς — οι VM στο cloud δεν χρειάζονται updates.", why: "Ένα λειτουργικό χωρίς updates είναι ευάλωτο, όπου κι αν τρέχει." }
+        - { id: "automatic", text: "Γίνονται πάντα αυτόματα από το hypervisor.", why: "Ο hypervisor δεν ενημερώνει το λειτουργικό των guests." }
+
+  - id: elasticity-fill
+    type: fill_in_command
+    prompt: "Οι πόροι αυξάνονται και μειώνονται γρήγορα, ακόμη και αυτόματα, ανάλογα με τη ζήτηση. Πώς λέγεται αυτό το χαρακτηριστικό; (αγγλικά ή ελληνικά)"
+    explanation: "**Elasticity** (ελαστικότητα) — στον ορισμό του NIST: *rapid elasticity*."
+    citations: [{ source: "nist", url: "https://csrc.nist.gov/pubs/sp/800/145/final", doc_version: "NIST SP 800-145 (2011)", last_verified: 2026-10-06 }]
+    spec:
+      template: "____"
+      blanks:
+        - accepted: ["elasticity", "rapid elasticity", "ελαστικότητα", "ελαστικοτητα"]
+          case_sensitive: false
+          known_mistakes:
+            - { id: "pooling", match: "resource pooling", feedback: "Το resource pooling σημαίνει ότι οι πόροι του παρόχου μοιράζονται σε πολλούς πελάτες." }
+
+  - id: hybrid
+    type: multiple_choice
+    prompt: "Τι είναι ένα **hybrid cloud**;"
+    explanation: "Συνδυασμός δύο ή περισσότερων διακριτών υποδομών cloud (π.χ. private και public) που συνδέονται ώστε δεδομένα και εφαρμογές να μπορούν να μετακινούνται μεταξύ τους."
+    citations: [{ source: "nist", url: "https://csrc.nist.gov/pubs/sp/800/145/final", doc_version: "NIST SP 800-145 (2011)", last_verified: 2026-10-06 }]
+    spec:
+      options:
+        - { id: "combo", text: "Συνδυασμός π.χ. private και public cloud που λειτουργούν μαζί.", correct: true }
+        - { id: "vm-container", text: "Ένα cloud που τρέχει και VMs και containers.", why: "Το «hybrid» αφορά το μοντέλο ανάπτυξης, όχι τον τύπο φορτίων." }
+        - { id: "two-regions", text: "Ένα cloud σε δύο regions.", why: "Δύο regions του ίδιου παρόχου είναι ακόμη public cloud." }
+        - { id: "half-price", text: "Ένα cloud με μειωμένη χρέωση.", why: "Δεν σχετίζεται με τιμολόγηση." }
+
+  - id: forgotten-resources
+    type: multiple_choice
+    cognitive_level: apply
+    prompt: "Έφτιαξες πέντε VMs για ένα πείραμα και ξέχασες να τις σβήσεις. Γιατί είναι πρόβλημα στο cloud;"
+    explanation: "Το cloud χρεώνει με βάση τη χρήση (measured service). Πόροι που μένουν ανοιχτοί συνεχίζουν να χρεώνονται. Σβήνε ό,τι δεν χρειάζεσαι και βάλε όρια/ειδοποιήσεις κόστους (budgets)."
+    spec:
+      options:
+        - { id: "billing", text: "Συνεχίζουν να χρεώνονται όσο υπάρχουν.", correct: true }
+        - { id: "auto-delete", text: "Δεν είναι πρόβλημα — σβήνουν αυτόματα μετά από 24 ώρες.", why: "Οι πάροχοι δεν σβήνουν αυτόματα τους πόρους σου." }
+        - { id: "slow", text: "Κάνουν πιο αργό τον λογαριασμό σου.", why: "Το πρόβλημα είναι το κόστος (και η επιφάνεια επίθεσης), όχι η ταχύτητα." }
+        - { id: "illegal", text: "Παραβιάζουν τους όρους χρήσης.", why: "Επιτρέπονται — απλώς πληρώνεις για αυτές." }
