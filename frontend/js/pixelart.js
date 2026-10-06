@@ -169,7 +169,7 @@ function mountain(group, cx, height, base, body, snow) {
   }
 }
 
-/** The home-page world banner: sky, mountains, forest, our hero and a terminal. */
+/** The home-page world banner: sky, mountains, forest, our penguin and a terminal. */
 export function worldScene() {
   const W = 120;
   const H = 40;
@@ -178,7 +178,7 @@ export function worldScene() {
     class: "scene",
     "shape-rendering": "crispEdges",
     role: "img",
-    "aria-label": "Pixel-art τοπίο με βουνά, δάσος, έναν ήρωα και ένα τερματικό",
+    "aria-label": "Pixel-art τοπίο με βουνά, δάσος, έναν πιγκουίνο και ένα τερματικό",
   });
 
   // Sky in dithered bands.
@@ -216,7 +216,7 @@ export function worldScene() {
 
   drawSprite(svg, SPRITES.terminal, 86, 24);
   const hero = el("g", { class: "hero-sprite" });
-  drawSprite(hero, SPRITES.hero, 54, 22);
+  drawSprite(hero, SPRITES.penguin, 51, 20);
   svg.append(hero);
   return svg;
 }
