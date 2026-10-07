@@ -23,6 +23,8 @@ from app.content.schemas import (
     Quiz,
     Source,
     Track,
+    TrackIntro,
+    TrackIntroMeta,
 )
 
 
@@ -44,6 +46,7 @@ class ContentBundle:
     exercises: dict[str, Exercise] = field(default_factory=dict)
     commands: dict[str, Command] = field(default_factory=dict)
     quizzes: dict[str, Quiz] = field(default_factory=dict)
+    intros: dict[str, TrackIntro] = field(default_factory=dict)
     paths: dict[str, LearningPath] = field(default_factory=dict)
     achievements: dict[str, Achievement] = field(default_factory=dict)
     # Where each object came from, for error messages: (kind, id) -> relative path.
@@ -136,19 +139,21 @@ class _Loader:
             if obj is not None:
                 self.add(kind, store, obj, path)
 
-    def load_lessons(self, paths: Iterable[Path]) -> None:
+    def load_markdown(
+        self, paths: Iterable[Path], meta_model: Any, model: Any, kind: str, store: dict[str, Any]
+    ) -> None:
         for path in sorted(paths):
             try:
                 meta, body = split_front_matter(path.read_text(encoding="utf-8"))
             except (OSError, ValueError, yaml.YAMLError) as exc:
                 self.errors.append(LoadError(self.rel(path), str(exc)))
                 continue
-            lesson_meta = self.validate(LessonMeta, meta, path)
-            if lesson_meta is None:
+            parsed_meta = self.validate(meta_model, meta, path)
+            if parsed_meta is None:
                 continue
-            lesson = self.validate(Lesson, {"meta": lesson_meta, "body_md": body}, path)
-            if lesson is not None:
-                self.add("lesson", self.bundle.lessons, lesson, path)
+            obj = self.validate(model, {"meta": parsed_meta, "body_md": body}, path)
+            if obj is not None:
+                self.add(kind, store, obj, path)
 
     def load_quizzes(self, paths: Iterable[Path]) -> None:
         for path in sorted(paths):
@@ -185,7 +190,12 @@ class _Loader:
         self.load_list(root / "achievements.yaml", Achievement, "achievement", b.achievements)
         self.load_each(root.glob("tracks/*/track.yaml"), Track, "track", b.tracks)
         self.load_each(root.glob("tracks/*/modules/*/module.yaml"), Module, "module", b.modules)
-        self.load_lessons(root.glob("tracks/*/modules/*/lessons/*.md"))
+        self.load_markdown(
+            root.glob("tracks/*/modules/*/lessons/*.md"), LessonMeta, Lesson, "lesson", b.lessons
+        )
+        self.load_markdown(
+            root.glob("tracks/*/intro.md"), TrackIntroMeta, TrackIntro, "intro", b.intros
+        )
         self.load_quizzes(root.glob("tracks/*/quizzes/*.yaml"))
         self.load_each(root.glob("commands/**/*.yaml"), Command, "command", b.commands)
         self.load_each(root.glob("paths/*.yaml"), LearningPath, "path", b.paths)

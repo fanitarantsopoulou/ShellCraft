@@ -95,6 +95,21 @@ def test_stale_and_future_citations():
     assert "future" in messages(lint(bundle(commands={"cp": future}), today=TODAY))[0]
 
 
+def test_one_day_clock_skew_is_tolerated():
+    cmd = cp_command(
+        related=[],
+        citations=[
+            {
+                "source": "gnu-coreutils",
+                "url": "https://www.gnu.org/x",
+                "doc_version": "1",
+                "last_verified": date(2026, 10, 7),
+            }
+        ],
+    )
+    assert lint(bundle(commands={"cp": cmd}), today=TODAY) == []
+
+
 def test_skill_cycle_detected():
     track = Track(
         id="linux",

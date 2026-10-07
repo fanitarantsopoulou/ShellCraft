@@ -83,3 +83,27 @@
   kind: official_manual
   url: https://developer.hashicorp.com/terraform
   allowed_domains: [developer.hashicorp.com]
+- id: kernel-org
+  name: The Linux Kernel Archives
+  publisher: kernel.org
+  kind: project_docs
+  url: https://www.kernel.org/
+  allowed_domains: [kernel.org]
+- id: linux-foundation
+  name: The Linux Foundation
+  publisher: The Linux Foundation
+  kind: project_docs
+  url: https://www.linuxfoundation.org/
+  allowed_domains: [linuxfoundation.org]
+- id: debian
+  name: Debian
+  publisher: Debian Project
+  kind: project_docs
+  url: https://www.debian.org/
+  allowed_domains: [debian.org]
+- id: android
+  name: Android Open Source Project
+  publisher: Google
+  kind: project_docs
+  url: https://source.android.com/
+  allowed_domains: [source.android.com]

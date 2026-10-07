@@ -147,3 +147,16 @@ def quiz_view(bundle: ContentBundle, quiz_id: str) -> dict[str, Any] | None:
         ],
         "next_quiz": siblings[index + 1] if index + 1 < len(siblings) else None,
     }
+
+
+def intro_view(bundle: ContentBundle, track_id: str) -> dict[str, Any] | None:
+    intro = bundle.intros.get(track_id)
+    if intro is None:
+        return None
+    return {
+        "title": intro.meta.title,
+        "body_html": render_block(intro.body_md),
+        "sources": [
+            {"url": str(c.url), "label": c.section or c.doc_version} for c in intro.meta.citations
+        ],
+    }

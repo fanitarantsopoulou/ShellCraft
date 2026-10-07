@@ -1,10 +1,11 @@
 /** 8-bit sound effects synthesized with WebAudio — no audio files. */
 
-const KEY = "linux-learning.sound.v1";
+const KEY = "sudolearn.sound.v1";
+const LEGACY_KEY = "linux-learning.sound.v1";
 let ctx = null;
 let muted = (() => {
   try {
-    return localStorage.getItem(KEY) === "off";
+    return (localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY)) === "off";
   } catch {
     return false;
   }

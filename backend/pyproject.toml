@@ -1,5 +1,5 @@
 [project]
-name = "linux-learning"
+name = "sudolearn"
 version = "0.1.0"
 description = "Interactive learning platform for Linux, networking, containers and cloud."
 requires-python = ">=3.12"

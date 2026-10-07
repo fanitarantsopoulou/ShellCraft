@@ -86,7 +86,7 @@ function score(quiz, run) {
 /* ---------------------------------------------------------------- pages */
 
 function home() {
-  document.title = "Linux Learning";
+  document.title = "SudoLearn";
   show(null,
     worldScene(),
     h("section", { class: "intro" },
@@ -101,15 +101,18 @@ function home() {
   );
 }
 
-function trackTabs(id, active) {
+function trackTabs(id, active, hasIntro) {
   return h("nav", { class: "subtabs", "aria-label": "Ενότητες" },
+    hasIntro
+      ? h("a", { href: `#/track/${id}/intro`, class: active === "intro" ? "active" : "", "data-sfx": "click" }, "Εισαγωγή")
+      : null,
     h("a", { href: `#/track/${id}`, class: active === "quiz" ? "active" : "", "data-sfx": "click" }, "Quiz"),
     h("a", { href: `#/track/${id}/theory`, class: active === "theory" ? "active" : "", "data-sfx": "click" }, "Θεωρία"));
 }
 
 async function trackPage(id, section) {
   const track = await api.track(id);
-  document.title = `${track.title} · Linux Learning`;
+  document.title = `${track.title} · SudoLearn`;
   const head = h("div", { class: "track-head" }, sprite(TRACK_SPRITES[id] ?? "terminal"),
     h("div", {}, h("h1", {}, track.title), h("p", { class: "muted" }, track.summary)));
 
@@ -122,8 +125,20 @@ async function trackPage(id, section) {
     return;
   }
 
+  const hasIntro = Boolean(track.intro);
+
+  if (section === "intro" && hasIntro) {
+    show(id, head, trackTabs(id, "intro", hasIntro),
+      trustedHtml("article", track.intro.body_html, { class: "theory intro" }),
+      h("div", { class: "start-box" },
+        h("a", { class: "btn gold", href: `#/track/${id}`, "data-sfx": "start" }, "Πάμε στα quiz ▶")),
+      h("p", { class: "muted sources" }, "Πηγές: ",
+        track.intro.sources.map((s, i) => [i ? " · " : "", h("a", { href: s.url, target: "_blank", rel: "noopener noreferrer" }, s.label)])));
+    return;
+  }
+
   if (section === "theory") {
-    show(id, head, trackTabs(id, "theory"),
+    show(id, head, trackTabs(id, "theory", hasIntro),
       track.modules.length ? track.modules.map((m) =>
         h("section", { class: "module frame" },
           h("h2", {}, m.title),
@@ -136,7 +151,11 @@ async function trackPage(id, section) {
     return;
   }
 
-  show(id, head, trackTabs(id, "quiz"),
+  show(id, head, trackTabs(id, "quiz", hasIntro),
+    hasIntro
+      ? h("a", { class: "intro-hint", href: `#/track/${id}/intro`, "data-sfx": "click" },
+          `📖 Πρώτη φορά εδώ; Διάβασε πρώτα «${track.intro.title}» ▶`)
+      : null,
     h("ol", { class: "quiz-path" }, track.quizzes.map((q) => {
       const best = bestScore(q.id);
       const stars = best ? starsFor(best.points, best.total) : 0;
@@ -155,7 +174,7 @@ async function trackPage(id, section) {
 async function lessonPage(id) {
   const lesson = await api.lesson(id);
   const trackId = lesson.module?.id.split(".")[0] ?? "linux";
-  document.title = `${lesson.title} · Linux Learning`;
+  document.title = `${lesson.title} · SudoLearn`;
   show(trackId,
     h("nav", { class: "crumbs" }, h("a", { href: `#/track/${trackId}/theory`, "data-sfx": "click" }, "◀ Θεωρία")),
     h("h1", {}, lesson.title),
@@ -301,6 +320,8 @@ const ROUTES = [
   [/^\/$/, () => home()],
   [/^\/track\/([\w-]+)$/, (m) => trackPage(m[1], "quiz")],
   [/^\/track\/([\w-]+)\/theory$/, (m) => trackPage(m[1], "theory")],
+  [/^\/track\/([\w-]+)\/intro$/, (m) => trackPage(m[1], "intro")],
+  [/^\/track\/([\w-]+)\/intro$/, (m) => trackPage(m[1], "intro")],
   [/^\/lesson\/([\w.-]+)$/, (m) => lessonPage(m[1])],
   [/^\/quiz\/([\w.-]+)$/, (m) => quizIntro(m[1])],
   [/^\/quiz\/([\w.-]+)\/q\/(\d+)$/, (m) => questionPage(m[1], Number(m[2]))],

@@ -1,4 +1,4 @@
-# Architecture & Design Analysis
+# SudoLearn — Architecture & Design Analysis
 
 > Status: proposal v0.1 — 2026-10-06. Δεν υπάρχει ακόμη implementation code.
 > Οι τεχνικές αποφάσεις παραπέμπουν σε επίσημες πηγές (βλ. §0).
@@ -577,7 +577,7 @@ spec:
 ## 16. Recommended directory structure
 
 ```
-linux-learning/
+sudolearn/
 ├── backend/
 │   ├── pyproject.toml
 │   ├── alembic.ini

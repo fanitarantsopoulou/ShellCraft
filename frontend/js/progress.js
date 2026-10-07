@@ -1,9 +1,10 @@
 /** Progress lives in this browser only (no accounts yet). */
-const KEY = "linux-learning.progress.v1";
+const KEY = "sudolearn.progress.v1";
+const LEGACY_KEY = "linux-learning.progress.v1"; // before the rename to SudoLearn
 
 function load() {
   try {
-    return new Set(JSON.parse(localStorage.getItem(KEY) || "[]"));
+    return new Set(JSON.parse(localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY) ?? "[]"));
   } catch {
     return new Set();
   }
@@ -30,11 +31,12 @@ export function solvedCount() {
 }
 
 /* Best quiz scores, as { quizId: { points, total } }. */
-const BEST_KEY = "linux-learning.best.v1";
+const BEST_KEY = "sudolearn.best.v1";
+const LEGACY_BEST_KEY = "linux-learning.best.v1";
 
 function loadBest() {
   try {
-    return JSON.parse(localStorage.getItem(BEST_KEY) || "{}");
+    return JSON.parse(localStorage.getItem(BEST_KEY) ?? localStorage.getItem(LEGACY_BEST_KEY) ?? "{}");
   } catch {
     return {};
   }

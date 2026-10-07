@@ -10,6 +10,8 @@ from app.content.schemas.structure import (
     Quiz,
     Skill,
     Track,
+    TrackIntro,
+    TrackIntroMeta,
 )
 
 __all__ = [
@@ -25,4 +27,6 @@ __all__ = [
     "Skill",
     "Source",
     "Track",
+    "TrackIntro",
+    "TrackIntroMeta",
 ]

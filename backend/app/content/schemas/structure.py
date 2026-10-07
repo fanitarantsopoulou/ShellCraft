@@ -88,6 +88,23 @@ class Quiz(ContentModel):
         return self
 
 
+class TrackIntroMeta(ContentModel):
+    """Front matter of content/tracks/<track>/intro.md."""
+
+    track: Slug
+    title: NonEmptyStr
+    citations: list[Citation] = Field(min_length=1)
+
+
+class TrackIntro(ContentModel):
+    meta: TrackIntroMeta
+    body_md: NonEmptyStr
+
+    @property
+    def id(self) -> str:
+        return self.meta.track
+
+
 class LearningPath(ContentModel):
     id: Slug
     title: NonEmptyStr

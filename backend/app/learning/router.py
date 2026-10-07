@@ -7,6 +7,7 @@ from app.evaluation.context import EvalContext
 from app.evaluation.registry import evaluate
 from app.evaluation.result import EvaluationResult
 from app.learning.public import (
+    intro_view,
     lesson_view,
     module_summaries,
     quiz_summaries,
@@ -32,6 +33,7 @@ def get_track(track_id: str) -> dict[str, Any]:
         **track,
         "modules": module_summaries(bundle, track_id),
         "quizzes": quiz_summaries(bundle, track_id),
+        "intro": intro_view(bundle, track_id),
     }
 
 

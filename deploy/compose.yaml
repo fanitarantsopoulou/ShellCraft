@@ -1,4 +1,4 @@
-name: linux-learning
+name: sudolearn
 
 services:
   db:

@@ -1,4 +1,4 @@
-# Linux Learning
+# SudoLearn
 
 Interactive learning platform for Linux, networking, Docker, Kubernetes and cloud,
 with an RPG / pixel-art presentation. Learner-facing content is in Greek; code and docs are in English.

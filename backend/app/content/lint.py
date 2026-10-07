@@ -15,6 +15,8 @@ from app.content.loader import ContentBundle
 from app.content.schemas import Citation
 
 MAX_CITATION_AGE = timedelta(days=365)
+# Authors may be a timezone ahead of the machine running lint (e.g. EEST vs UTC).
+CLOCK_SKEW = timedelta(days=1)
 
 
 class Severity(StrEnum):
@@ -87,7 +89,7 @@ class _Linter:
                 self.error(
                     loc, f"citation URL host {host!r} is not allowed for source {c.source!r}"
                 )
-            if c.last_verified > self.today:
+            if c.last_verified > self.today + CLOCK_SKEW:
                 self.error(loc, f"last_verified {c.last_verified} is in the future")
             elif self.today - c.last_verified > MAX_CITATION_AGE:
                 self.warn(loc, f"citation for {c.url} last verified {c.last_verified}; re-verify")
@@ -128,6 +130,11 @@ class _Linter:
             self.refs(loc, "skill", lesson.meta.skills, skills)
             self.refs(loc, "command", lesson.meta.commands, b.commands)
             self.citations(loc, lesson.meta.citations)
+
+        for intro in b.intros.values():
+            loc = self.where("intro", intro.id)
+            self.refs(loc, "track", [intro.meta.track], b.tracks)
+            self.citations(loc, intro.meta.citations)
 
         orders: dict[tuple[str, int], str] = {}
         for quiz in b.quizzes.values():
