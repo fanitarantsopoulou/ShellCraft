@@ -1,10 +1,11 @@
 /** Progress lives in this browser only (no accounts yet). */
-const KEY = "sudolearn.progress.v1";
-const LEGACY_KEY = "linux-learning.progress.v1"; // before the rename to SudoLearn
+const KEY = "shellcraft.progress.v1";
+// Keys used under earlier project names (Linux Learning, SudoLearn); read once so progress survives renames.
+const LEGACY_KEYS = ["sudolearn.progress.v1", "linux-learning.progress.v1"];
 
 function load() {
   try {
-    return new Set(JSON.parse(localStorage.getItem(KEY) ?? localStorage.getItem(LEGACY_KEY) ?? "[]"));
+    return new Set(JSON.parse([KEY, ...LEGACY_KEYS].map((k) => localStorage.getItem(k)).find((v) => v !== null) ?? "[]"));
   } catch {
     return new Set();
   }
@@ -31,12 +32,12 @@ export function solvedCount() {
 }
 
 /* Best quiz scores, as { quizId: { points, total } }. */
-const BEST_KEY = "sudolearn.best.v1";
-const LEGACY_BEST_KEY = "linux-learning.best.v1";
+const BEST_KEY = "shellcraft.best.v1";
+const LEGACY_BEST_KEYS = ["sudolearn.best.v1", "linux-learning.best.v1"];
 
 function loadBest() {
   try {
-    return JSON.parse(localStorage.getItem(BEST_KEY) ?? localStorage.getItem(LEGACY_BEST_KEY) ?? "{}");
+    return JSON.parse([BEST_KEY, ...LEGACY_BEST_KEYS].map((k) => localStorage.getItem(k)).find((v) => v !== null) ?? "{}");
   } catch {
     return {};
   }

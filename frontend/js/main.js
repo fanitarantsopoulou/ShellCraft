@@ -86,7 +86,7 @@ function score(quiz, run) {
 /* ---------------------------------------------------------------- pages */
 
 function home() {
-  document.title = "SudoLearn";
+  document.title = "ShellCraft";
   show(null,
     worldScene(),
     h("section", { class: "intro" },
@@ -112,7 +112,7 @@ function trackTabs(id, active, hasIntro) {
 
 async function trackPage(id, section) {
   const track = await api.track(id);
-  document.title = `${track.title} · SudoLearn`;
+  document.title = `${track.title} · ShellCraft`;
   const head = h("div", { class: "track-head" }, sprite(TRACK_SPRITES[id] ?? "terminal"),
     h("div", {}, h("h1", {}, track.title), h("p", { class: "muted" }, track.summary)));
 
@@ -174,7 +174,7 @@ async function trackPage(id, section) {
 async function lessonPage(id) {
   const lesson = await api.lesson(id);
   const trackId = lesson.module?.id.split(".")[0] ?? "linux";
-  document.title = `${lesson.title} · SudoLearn`;
+  document.title = `${lesson.title} · ShellCraft`;
   show(trackId,
     h("nav", { class: "crumbs" }, h("a", { href: `#/track/${trackId}/theory`, "data-sfx": "click" }, "◀ Θεωρία")),
     h("h1", {}, lesson.title),

@@ -1,4 +1,4 @@
-name: sudolearn
+name: shellcraft
 
 services:
   db:

@@ -8,7 +8,7 @@ from app.learning.router import router as learning_router
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(
-        title="SudoLearn API",
+        title="ShellCraft API",
         version="0.1.0",
         # Interactive docs only outside production.
         docs_url="/api/docs" if settings.env != "production" else None,
