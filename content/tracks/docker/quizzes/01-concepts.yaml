@@ -1,149 +1,251 @@
 id: docker.q01
 track: docker
 title: Τι είναι το Docker
-description: Images, containers, registries και tags — οι βασικές έννοιες πριν τρέξεις οτιδήποτε.
+description: 'Images, containers, registries και tags: οι βασικές έννοιες πριν τρέξεις οτιδήποτε.'
 level: beginner
 order: 1
-skills: [docker.concepts]
+skills:
+- docker.concepts
 questions:
-  - id: image-vs-container
-    type: multiple_choice
-    prompt: Ποια είναι η σχέση **image** και **container**;
-    explanation: "Το image είναι ένα πακέτο μόνο-για-ανάγνωση με ό,τι χρειάζεται μια εφαρμογή. Το container είναι μια εκτέλεση (instance) αυτού του image — από ένα image μπορείς να τρέξεις πολλά containers."
-    citations:
-      - { source: "docker-docs", url: "https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/", doc_version: "Docker docs 2026", last_verified: 2026-10-06 }
-    spec:
-      options:
-        - { id: "instance", text: "Το container είναι μια εκτέλεση ενός image· από ένα image τρέχουν πολλά containers.", correct: true }
-        - { id: "same", text: "Είναι δύο ονόματα για το ίδιο πράγμα.", why: "Το image είναι το «καλούπι», το container αυτό που τρέχει από αυτό." }
-        - { id: "reverse", text: "Το image φτιάχνεται τρέχοντας ένα container.", why: "Τα images συνήθως χτίζονται από Dockerfile με `docker build`· τα containers δημιουργούνται από images." }
-        - { id: "vm", text: "Το image είναι εικονική μηχανή και το container ο δίσκος της.", why: "Κανένα από τα δύο δεν είναι εικονική μηχανή." }
-
-  - id: container-vs-vm
-    type: multiple_choice
-    prompt: Ποια είναι η βασική διαφορά ενός container από μια εικονική μηχανή (VM);
-    explanation: "Τα containers μοιράζονται τον kernel του host και απομονώνονται με μηχανισμούς του Linux kernel (namespaces, cgroups). Μια VM τρέχει δικό της πλήρες λειτουργικό με δικό της kernel. Γι' αυτό τα containers ξεκινούν σε δευτερόλεπτα και είναι πολύ ελαφρύτερα."
-    citations:
-      - { source: "docker-docs", url: "https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/", doc_version: "Docker docs 2026", last_verified: 2026-10-06 }
-    spec:
-      options:
-        - { id: "kernel", text: "Τα containers μοιράζονται τον kernel του host· μια VM έχει δικό της λειτουργικό και kernel.", correct: true }
-        - { id: "gui", text: "Τα containers δεν έχουν γραφικό περιβάλλον, οι VM έχουν.", why: "Ούτε οι VM έχουν απαραίτητα γραφικό περιβάλλον· η διαφορά είναι ο kernel." }
-        - { id: "windows", text: "Τα containers τρέχουν μόνο σε Windows.", why: "Τα Linux containers χρησιμοποιούν λειτουργίες του Linux kernel." }
-        - { id: "security", text: "Τα containers είναι πάντα πιο ασφαλή από τις VM.", why: "Η κοινή χρήση του kernel σημαίνει *ασθενέστερη* απομόνωση από μια VM, όχι ισχυρότερη." }
-
-  - id: registry
-    type: multiple_choice
-    prompt: Τι είναι ένα **registry** (π.χ. το Docker Hub);
-    explanation: "Ένα registry αποθηκεύει και διανέμει images. Το `docker pull` κατεβάζει από αυτό και το `docker push` ανεβάζει."
-    spec:
-      options:
-        - { id: "store", text: "Υπηρεσία που αποθηκεύει και διανέμει images.", correct: true }
-        - { id: "running", text: "Λίστα με τα containers που τρέχουν.", why: "Αυτό το δείχνει το `docker ps`." }
-        - { id: "windows-registry", text: "Ρυθμίσεις του Docker, όπως το Registry των Windows.", why: "Δεν σχετίζεται με το Windows Registry." }
-        - { id: "logs", text: "Το αρχείο όπου γράφονται τα logs των containers.", why: "Τα logs τα βλέπεις με `docker logs`." }
-
-  - id: run-pulls
-    type: multiple_choice
-    prompt: Τρέχεις `docker run alpine:3 echo hello` αλλά το image δεν υπάρχει στον υπολογιστή σου. Τι γίνεται;
-    explanation: "Το Docker το κατεβάζει αυτόματα από το registry («Unable to find image 'alpine:3' locally… Pulling») και μετά τρέχει το container."
-    reference: docker-container-run
-    spec:
-      options:
-        - { id: "pull", text: "Το κατεβάζει αυτόματα από το registry και μετά το τρέχει.", correct: true }
-        - { id: "error", text: "Αποτυγχάνει· πρέπει πρώτα να κάνεις docker pull.", why: "Το `docker run` κάνει pull μόνο του όταν το image λείπει." }
-        - { id: "build", text: "Χτίζει το image από Dockerfile.", why: "Το `run` δεν χτίζει images· αυτό το κάνει το `docker build`." }
-        - { id: "empty", text: "Τρέχει ένα άδειο container.", why: "Δεν υπάρχει «άδειο container» — χωρίς image δεν τρέχει τίποτα." }
-
-  - id: tag
-    type: multiple_choice
-    prompt: "Στο `nginx:alpine`, τι είναι το `alpine`;"
-    explanation: "Μετά την άνω-κάτω τελεία είναι το **tag**: μια έκδοση ή παραλλαγή του image. Αν δεν δώσεις tag, το Docker χρησιμοποιεί το `latest`."
-    reference: docker-image-pull
-    spec:
-      options:
-        - { id: "tag", text: "Το tag — μια έκδοση/παραλλαγή του image nginx.", correct: true }
-        - { id: "user", text: "Ο χρήστης που ανέβασε το image.", why: "Ο χρήστης/οργανισμός μπαίνει *πριν* από κάθετο, π.χ. `bitnami/nginx`." }
-        - { id: "container", text: "Το όνομα του container που θα δημιουργηθεί.", why: "Το όνομα container δίνεται με `--name`." }
-        - { id: "host", text: "Ο host όπου θα τρέξει.", why: "Το tag περιγράφει το image, όχι το πού θα τρέξει." }
-
-  - id: pull-fill
-    type: fill_in_command
-    prompt: Συμπλήρωσε ώστε να **κατέβει** το image `nginx:alpine` χωρίς να τρέξει τίποτα.
-    explanation: "Το `docker pull` (ή `docker image pull`) κατεβάζει ένα image από το registry."
-    reference: docker-image-pull
-    spec:
-      template: "docker ____ nginx:alpine"
-      blanks:
-        - accepted: ["pull", "image pull"]
-          known_mistakes:
-            - { id: "run", match: "run", feedback: "Το `run` κατεβάζει *και τρέχει* container." }
-            - { id: "download", match: "download", feedback: "Δεν υπάρχει `docker download` — η εντολή είναι `pull`." }
-            - { id: "get", match: "get", feedback: "Δεν υπάρχει `docker get` — η εντολή είναι `pull`." }
-
-  - id: images-write
-    type: command_writing
-    cognitive_level: apply
-    prompt: Δείξε τα **images** που υπάρχουν τοπικά στον υπολογιστή σου.
-    explanation: "Το `docker images` (ή η νεότερη μορφή `docker image ls`) δείχνει τα τοπικά images."
-    reference: docker-image-ls
-    spec:
-      accepted: ["docker image ls"]
+- id: image-vs-container
+  type: multiple_choice
+  prompt: Ποια είναι η σχέση **image** και **container**;
+  explanation: 'Το image είναι ένα πακέτο μόνο για ανάγνωση με ό,τι χρειάζεται μια εφαρμογή. Το container είναι μια εκτέλεση (instance) αυτού του image: από ένα image μπορείς να τρέξεις πολλά containers.'
+  citations:
+  - source: docker-docs
+    url: https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/
+    doc_version: Docker docs 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: instance
+      text: Το container είναι μια εκτέλεση ενός image· από ένα image τρέχουν πολλά containers.
+      correct: true
+    - id: same
+      text: Είναι δύο ονόματα για το ίδιο πράγμα.
+      why: Το image είναι το «καλούπι», το container αυτό που τρέχει από αυτό.
+    - id: reverse
+      text: Το image φτιάχνεται τρέχοντας ένα container.
+      why: Τα images συνήθως χτίζονται από Dockerfile με `docker build`· τα containers δημιουργούνται από images.
+    - id: vm
+      text: Το image είναι εικονική μηχανή και το container ο δίσκος της.
+      why: Κανένα από τα δύο δεν είναι εικονική μηχανή.
+  cognitive_level: recognize
+- id: container-vs-vm
+  type: multiple_choice
+  prompt: Ποια είναι η βασική διαφορά ενός container από μια εικονική μηχανή (VM);
+  explanation: Τα containers μοιράζονται τον kernel του host και απομονώνονται με μηχανισμούς του Linux kernel (namespaces,
+    cgroups). Μια VM τρέχει δικό της πλήρες λειτουργικό με δικό της kernel. Γι' αυτό τα containers ξεκινούν σε δευτερόλεπτα
+    και είναι πολύ ελαφρύτερα.
+  citations:
+  - source: docker-docs
+    url: https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/
+    doc_version: Docker docs 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: kernel
+      text: Τα containers μοιράζονται τον kernel του host· μια VM έχει δικό της λειτουργικό και kernel.
+      correct: true
+    - id: gui
+      text: Τα containers δεν έχουν γραφικό περιβάλλον, οι VM έχουν.
+      why: Ούτε οι VM έχουν απαραίτητα γραφικό περιβάλλον· η διαφορά είναι ο kernel.
+    - id: windows
+      text: Τα containers τρέχουν μόνο σε Windows.
+      why: Τα Linux containers χρησιμοποιούν λειτουργίες του Linux kernel.
+    - id: security
+      text: Τα containers είναι πάντα πιο ασφαλή από τις VM.
+      why: Η κοινή χρήση του kernel σημαίνει *ασθενέστερη* απομόνωση από μια VM, όχι ισχυρότερη.
+  cognitive_level: recognize
+- id: registry
+  type: multiple_choice
+  prompt: Τι είναι ένα **registry** (π.χ. το Docker Hub);
+  explanation: Ένα registry αποθηκεύει images και από εκεί τα κατεβάζει όποιος τα χρειάζεται. Το `docker pull` κατεβάζει από αυτό και το `docker push`
+    ανεβάζει.
+  spec:
+    options:
+    - id: store
+      text: Υπηρεσία που αποθηκεύει images, ώστε να τα κατεβάζει όποιος τα χρειάζεται.
+      correct: true
+    - id: running
+      text: Λίστα με τα containers που τρέχουν.
+      why: Αυτό το δείχνει το `docker ps`.
+    - id: windows-registry
+      text: Ρυθμίσεις του Docker, όπως το Registry των Windows.
+      why: Δεν σχετίζεται με το Windows Registry.
+    - id: logs
+      text: Το αρχείο όπου γράφονται τα logs των containers.
+      why: Τα logs τα βλέπεις με `docker logs`.
+  cognitive_level: recognize
+- id: tag
+  type: multiple_choice
+  prompt: Στο `nginx:alpine`, τι είναι το `alpine`;
+  explanation: 'Μετά την άνω-κάτω τελεία είναι το **tag**: μια έκδοση ή παραλλαγή του image. Αν δεν δώσεις tag,
+    το Docker χρησιμοποιεί το `latest`.'
+  reference: docker-image-pull
+  spec:
+    options:
+    - id: tag
+      text: 'Το tag: μια έκδοση/παραλλαγή του image nginx.'
+      correct: true
+    - id: user
+      text: Ο χρήστης που ανέβασε το image.
+      why: Ο χρήστης/οργανισμός μπαίνει *πριν* από κάθετο, π.χ. `bitnami/nginx`.
+    - id: container
+      text: Το όνομα του container που θα δημιουργηθεί.
+      why: Το όνομα container δίνεται με `--name`.
+    - id: host
+      text: Ο host όπου θα τρέξει.
+      why: Το tag περιγράφει το image, όχι το πού θα τρέξει.
+  cognitive_level: recognize
+- id: run-pulls
+  type: multiple_choice
+  prompt: Τρέχεις `docker run alpine:3 echo hello` αλλά το image δεν υπάρχει στον υπολογιστή σου. Τι γίνεται;
+  explanation: Το Docker το κατεβάζει αυτόματα από το registry («Unable to find image 'alpine:3' locally… Pulling»)
+    και μετά τρέχει το container.
+  reference: docker-container-run
+  spec:
+    options:
+    - id: pull
+      text: Το κατεβάζει αυτόματα από το registry και μετά το τρέχει.
+      correct: true
+    - id: error
+      text: Αποτυγχάνει· πρέπει πρώτα να κάνεις docker pull.
+      why: Το `docker run` κάνει pull μόνο του όταν το image λείπει.
+    - id: build
+      text: Χτίζει το image από Dockerfile.
+      why: Το `run` δεν χτίζει images· αυτό το κάνει το `docker build`.
+    - id: empty
+      text: Τρέχει ένα άδειο container.
+      why: 'Δεν υπάρχει «άδειο container»: χωρίς image δεν τρέχει τίποτα.'
+  cognitive_level: recognize
+- id: ps-select
+  type: command_selection
+  prompt: Ποια εντολή δείχνει τα containers που **τρέχουν** αυτή τη στιγμή;
+  explanation: 'Το `docker ps` (νεότερη μορφή: `docker container ls`) δείχνει τα containers που τρέχουν.'
+  reference: docker-container-ls
+  spec:
+    options:
+    - id: ps
+      text: docker ps
+      correct: true
+    - id: images
+      text: docker images
+      why: Δείχνει images, όχι containers.
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: docker images
+    - id: ls
+      text: docker ls
+      why: '«docker: unknown command: docker ls», το `ls` υπάρχει μόνο ως υποεντολή, π.χ. `docker container ls`.'
+      distractor:
+        existence: nonexistent
+        command: docker ls
+        note: Ελέγχθηκε με Docker CLI 29.5.2.
+    - id: top
+      text: docker top
+      why: Το `docker top` δείχνει τις *διεργασίες μέσα* σε ένα συγκεκριμένο container.
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: docker top
+  cognitive_level: recognize
+- id: pull-fill
+  type: fill_in_command
+  prompt: Συμπλήρωσε ώστε να **κατέβει** το image `nginx:alpine` χωρίς να τρέξει τίποτα.
+  explanation: Το `docker pull` (ή `docker image pull`) κατεβάζει ένα image από το registry.
+  reference: docker-image-pull
+  spec:
+    template: docker ____ nginx:alpine
+    blanks:
+    - accepted:
+      - pull
+      - image pull
       known_mistakes:
-        - { id: "ps", match: "docker ps", feedback: "Το `docker ps` δείχνει containers, όχι images." }
-      test_cases:
-        accept: ["docker images", "docker image ls", "docker image list"]
-        reject: ["docker ps", "docker ls", "docker image", "docker images ls"]
+      - id: run
+        match: run
+        feedback: Το `run` κατεβάζει *και τρέχει* container.
+      - id: download
+        match: download
+        feedback: 'Δεν υπάρχει `docker download`: η εντολή είναι `pull`.'
+      - id: get
+        match: get
+        feedback: 'Δεν υπάρχει `docker get`: η εντολή είναι `pull`.'
+  cognitive_level: recognize
+- id: images-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δείξε τα **images** που υπάρχουν τοπικά στον υπολογιστή σου.
+  explanation: Το `docker images` (ή η νεότερη μορφή `docker image ls`) δείχνει τα τοπικά images.
+  reference: docker-image-ls
+  spec:
+    accepted:
+    - docker image ls
+    known_mistakes:
+    - id: ps
+      match: docker ps
+      feedback: Το `docker ps` δείχνει containers, όχι images.
+    test_cases:
+      accept:
+      - docker images
+      - docker image ls
+      - docker image list
+      reject:
+      - docker ps
+      - docker ls
+      - docker image
+      - docker images ls
+- id: ephemeral
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Μια βάση δεδομένων τρέχει σε container και γράφει δεδομένα στο δικό της filesystem. Τι γίνεται με τα δεδομένα
+    αν **διαγράψεις** το container;
+  explanation: Ό,τι γράφεται στο writable layer ενός container χάνεται όταν το container διαγραφεί. Για δεδομένα
+    που πρέπει να επιζήσουν χρησιμοποιείς **volumes**.
+  citations:
+  - source: docker-docs
+    url: https://docs.docker.com/engine/storage/volumes/
+    doc_version: Docker docs 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: lost
+      text: Χάνονται, εκτός αν ήταν σε volume.
+      correct: true
+    - id: image
+      text: Αποθηκεύονται αυτόματα μέσα στο image.
+      why: Το image δεν αλλάζει όταν τρέχει ένα container.
+    - id: kept
+      text: Μένουν και τα βρίσκει το επόμενο container.
+      why: Ένα νέο container ξεκινά με καθαρό writable layer.
+    - id: host
+      text: Μεταφέρονται στο home του χρήστη.
+      why: Δεν γίνεται καμία αυτόματη μεταφορά.
+- id: pull-denied
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Τι πήγε στραβά;
+  explanation: Το image δεν υπάρχει τοπικά, και στο registry δεν υπάρχει repository με αυτό το όνομα (ή είναι ιδιωτικό).
+    Συνήθως είναι τυπογραφικό λάθος στο όνομα.
+  reference: docker-container-run
+  spec:
+    command: docker run webapp
+    output: 'Unable to find image ''webapp:latest'' locally
 
-  - id: ps-select
-    type: command_selection
-    prompt: Ποια εντολή δείχνει τα containers που **τρέχουν** αυτή τη στιγμή;
-    explanation: "Το `docker ps` (νεότερη μορφή: `docker container ls`) δείχνει τα containers που τρέχουν."
-    reference: docker-container-ls
-    spec:
-      options:
-        - { id: "ps", text: "docker ps", correct: true }
-        - id: "images"
-          text: "docker images"
-          why: "Δείχνει images, όχι containers."
-          distractor: { existence: "exists", issue: "wrong_semantics", command: "docker images" }
-        - id: "ls"
-          text: "docker ls"
-          why: "«docker: unknown command: docker ls» — το `ls` υπάρχει μόνο ως υποεντολή, π.χ. `docker container ls`."
-          distractor: { existence: "nonexistent", command: "docker ls", note: "Ελέγχθηκε με Docker CLI 29.5.2." }
-        - id: "top"
-          text: "docker top"
-          why: "Το `docker top` δείχνει τις *διεργασίες μέσα* σε ένα συγκεκριμένο container."
-          distractor: { existence: "exists", issue: "wrong_semantics", command: "docker top" }
-
-  - id: pull-denied
-    type: output_analysis
-    cognitive_level: troubleshoot
-    prompt: Τι πήγε στραβά;
-    explanation: "Το image δεν υπάρχει τοπικά, και στο registry δεν υπάρχει repository με αυτό το όνομα (ή είναι ιδιωτικό). Συνήθως είναι τυπογραφικό λάθος στο όνομα."
-    reference: docker-container-run
-    spec:
-      command: docker run webapp
-      output: |-
-        Unable to find image 'webapp:latest' locally
-        docker: Error response from daemon: pull access denied for webapp, repository does not exist or may require 'docker login'
-      captured_on: docker-29.5.2
-      options:
-        - { id: "missing", text: "Το image δεν υπάρχει ούτε τοπικά ούτε (δημόσια) στο registry — πιθανώς λάθος όνομα.", correct: true }
-        - { id: "daemon", text: "Το Docker daemon δεν τρέχει.", why: "Τότε δεν θα υπήρχε «Error response from daemon» — ο daemon απάντησε." }
-        - { id: "port", text: "Η θύρα είναι πιασμένη.", why: "Δεν δόθηκε καν θύρα· το πρόβλημα είναι το image." }
-        - { id: "latest", text: "Το tag latest απαγορεύεται.", why: "Το `latest` είναι το προεπιλεγμένο tag και επιτρέπεται κανονικά." }
-
-  - id: ephemeral
-    type: multiple_choice
-    cognitive_level: apply
-    prompt: Μια βάση δεδομένων τρέχει σε container και γράφει δεδομένα στο δικό της filesystem. Τι γίνεται με τα δεδομένα αν **διαγράψεις** το container;
-    explanation: "Ό,τι γράφεται στο writable layer ενός container χάνεται όταν το container διαγραφεί. Για δεδομένα που πρέπει να επιζήσουν χρησιμοποιείς **volumes**."
-    citations:
-      - { source: "docker-docs", url: "https://docs.docker.com/engine/storage/volumes/", doc_version: "Docker docs 2026", last_verified: 2026-10-06 }
-    spec:
-      options:
-        - { id: "lost", text: "Χάνονται — εκτός αν ήταν σε volume.", correct: true }
-        - { id: "image", text: "Αποθηκεύονται αυτόματα μέσα στο image.", why: "Το image δεν αλλάζει όταν τρέχει ένα container." }
-        - { id: "kept", text: "Μένουν και τα βρίσκει το επόμενο container.", why: "Ένα νέο container ξεκινά με καθαρό writable layer." }
-        - { id: "host", text: "Μεταφέρονται στο home του χρήστη.", why: "Δεν γίνεται καμία αυτόματη μεταφορά." }
+      docker: Error response from daemon: pull access denied for webapp, repository does not exist or may require
+      ''docker login'''
+    captured_on: docker-29.5.2
+    options:
+    - id: missing
+      text: 'Το image δεν υπάρχει ούτε τοπικά ούτε (δημόσια) στο registry: πιθανώς λάθος όνομα.'
+      correct: true
+    - id: daemon
+      text: Το Docker daemon δεν τρέχει.
+      why: 'Τότε δεν θα υπήρχε «Error response from daemon»: ο daemon απάντησε.'
+    - id: port
+      text: Η θύρα είναι πιασμένη.
+      why: Δεν δόθηκε καν θύρα· το πρόβλημα είναι το image.
+    - id: latest
+      text: Το tag latest απαγορεύεται.
+      why: Το `latest` είναι το προεπιλεγμένο tag και επιτρέπεται κανονικά.

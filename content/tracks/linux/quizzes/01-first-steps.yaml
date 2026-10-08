@@ -1,7 +1,7 @@
 id: linux.q01
 track: linux
 title: Πρώτα βήματα στο shell
-description: Πού βρίσκομαι, τι υπάρχει εδώ και πώς πάω αλλού — pwd, ls, cd και διαδρομές.
+description: 'Πού βρίσκομαι, τι υπάρχει εδώ και πώς πάω αλλού: pwd, ls, cd και διαδρομές.'
 level: beginner
 order: 1
 skills:
@@ -21,41 +21,14 @@ questions:
       correct: true
     - id: password
       text: Αλλάζει τον κωδικό του χρήστη.
-      why: Αυτό το κάνει το `passwd` — μοιάζει στο όνομα, αλλά είναι άλλη εντολή.
+      why: 'Αυτό το κάνει το `passwd`: μοιάζει στο όνομα, αλλά είναι άλλη εντολή.'
     - id: lists
       text: Δείχνει τα αρχεία του τρέχοντος φακέλου.
       why: Αυτό το κάνει το `ls`.
     - id: home
       text: Με πηγαίνει στον αρχικό μου φάκελο (home).
       why: Αυτό το κάνει το `cd` χωρίς όρισμα.
-- id: pwd-write
-  type: command_writing
-  cognitive_level: apply
-  prompt: Γράψε την εντολή που δείχνει σε ποιον φάκελο βρίσκεσαι.
-  explanation: Το `pwd` τυπώνει την πλήρη διαδρομή του τρέχοντος φακέλου.
-  reference: pwd
-  commands:
-  - pwd
-  spec:
-    accepted:
-    - pwd
-    known_mistakes:
-    - id: passwd
-      match: passwd
-      feedback: Το `passwd` αλλάζει τον κωδικό σου — όχι αυτό που θέλουμε!
-    - id: cd
-      match: cd
-      feedback: Το `cd` χωρίς όρισμα σε μεταφέρει στο home σου, δεν τυπώνει πού είσαι.
-    test_cases:
-      accept:
-      - pwd
-      - '  pwd  '
-      reject:
-      - passwd
-      - cd
-      - ls
-      - PWD
-      - pwd /
+  cognitive_level: recognize
 - id: ls-select
   type: command_selection
   prompt: Θέλεις να δεις ποια αρχεία υπάρχουν στον φάκελο όπου βρίσκεσαι. Ποια εντολή;
@@ -85,11 +58,12 @@ questions:
         command: cat
     - id: list
       text: list
-      why: Δεν υπάρχει εντολή `list` στο Linux — η εντολή είναι το σύντομο `ls`.
+      why: 'Δεν υπάρχει εντολή `list` στο Linux: η εντολή είναι το σύντομο `ls`.'
       distractor:
         existence: nonexistent
         command: list
         note: 'Ελέγχθηκε σε Debian 13: «list: not found».'
+  cognitive_level: recognize
 - id: cd-no-arg
   type: multiple_choice
   prompt: Γράφεις `cd` χωρίς τίποτα άλλο και πατάς Enter. Πού βρίσκεσαι μετά;
@@ -107,10 +81,11 @@ questions:
       why: Για τη ρίζα γράφεις `cd /`.
     - id: same
       text: Μένω στον ίδιο φάκελο.
-      why: Το `cd` χωρίς όρισμα *δεν* είναι «κάνε τίποτα» — πηγαίνει στο home.
+      why: 'Το `cd` χωρίς όρισμα *δεν* είναι «κάνε τίποτα»: πηγαίνει στο home.'
     - id: previous
       text: Στον φάκελο που ήμουν πριν.
       why: Αυτό το κάνει το `cd -`.
+  cognitive_level: recognize
 - id: cd-dotdot
   type: multiple_choice
   prompt: Βρίσκεσαι στο `/home/maria/projects`. Πού θα βρεθείς μετά το `cd ..`;
@@ -128,44 +103,11 @@ questions:
       why: Το `..` ανεβαίνει *ένα* επίπεδο, όχι μέχρι τη ρίζα.
     - id: home
       text: /home
-      why: Αυτό θα ήταν δύο επίπεδα πάνω — `cd ../..`.
+      why: 'Αυτό θα ήταν δύο επίπεδα πάνω: `cd ../..`.'
     - id: same
       text: /home/maria/projects
       why: Το `.` (μία τελεία) είναι ο τρέχων φάκελος· το `..` είναι ο γονικός.
-- id: cd-up-write
-  type: command_writing
-  cognitive_level: apply
-  prompt: Ανέβα **έναν** φάκελο πάνω από εκεί που βρίσκεσαι.
-  explanation: Το `..` είναι ο γονικός φάκελος, άρα `cd ..`.
-  reference: cd
-  commands:
-  - cd
-  spec:
-    accepted:
-    - cd ..
-    - cd ../
-    known_mistakes:
-    - id: nospace
-      match: cd..
-      feedback: 'Χρειάζεται κενό: `cd ..`. Το `cd..` το shell το ψάχνει ως μία (ανύπαρκτη) εντολή.'
-    - id: dot
-      match: cd .
-      feedback: Μία τελεία είναι ο *τρέχων* φάκελος — μένεις εκεί που είσαι.
-    - id: root
-      match: cd /
-      feedback: Αυτό πηγαίνει στη ρίζα, όχι έναν φάκελο πάνω.
-    test_cases:
-      accept:
-      - cd ..
-      - cd ../
-      - cd  ..
-      reject:
-      - cd..
-      - cd .
-      - cd /
-      - cd ../..
-      - cd ~
-      - cd -
+  cognitive_level: recognize
 - id: absolute-path
   type: multiple_choice
   prompt: Ποια από αυτές είναι **απόλυτη** διαδρομή (δουλεύει ίδια από όποιον φάκελο κι αν βρίσκεσαι);
@@ -180,10 +122,11 @@ questions:
       why: Χωρίς `/` στην αρχή, ψάχνει φάκελο `var` *μέσα* στον τρέχοντα φάκελο.
     - id: dot
       text: ./var/log
-      why: Το `./` σημαίνει «από εδώ που είμαι» — είναι σχετική διαδρομή.
+      why: 'Το `./` σημαίνει «από εδώ που είμαι»: είναι σχετική διαδρομή.'
     - id: dotdot
       text: ../log
-      why: Το `..` εξαρτάται από το πού βρίσκεσαι — σχετική διαδρομή.
+      why: 'Το `..` εξαρτάται από το πού βρίσκεσαι: σχετική διαδρομή.'
+  cognitive_level: recognize
 - id: tilde
   type: multiple_choice
   prompt: Τι σημαίνει το `~` σε μια διαδρομή όπως `~/notes.txt`;
@@ -203,6 +146,7 @@ questions:
       text: Ένα προσωρινό αρχείο.
       why: Στο shell το `~` στην αρχή μιας διαδρομής είναι το home· άλλα προγράμματα χρησιμοποιούν το `~` στο *τέλος*
         ονομάτων για backup αρχεία (π.χ. `notes.txt~`).
+  cognitive_level: recognize
 - id: ls-a
   type: multiple_choice
   prompt: Τι επιπλέον δείχνει το `ls -a` σε σχέση με το σκέτο `ls`;
@@ -225,6 +169,7 @@ questions:
     - id: dirs
       text: Μόνο τους φακέλους.
       why: Το `-a` δείχνει *περισσότερα*, όχι λιγότερα.
+  cognitive_level: recognize
 - id: ls-long-fill
   type: fill_in_command
   prompt: Συμπλήρωσε ώστε το `ls` να δείξει αναλυτική λίστα (δικαιώματα, ιδιοκτήτη, μέγεθος, ημερομηνία).
@@ -247,6 +192,102 @@ questions:
       - id: h
         match: -h
         feedback: Το `-h` κάνει τα μεγέθη ευανάγνωστα (π.χ. 4.0K), αλλά μόνο *μαζί* με το `-l`.
+  cognitive_level: recognize
+- id: pwd-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Γράψε την εντολή που δείχνει σε ποιον φάκελο βρίσκεσαι.
+  explanation: Το `pwd` τυπώνει την πλήρη διαδρομή του τρέχοντος φακέλου.
+  reference: pwd
+  commands:
+  - pwd
+  spec:
+    accepted:
+    - pwd
+    known_mistakes:
+    - id: passwd
+      match: passwd
+      feedback: Το `passwd` αλλάζει τον κωδικό σου, όχι αυτό που θέλουμε!
+    - id: cd
+      match: cd
+      feedback: Το `cd` χωρίς όρισμα σε μεταφέρει στο home σου, δεν τυπώνει πού είσαι.
+    test_cases:
+      accept:
+      - pwd
+      - '  pwd  '
+      reject:
+      - passwd
+      - cd
+      - ls
+      - PWD
+      - pwd /
+- id: cd-up-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Ανέβα **έναν** φάκελο πάνω από εκεί που βρίσκεσαι.
+  explanation: Το `..` είναι ο γονικός φάκελος, άρα `cd ..`.
+  reference: cd
+  commands:
+  - cd
+  spec:
+    accepted:
+    - cd ..
+    - cd ../
+    known_mistakes:
+    - id: nospace
+      match: cd..
+      feedback: 'Χρειάζεται κενό: `cd ..`. Το `cd..` το shell το ψάχνει ως μία (ανύπαρκτη) εντολή.'
+    - id: dot
+      match: cd .
+      feedback: 'Μία τελεία είναι ο *τρέχων* φάκελος: μένεις εκεί που είσαι.'
+    - id: root
+      match: cd /
+      feedback: Αυτό πηγαίνει στη ρίζα, όχι έναν φάκελο πάνω.
+    test_cases:
+      accept:
+      - cd ..
+      - cd ../
+      - cd  ..
+      reject:
+      - cd..
+      - cd .
+      - cd /
+      - cd ../..
+      - cd ~
+      - cd -
+- id: cd-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Πήγαινε στον φάκελο `/var/log`, ώστε η εντολή να δουλεύει από όποιον φάκελο κι αν βρίσκεσαι.
+  hints:
+  - 'Χρειάζεσαι απόλυτη διαδρομή: ξεκινά με `/`.'
+  explanation: Το `cd /var/log` χρησιμοποιεί απόλυτη διαδρομή, άρα δουλεύει από παντού.
+  reference: cd
+  commands:
+  - cd
+  spec:
+    accepted:
+    - cd /var/log
+    - cd /var/log/
+    known_mistakes:
+    - id: relative
+      match: cd var/log
+      feedback: 'Χωρίς `/` στην αρχή, η διαδρομή είναι σχετική: δουλεύει μόνο αν βρίσκεσαι ήδη στο `/`.'
+    - id: ls
+      match: ls /var/log
+      feedback: Το `ls` δείχνει τι υπάρχει στον φάκελο, αλλά δεν σε μεταφέρει εκεί.
+    test_cases:
+      accept:
+      - cd /var/log
+      - cd /var/log/
+      - cd '/var/log'
+      reject:
+      - cd var/log
+      - cd /var/logs
+      - ls /var/log
+      - cd /var /log
+      - cd ~/var/log
+      - cd /var/log && ls
 - id: ls-la-write
   type: command_writing
   cognitive_level: apply
@@ -266,10 +307,10 @@ questions:
     known_mistakes:
     - id: only-l
       match: ls -l
-      feedback: Λείπουν τα κρυφά αρχεία — χρειάζεται και `-a`.
+      feedback: 'Λείπουν τα κρυφά αρχεία: χρειάζεται και `-a`.'
     - id: only-a
       match: ls -a
-      feedback: Λείπει η αναλυτική μορφή — χρειάζεται και `-l`.
+      feedback: 'Λείπει η αναλυτική μορφή: χρειάζεται και `-l`.'
     test_cases:
       accept:
       - ls -la
@@ -285,39 +326,32 @@ questions:
       - ls -lh
       - ls -LA
       - ls -R
-- id: cd-write
-  type: command_writing
+- id: cd-builtin
+  type: multiple_choice
   cognitive_level: apply
-  prompt: Πήγαινε στον φάκελο `/var/log`, ώστε η εντολή να δουλεύει από όποιον φάκελο κι αν βρίσκεσαι.
-  hints:
-  - Χρειάζεσαι απόλυτη διαδρομή — ξεκινά με `/`.
-  explanation: Το `cd /var/log` χρησιμοποιεί απόλυτη διαδρομή, άρα δουλεύει από παντού.
+  prompt: Το `ls` είναι πρόγραμμα (`/usr/bin/ls`), αλλά το `cd` είναι ενσωματωμένο στο shell (*builtin*). Γιατί;
+  explanation: 'Κάθε εξωτερικό πρόγραμμα τρέχει σε δική του διεργασία. Αν το `cd` ήταν πρόγραμμα, θα άλλαζε τον
+    φάκελο της δικής του διεργασίας και μετά θα τερμάτιζε: το shell σου θα έμενε εκεί που ήταν.
+
+    '
   reference: cd
   commands:
   - cd
+  - ls
   spec:
-    accepted:
-    - cd /var/log
-    - cd /var/log/
-    known_mistakes:
-    - id: relative
-      match: cd var/log
-      feedback: Χωρίς `/` στην αρχή, η διαδρομή είναι σχετική — δουλεύει μόνο αν βρίσκεσαι ήδη στο `/`.
-    - id: ls
-      match: ls /var/log
-      feedback: Το `ls` δείχνει τι υπάρχει στον φάκελο, αλλά δεν σε μεταφέρει εκεί.
-    test_cases:
-      accept:
-      - cd /var/log
-      - cd /var/log/
-      - cd '/var/log'
-      reject:
-      - cd var/log
-      - cd /var/logs
-      - ls /var/log
-      - cd /var /log
-      - cd ~/var/log
-      - cd /var/log && ls
+    options:
+    - id: process
+      text: Ένα ξεχωριστό πρόγραμμα δεν μπορεί να αλλάξει τον φάκελο του shell που το ξεκίνησε.
+      correct: true
+    - id: speed
+      text: 'Μόνο για ταχύτητα: θα μπορούσε άνετα να είναι και πρόγραμμα.'
+      why: Η ταχύτητα δεν είναι ο λόγος· ένα εξωτερικό `cd` απλώς δεν θα λειτουργούσε.
+    - id: kernel
+      text: Επειδή το cd είναι μέρος του Linux kernel.
+      why: Ο kernel παρέχει την κλήση συστήματος `chdir`, αλλά η εντολή `cd` ανήκει στο shell (bash).
+    - id: security
+      text: Για λόγους ασφαλείας, ώστε να μην μπορεί να το αλλάξει κανείς.
+      why: 'Δεν σχετίζεται με ασφάλεια: σχετίζεται με το ότι κάθε διεργασία έχει δικό της τρέχοντα φάκελο.'
 - id: cd-not-dir
   type: output_analysis
   cognitive_level: troubleshoot
@@ -344,29 +378,3 @@ questions:
     - id: bash
       text: Το bash δεν βρήκε την εντολή cd.
       why: Τότε θα έβλεπες «command not found». Εδώ το cd έτρεξε κανονικά και διαμαρτυρήθηκε για το όρισμα.
-- id: cd-builtin
-  type: multiple_choice
-  cognitive_level: apply
-  prompt: Το `ls` είναι πρόγραμμα (`/usr/bin/ls`), αλλά το `cd` είναι ενσωματωμένο στο shell (*builtin*). Γιατί;
-  explanation: 'Κάθε εξωτερικό πρόγραμμα τρέχει σε δική του διεργασία. Αν το `cd` ήταν πρόγραμμα, θα άλλαζε τον
-    φάκελο της δικής του διεργασίας και μετά θα τερμάτιζε — το shell σου θα έμενε εκεί που ήταν.
-
-    '
-  reference: cd
-  commands:
-  - cd
-  - ls
-  spec:
-    options:
-    - id: process
-      text: Ένα ξεχωριστό πρόγραμμα δεν μπορεί να αλλάξει τον φάκελο του shell που το ξεκίνησε.
-      correct: true
-    - id: speed
-      text: Μόνο για ταχύτητα — θα μπορούσε άνετα να είναι και πρόγραμμα.
-      why: Η ταχύτητα δεν είναι ο λόγος· ένα εξωτερικό `cd` απλώς δεν θα λειτουργούσε.
-    - id: kernel
-      text: Επειδή το cd είναι μέρος του Linux kernel.
-      why: Ο kernel παρέχει την κλήση συστήματος `chdir`, αλλά η εντολή `cd` ανήκει στο shell (bash).
-    - id: security
-      text: Για λόγους ασφαλείας, ώστε να μην μπορεί να το αλλάξει κανείς.
-      why: Δεν σχετίζεται με ασφάλεια — σχετίζεται με το ότι κάθε διεργασία έχει δικό της τρέχοντα φάκελο.

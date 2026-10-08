@@ -1,7 +1,7 @@
 id: linux.q04
 track: linux
 title: Αναζήτηση με grep
-description: Βρες γραμμές μέσα σε αρχεία — με ή χωρίς κεφαλαία, με αριθμό γραμμής, αντίστροφα και αναδρομικά.
+description: 'Βρες γραμμές μέσα σε αρχεία: με ή χωρίς κεφαλαία, με αριθμό γραμμής, αντίστροφα και σε όλους τους υποφακέλους.'
 level: beginner
 order: 4
 skills:
@@ -10,7 +10,7 @@ questions:
 - id: grep-purpose
   type: multiple_choice
   prompt: Τι κάνει το `grep error app.log`;
-  explanation: Το `grep` τυπώνει κάθε γραμμή του αρχείου που περιέχει το μοτίβο — εδώ τη λέξη «error».
+  explanation: 'Το `grep` τυπώνει κάθε γραμμή του αρχείου που περιέχει το μοτίβο: εδώ τη λέξη «error».'
   reference: grep
   commands:
   - grep
@@ -27,236 +27,8 @@ questions:
       why: Αναζήτηση με *όνομα* αρχείου κάνει το `find`· το `grep` ψάχνει *περιεχόμενο*.
     - id: delete
       text: Διαγράφει τις γραμμές με «error».
-      why: Το `grep` μόνο διαβάζει — δεν αλλάζει το αρχείο.
-- id: grep-case-output
-  type: output_analysis
-  cognitive_level: troubleshoot
-  prompt: Το `app.log` περιέχει τις γραμμές «Error disk full», «error network down» και «ok». Γιατί εμφανίστηκε
-    μόνο μία γραμμή;
-  explanation: Το `grep` κάνει διάκριση πεζών-κεφαλαίων. Το «Error» με κεφαλαίο Ε δεν ταιριάζει με «error». Με `grep
-    -i error app.log` θα έβγαιναν και οι δύο.
-  reference: grep
-  commands:
-  - grep
-  spec:
-    command: grep error app.log
-    output: error network down
-    captured_on: debian-13.7
-    options:
-    - id: case
-      text: Το grep ξεχωρίζει κεφαλαία από πεζά — το «Error» δεν ταιριάζει.
-      correct: true
-    - id: first
-      text: Το grep σταματά στο πρώτο αποτέλεσμα.
-      why: Το `grep` τυπώνει *όλες* τις γραμμές που ταιριάζουν (εκτός αν δώσεις `-m`).
-    - id: words
-      text: Το grep ψάχνει μόνο ολόκληρες γραμμές.
-      why: Ψάχνει οπουδήποτε μέσα στη γραμμή· μόνο το `-x` ζητά ολόκληρη γραμμή.
-    - id: last
-      text: Το grep δείχνει μόνο την τελευταία γραμμή που ταιριάζει.
-      why: Δείχνει όλες τις γραμμές που ταιριάζουν, με τη σειρά.
-- id: grep-i-fill
-  type: fill_in_command
-  prompt: Συμπλήρωσε ώστε να βρεθούν και το «Error» και το «ERROR» και το «error».
-  explanation: Το `-i` (*ignore case*) κάνει την αναζήτηση χωρίς διάκριση πεζών-κεφαλαίων.
-  reference: grep
-  commands:
-  - grep
-  spec:
-    template: grep ____ error app.log
-    blanks:
-    - accepted:
-      - -i
-      - --ignore-case
-      known_mistakes:
-      - id: v
-        match: -v
-        feedback: 'Το `-v` αντιστρέφει την αναζήτηση: δείχνει τις γραμμές που *δεν* ταιριάζουν.'
-      - id: c
-        match: -c
-        feedback: Το `-c` μετράει γραμμές, δεν αλλάζει τη διάκριση πεζών-κεφαλαίων.
-      - id: big-i
-        match: -I
-        feedback: Το κεφαλαίο `-I` αγνοεί binary αρχεία. Θέλεις μικρό `-i`.
-- id: grep-n-write
-  type: command_writing
-  cognitive_level: apply
-  prompt: Βρες τις γραμμές του `app.log` που περιέχουν «timeout» και δείξε **σε ποια γραμμή** είναι η καθεμία.
-  hints:
-  - Το grep έχει επιλογή που τυπώνει τον αριθμό γραμμής.
-  explanation: Το `grep -n timeout app.log` προσθέτει τον αριθμό γραμμής μπροστά από κάθε αποτέλεσμα, π.χ. `42:connection
-    timeout`.
-  reference: grep
-  commands:
-  - grep
-  spec:
-    accepted:
-    - grep -n timeout app.log
-    - grep -n -e timeout app.log
-    known_mistakes:
-    - id: no-n
-      match: grep timeout app.log
-      feedback: Αυτό βρίσκει τις γραμμές, αλλά χωρίς αριθμό γραμμής — χρειάζεται `-n`.
-    - id: swapped
-      match: grep -n app.log timeout
-      feedback: Πρώτα το μοτίβο, μετά το αρχείο.
-    - id: count
-      match: grep -c timeout app.log
-      feedback: Το `-c` τυπώνει μόνο *πόσες* γραμμές ταιριάζουν.
-    test_cases:
-      accept:
-      - grep -n timeout app.log
-      - grep --line-number timeout app.log
-      - grep timeout app.log -n
-      - grep -n 'timeout' app.log
-      - grep -n -e timeout app.log
-      reject:
-      - grep timeout app.log
-      - grep -n app.log timeout
-      - grep -c timeout app.log
-      - grep -N timeout app.log
-      - grep -n Timeout app.log
-- id: grep-v
-  type: multiple_choice
-  prompt: Τι δείχνει το `grep -v ok status.txt`;
-  explanation: Το `-v` (*invert match*) δείχνει τις γραμμές που **δεν** περιέχουν το μοτίβο. Χρήσιμο για να κρύψεις
-    «θόρυβο».
-  reference: grep
-  commands:
-  - grep
-  spec:
-    options:
-    - id: invert
-      text: Όλες τις γραμμές που ΔΕΝ περιέχουν «ok».
-      correct: true
-    - id: verbose
-      text: Τις γραμμές με «ok» και επιπλέον πληροφορίες.
-      why: Στο `grep` το `-v` *δεν* σημαίνει verbose — σημαίνει invert.
-    - id: version
-      text: Την έκδοση του grep.
-      why: Η έκδοση εμφανίζεται με `-V` ή `--version`.
-    - id: count
-      text: Πόσες γραμμές περιέχουν «ok».
-      why: Αυτό κάνει το `-c`.
-- id: grep-v-write
-  type: command_writing
-  cognitive_level: apply
-  prompt: Δείξε τις γραμμές του `app.log` που **ΔΕΝ** περιέχουν τη λέξη `DEBUG`.
-  explanation: Το `grep -v DEBUG app.log` αντιστρέφει την αναζήτηση — ιδανικό για να κρύψεις τον «θόρυβο».
-  reference: grep
-  commands:
-  - grep
-  spec:
-    accepted:
-    - grep -v DEBUG app.log
-    known_mistakes:
-    - id: no-v
-      match: grep DEBUG app.log
-      feedback: Αυτό δείχνει τις γραμμές *με* DEBUG — χρειάζεται `-v` για το αντίθετο.
-    - id: i
-      match: grep -i DEBUG app.log
-      feedback: Το `-i` αγνοεί κεφαλαία/πεζά· δεν αντιστρέφει την αναζήτηση.
-    test_cases:
-      accept:
-      - grep -v DEBUG app.log
-      - grep --invert-match DEBUG app.log
-      - grep -v 'DEBUG' app.log
-      - grep DEBUG app.log -v
-      reject:
-      - grep DEBUG app.log
-      - grep -i DEBUG app.log
-      - grep -v debug app.log
-      - grep -v app.log DEBUG
-- id: grep-exit
-  type: multiple_choice
-  cognitive_level: apply
-  prompt: Το `grep` δεν βρήκε καμία γραμμή. Τι exit code επιστρέφει; (Χρήσιμο σε scripts.)
-  explanation: 'Το GNU grep επιστρέφει 0 όταν βρει κάτι, 1 όταν δεν βρει τίποτα και 2 όταν υπάρξει σφάλμα (π.χ.
-    ανύπαρκτο αρχείο). Έτσι ένα script μπορεί να ελέγξει `if grep -q error app.log; then ...`.
-
-    '
-  reference: grep
-  commands:
-  - grep
-  spec:
-    options:
-    - id: one
-      text: '1'
-      correct: true
-    - id: zero
-      text: '0'
-      why: Το 0 σημαίνει «βρέθηκε τουλάχιστον μία γραμμή».
-    - id: two
-      text: '2'
-      why: Το 2 σημαίνει σφάλμα (π.χ. το αρχείο δεν υπάρχει).
-    - id: msg
-      text: Τυπώνει «not found» και επιστρέφει 0.
-      why: Δεν τυπώνει τίποτα· απλώς επιστρέφει 1.
-- id: grep-recursive
-  type: command_selection
-  cognitive_level: apply
-  prompt: Θέλεις να βρεις τη λέξη «password» σε **όλα** τα αρχεία μέσα στον φάκελο `config/` (και στους υποφακέλους
-    του). Ποια εντολή;
-  explanation: Το `grep -r` ψάχνει αναδρομικά σε όλα τα αρχεία ενός φακέλου και τυπώνει `αρχείο:γραμμή`, π.χ. `config/app.conf:password=...`.
-  reference: grep
-  commands:
-  - grep
-  spec:
-    options:
-    - id: r
-      text: grep -r password config/
-      correct: true
-    - id: plain
-      text: grep password config/
-      why: 'Χωρίς `-r` το grep δεν μπαίνει σε φακέλους: «grep: config/: Is a directory».'
-      distractor:
-        existence: exists
-        issue: wrong_flag
-        command: grep
-    - id: find
-      text: find config/ password
-      why: Το `find` ψάχνει *ονόματα* αρχείων, όχι περιεχόμενο — και εδώ θα θεωρούσε το «password» δεύτερη διαδρομή.
-      distractor:
-        existence: exists
-        issue: wrong_semantics
-        command: find
-    - id: v
-      text: grep -v password config/
-      why: Το `-v` αντιστρέφει την αναζήτηση, και χωρίς `-r` δεν μπαίνει στον φάκελο.
-      distractor:
-        existence: exists
-        issue: wrong_flag
-        command: grep
-- id: grep-r-write
-  type: command_writing
-  cognitive_level: apply
-  prompt: Ψάξε το κείμενο `TODO` σε **όλα** τα αρχεία μέσα στον φάκελο `src` και στους υποφακέλους του.
-  explanation: Το `grep -r TODO src` ψάχνει αναδρομικά και τυπώνει `αρχείο:γραμμή` για κάθε αποτέλεσμα.
-  reference: grep
-  commands:
-  - grep
-  spec:
-    accepted:
-    - grep -r TODO src
-    - grep -r TODO src/
-    - grep -R TODO src
-    - grep -R TODO src/
-    known_mistakes:
-    - id: no-r
-      match: grep TODO src
-      feedback: 'Χωρίς `-r` το grep δεν μπαίνει σε φακέλους: «grep: src: Is a directory».'
-    test_cases:
-      accept:
-      - grep -r TODO src
-      - grep -r TODO src/
-      - grep --recursive TODO src
-      - grep -R TODO src
-      - grep TODO -r src
-      reject:
-      - grep TODO src
-      - grep -r src TODO
-      - find src TODO
-      - grep -v TODO src
+      why: Το `grep` μόνο διαβάζει, δεν αλλάζει το αρχείο.
+  cognitive_level: recognize
 - id: find-vs-grep
   type: multiple_choice
   prompt: Ποια είναι η βασική διαφορά `find` και `grep`;
@@ -276,30 +48,54 @@ questions:
     - id: speed
       text: Το grep είναι πιο γρήγορη έκδοση του find.
       why: Δεν είναι εκδόσεις του ίδιου εργαλείου· κάνουν διαφορετική δουλειά.
-- id: find-output
-  type: output_analysis
-  prompt: Τι έκανε αυτή η εντολή;
-  explanation: Το `find proj -name "*.py"` ψάχνει αναδρομικά μέσα στο `proj` για αρχεία που το όνομά τους τελειώνει
-    σε `.py`. Τα εισαγωγικά εμποδίζουν το shell να αντικαταστήσει το `*` πριν φτάσει στο find.
+  cognitive_level: recognize
+- id: grep-i-fill
+  type: fill_in_command
+  prompt: Συμπλήρωσε ώστε να βρεθούν και το «Error» και το «ERROR» και το «error».
+  explanation: Το `-i` (*ignore case*) κάνει την αναζήτηση χωρίς διάκριση πεζών και κεφαλαίων.
+  reference: grep
+  commands:
+  - grep
   spec:
-    command: find proj -name "*.py"
-    output: 'proj/src/main.py
-
-      proj/src/util.py'
-    captured_on: debian-13.7
+    template: grep ____ error app.log
+    blanks:
+    - accepted:
+      - -i
+      - --ignore-case
+      known_mistakes:
+      - id: v
+        match: -v
+        feedback: 'Το `-v` αντιστρέφει την αναζήτηση: δείχνει τις γραμμές που *δεν* ταιριάζουν.'
+      - id: c
+        match: -c
+        feedback: Το `-c` μετράει γραμμές, δεν αλλάζει τη διάκριση πεζών και κεφαλαίων.
+      - id: big-i
+        match: -I
+        feedback: Το κεφαλαίο `-I` αγνοεί binary αρχεία. Θέλεις μικρό `-i`.
+  cognitive_level: recognize
+- id: grep-v
+  type: multiple_choice
+  prompt: Τι δείχνει το `grep -v ok status.txt`;
+  explanation: Το `-v` (*invert match*) δείχνει τις γραμμές που **δεν** περιέχουν το μοτίβο. Χρήσιμο για να κρύψεις
+    «θόρυβο».
+  reference: grep
+  commands:
+  - grep
+  spec:
     options:
-    - id: right
-      text: Βρήκε όλα τα αρχεία .py μέσα στο proj και στους υποφακέλους του.
+    - id: invert
+      text: Όλες τις γραμμές που ΔΕΝ περιέχουν «ok».
       correct: true
-    - id: top
-      text: Βρήκε τα αρχεία .py μόνο στον πρώτο φάκελο proj.
-      why: Τα αποτελέσματα είναι στο `proj/src` — το find ψάχνει αναδρομικά από προεπιλογή.
-    - id: content
-      text: Βρήκε αρχεία που περιέχουν το κείμενο «*.py».
-      why: Το `-name` ελέγχει το όνομα του αρχείου, όχι το περιεχόμενο.
-    - id: created
-      text: Δημιούργησε τα δύο αρχεία.
-      why: Το `find` μόνο αναζητά — εκτός αν του ζητήσεις ρητά ενέργεια (π.χ. `-delete`).
+    - id: verbose
+      text: Τις γραμμές με «ok» και επιπλέον πληροφορίες.
+      why: 'Στο `grep` το `-v` *δεν* σημαίνει verbose: σημαίνει invert.'
+    - id: version
+      text: Την έκδοση του grep.
+      why: Η έκδοση εμφανίζεται με `-V` ή `--version`.
+    - id: count
+      text: Πόσες γραμμές περιέχουν «ok».
+      why: Αυτό κάνει το `-c`.
+  cognitive_level: recognize
 - id: grep-count
   type: output_analysis
   prompt: Τι σημαίνει το «2»;
@@ -325,3 +121,213 @@ questions:
     - id: words
       text: Η λέξη error εμφανίζεται ακριβώς 2 φορές σε όλο το αρχείο.
       why: Το `-c` μετράει *γραμμές*· αν μια γραμμή είχε δύο φορές το error, θα μετρούσε μία.
+  cognitive_level: recognize
+- id: find-output
+  type: output_analysis
+  prompt: Τι έκανε αυτή η εντολή;
+  explanation: Το `find proj -name "*.py"` ψάχνει μέσα στο `proj` και σε όλους τους υποφακέλους του για αρχεία που το όνομά τους τελειώνει
+    σε `.py`. Τα εισαγωγικά εμποδίζουν το shell να αντικαταστήσει το `*` πριν φτάσει στο find.
+  spec:
+    command: find proj -name "*.py"
+    output: 'proj/src/main.py
+
+      proj/src/util.py'
+    captured_on: debian-13.7
+    options:
+    - id: right
+      text: Βρήκε όλα τα αρχεία .py μέσα στο proj και στους υποφακέλους του.
+      correct: true
+    - id: top
+      text: Βρήκε τα αρχεία .py μόνο στον πρώτο φάκελο proj.
+      why: 'Τα αποτελέσματα είναι στο `proj/src`: το find ψάχνει από μόνο του και στους υποφακέλους.'
+    - id: content
+      text: Βρήκε αρχεία που περιέχουν το κείμενο «*.py».
+      why: Το `-name` ελέγχει το όνομα του αρχείου, όχι το περιεχόμενο.
+    - id: created
+      text: Δημιούργησε τα δύο αρχεία.
+      why: Το `find` μόνο αναζητά, εκτός αν του ζητήσεις ρητά ενέργεια (π.χ. `-delete`).
+  cognitive_level: recognize
+- id: grep-n-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Βρες τις γραμμές του `app.log` που περιέχουν «timeout» και δείξε **σε ποια γραμμή** είναι η καθεμία.
+  hints:
+  - Το grep έχει επιλογή που τυπώνει τον αριθμό γραμμής.
+  explanation: Το `grep -n timeout app.log` προσθέτει τον αριθμό γραμμής μπροστά από κάθε αποτέλεσμα, π.χ. `42:connection
+    timeout`.
+  reference: grep
+  commands:
+  - grep
+  spec:
+    accepted:
+    - grep -n timeout app.log
+    - grep -n -e timeout app.log
+    known_mistakes:
+    - id: no-n
+      match: grep timeout app.log
+      feedback: 'Αυτό βρίσκει τις γραμμές, αλλά χωρίς αριθμό γραμμής: χρειάζεται `-n`.'
+    - id: swapped
+      match: grep -n app.log timeout
+      feedback: Πρώτα το μοτίβο, μετά το αρχείο.
+    - id: count
+      match: grep -c timeout app.log
+      feedback: Το `-c` τυπώνει μόνο *πόσες* γραμμές ταιριάζουν.
+    test_cases:
+      accept:
+      - grep -n timeout app.log
+      - grep --line-number timeout app.log
+      - grep timeout app.log -n
+      - grep -n 'timeout' app.log
+      - grep -n -e timeout app.log
+      reject:
+      - grep timeout app.log
+      - grep -n app.log timeout
+      - grep -c timeout app.log
+      - grep -N timeout app.log
+      - grep -n Timeout app.log
+- id: grep-v-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δείξε τις γραμμές του `app.log` που **ΔΕΝ** περιέχουν τη λέξη `DEBUG`.
+  explanation: 'Το `grep -v DEBUG app.log` αντιστρέφει την αναζήτηση: ιδανικό για να κρύψεις τον «θόρυβο».'
+  reference: grep
+  commands:
+  - grep
+  spec:
+    accepted:
+    - grep -v DEBUG app.log
+    known_mistakes:
+    - id: no-v
+      match: grep DEBUG app.log
+      feedback: 'Αυτό δείχνει τις γραμμές *με* DEBUG: χρειάζεται `-v` για το αντίθετο.'
+    - id: i
+      match: grep -i DEBUG app.log
+      feedback: Το `-i` αγνοεί κεφαλαία/πεζά· δεν αντιστρέφει την αναζήτηση.
+    test_cases:
+      accept:
+      - grep -v DEBUG app.log
+      - grep --invert-match DEBUG app.log
+      - grep -v 'DEBUG' app.log
+      - grep DEBUG app.log -v
+      reject:
+      - grep DEBUG app.log
+      - grep -i DEBUG app.log
+      - grep -v debug app.log
+      - grep -v app.log DEBUG
+- id: grep-recursive
+  type: command_selection
+  cognitive_level: apply
+  prompt: Θέλεις να βρεις τη λέξη «password» σε **όλα** τα αρχεία μέσα στον φάκελο `config/` (και στους υποφακέλους
+    του). Ποια εντολή;
+  explanation: Το `grep -r` ψάχνει σε όλα τα αρχεία ενός φακέλου και των υποφακέλων του και τυπώνει `αρχείο:γραμμή`, π.χ. `config/app.conf:password=...`.
+  reference: grep
+  commands:
+  - grep
+  spec:
+    options:
+    - id: r
+      text: grep -r password config/
+      correct: true
+    - id: plain
+      text: grep password config/
+      why: 'Χωρίς `-r` το grep δεν μπαίνει σε φακέλους: «grep: config/: Is a directory».'
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: grep
+    - id: find
+      text: find config/ password
+      why: Το `find` ψάχνει *ονόματα* αρχείων, όχι περιεχόμενο, και εδώ θα θεωρούσε το «password» δεύτερη διαδρομή.
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: find
+    - id: v
+      text: grep -v password config/
+      why: Το `-v` αντιστρέφει την αναζήτηση, και χωρίς `-r` δεν μπαίνει στον φάκελο.
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: grep
+- id: grep-r-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Ψάξε το κείμενο `TODO` σε **όλα** τα αρχεία μέσα στον φάκελο `src` και στους υποφακέλους του.
+  explanation: Το `grep -r TODO src` ψάχνει σε όλους τους υποφακέλους και τυπώνει `αρχείο:γραμμή` για κάθε αποτέλεσμα.
+  reference: grep
+  commands:
+  - grep
+  spec:
+    accepted:
+    - grep -r TODO src
+    - grep -r TODO src/
+    - grep -R TODO src
+    - grep -R TODO src/
+    known_mistakes:
+    - id: no-r
+      match: grep TODO src
+      feedback: 'Χωρίς `-r` το grep δεν μπαίνει σε φακέλους: «grep: src: Is a directory».'
+    test_cases:
+      accept:
+      - grep -r TODO src
+      - grep -r TODO src/
+      - grep --recursive TODO src
+      - grep -R TODO src
+      - grep TODO -r src
+      reject:
+      - grep TODO src
+      - grep -r src TODO
+      - find src TODO
+      - grep -v TODO src
+- id: grep-exit
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Το `grep` δεν βρήκε καμία γραμμή. Τι exit code επιστρέφει; (Χρήσιμο σε scripts.)
+  explanation: 'Το GNU grep επιστρέφει 0 όταν βρει κάτι, 1 όταν δεν βρει τίποτα και 2 όταν υπάρξει σφάλμα (π.χ.
+    ανύπαρκτο αρχείο). Έτσι ένα script μπορεί να ελέγξει `if grep -q error app.log; then ...`.
+
+    '
+  reference: grep
+  commands:
+  - grep
+  spec:
+    options:
+    - id: one
+      text: '1'
+      correct: true
+    - id: zero
+      text: '0'
+      why: Το 0 σημαίνει «βρέθηκε τουλάχιστον μία γραμμή».
+    - id: two
+      text: '2'
+      why: Το 2 σημαίνει σφάλμα (π.χ. το αρχείο δεν υπάρχει).
+    - id: msg
+      text: Τυπώνει «not found» και επιστρέφει 0.
+      why: Δεν τυπώνει τίποτα· απλώς επιστρέφει 1.
+- id: grep-case-output
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Το `app.log` περιέχει τις γραμμές «Error disk full», «error network down» και «ok». Γιατί εμφανίστηκε
+    μόνο μία γραμμή;
+  explanation: Το `grep` κάνει διάκριση πεζών και κεφαλαίων. Το «Error» με κεφαλαίο Ε δεν ταιριάζει με «error». Με `grep
+    -i error app.log` θα έβγαιναν και οι δύο.
+  reference: grep
+  commands:
+  - grep
+  spec:
+    command: grep error app.log
+    output: error network down
+    captured_on: debian-13.7
+    options:
+    - id: case
+      text: 'Το grep ξεχωρίζει κεφαλαία από πεζά: το «Error» δεν ταιριάζει.'
+      correct: true
+    - id: first
+      text: Το grep σταματά στο πρώτο αποτέλεσμα.
+      why: Το `grep` τυπώνει *όλες* τις γραμμές που ταιριάζουν (εκτός αν δώσεις `-m`).
+    - id: words
+      text: Το grep ψάχνει μόνο ολόκληρες γραμμές.
+      why: Ψάχνει οπουδήποτε μέσα στη γραμμή· μόνο το `-x` ζητά ολόκληρη γραμμή.
+    - id: last
+      text: Το grep δείχνει μόνο την τελευταία γραμμή που ταιριάζει.
+      why: Δείχνει όλες τις γραμμές που ταιριάζουν, με τη σειρά.

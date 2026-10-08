@@ -35,7 +35,7 @@ examples:
     meaning: repository:tag
 common_mistakes:
 - wrong: docker pull nginx
-  why: Χωρίς tag κατεβαίνει το `latest` — που μπορεί να αλλάξει χωρίς προειδοποίηση.
+  why: Χωρίς tag κατεβαίνει το `latest`, που μπορεί να αλλάξει χωρίς προειδοποίηση.
 related:
 - id: docker-image-ls
 - id: docker-container-run

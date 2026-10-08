@@ -2,7 +2,7 @@ id: kubernetes
 title: Kubernetes
 biome: helm-citadel
 order: 3
-summary: Pods, Deployments, Services — πώς τρέχουν εφαρμογές σε cluster.
+summary: 'Pods, Deployments, Services: πώς τρέχουν εφαρμογές σε cluster.'
 skills:
   - id: k8s.concepts
     title: Βασικές έννοιες Kubernetes

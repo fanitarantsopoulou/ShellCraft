@@ -11,8 +11,7 @@ platform: docker-29
 category: docker/images
 level: intermediate
 summary: Χτίζει ένα image από ένα Dockerfile.
-description: Το τελευταίο όρισμα είναι το *build context* — ο φάκελος που στέλνεται στο build. Συνήθως `.` (ο τρέχων
-  φάκελος).
+description: 'Το τελευταίο όρισμα είναι το *build context*: ο φάκελος που στέλνεται στο build. Συνήθως `.` (ο τρέχων φάκελος).'
 synopsis:
 - docker buildx build [OPTIONS] PATH | URL | -
 flag_grammar: pflag
@@ -200,7 +199,7 @@ examples:
     meaning: 'build context: ο τρέχων φάκελος (εκεί είναι το Dockerfile)'
 common_mistakes:
 - wrong: docker build -t myapp
-  why: Λείπει το build context — συνήθως η τελεία `.` στο τέλος.
+  why: Λείπει το build context, συνήθως η τελεία `.` στο τέλος.
 related:
 - id: docker-image-ls
 - id: docker-container-run

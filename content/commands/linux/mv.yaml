@@ -29,13 +29,13 @@ examples:
   - cmd: mv draft.txt final.txt
     explain:
       - { token: mv, meaning: η εντολή μετακίνησης/μετονομασίας }
-      - { token: draft.txt, meaning: "η πηγή (SOURCE) — μετά δεν θα υπάρχει" }
+      - { token: draft.txt, meaning: "η πηγή (SOURCE), μετά δεν θα υπάρχει" }
       - { token: final.txt, meaning: "το νέο όνομα (DEST)" }
   - cmd: mv report.txt archive/
     note: Αν ο archive είναι φάκελος, το αρχείο μετακινείται μέσα του ως archive/report.txt.
 common_mistakes:
   - wrong: cp draft.txt final.txt
-    why: Το cp δημιουργεί αντίγραφο — το draft.txt εξακολουθεί να υπάρχει, άρα δεν έγινε μετονομασία.
+    why: 'Το cp δημιουργεί αντίγραφο: το draft.txt υπάρχει ακόμα, άρα δεν έγινε μετονομασία.'
   - wrong: mv final.txt draft.txt
     why: Πρώτα γράφεται το τρέχον όνομα (πηγή) και μετά το νέο.
 related:

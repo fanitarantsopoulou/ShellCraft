@@ -61,7 +61,7 @@ examples:
   - token: rm
     meaning: διάγραψε
   - token: -r
-    meaning: αναδρομικά, μαζί με όλο το περιεχόμενο
+    meaning: μαζί με όλο το περιεχόμενο και τους υποφακέλους
   - token: build
     meaning: ο φάκελος
 - cmd: rm -i notes.txt
@@ -70,7 +70,7 @@ common_mistakes:
 - wrong: rm build
   why: 'Για φάκελο χωρίς -r: «rm: cannot remove ''build'': Is a directory».'
 when_not_to_use:
-- Όταν δεν είσαι σίγουρος τι θα ταιριάξει ένα wildcard — δοκίμασε πρώτα με `ls`.
+- 'Όταν δεν είσαι σίγουρος τι θα ταιριάξει ένα wildcard: δοκίμασε πρώτα με `ls`.'
 related:
 - id: rmdir
 - id: mv

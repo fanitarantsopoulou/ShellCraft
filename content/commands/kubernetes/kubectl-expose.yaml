@@ -6,7 +6,7 @@ provider: kubectl (Kubernetes)
 platform: kubernetes-1.37
 category: kubernetes/kubectl
 level: intermediate
-summary: Δημιουργεί Service που εκθέτει ένα Deployment, Pod κ.λπ.
+summary: Δημιουργεί Service που κάνει προσβάσιμο ένα Deployment, Pod κ.λπ.
 synopsis:
 - kubectl expose (-f FILENAME | TYPE NAME) [--port=port] [--protocol=TCP|UDP|SCTP] [--target-port=number-or-name]
   [--name=name] [--external-ip=external-ip-of-service] [--type=type] [options]

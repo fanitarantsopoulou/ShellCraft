@@ -64,7 +64,7 @@ examples:
     meaning: και τα σταματημένα
 common_mistakes:
 - wrong: docker ps
-  why: Χωρίς `-a` δεν βλέπεις containers που έχουν τερματίσει — π.χ. ένα που κρασάρισε.
+  why: 'Χωρίς `-a` δεν βλέπεις containers που έχουν τερματίσει: π.χ. ένα που κρασάρισε.'
 related:
 - id: docker-container-run
 - id: docker-container-rm

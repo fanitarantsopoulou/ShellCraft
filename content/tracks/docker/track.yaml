@@ -2,7 +2,7 @@ id: docker
 title: Docker
 biome: container-harbor
 order: 2
-summary: Images, containers, volumes και δίκτυα — πώς πακετάρεις και τρέχεις εφαρμογές.
+summary: 'Images, containers, volumes και δίκτυα: πώς πακετάρεις και τρέχεις εφαρμογές.'
 skills:
   - id: docker.concepts
     title: Βασικές έννοιες Docker

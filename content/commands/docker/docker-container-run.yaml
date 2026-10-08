@@ -9,7 +9,7 @@ platform: docker-29
 category: docker/containers
 level: beginner
 summary: Δημιουργεί και ξεκινά ένα νέο container από ένα image.
-description: Ό,τι γράψεις **μετά** το όνομα του image είναι η εντολή που θα τρέξει μέσα στο container — όχι επιλογές
+description: Ό,τι γράψεις **μετά** το όνομα του image είναι η εντολή που θα τρέξει μέσα στο container, όχι επιλογές
   του docker. Γι' αυτό οι επιλογές (`-d`, `-p`, `--name`) μπαίνουν πριν το image.
 synopsis:
 - docker container run [OPTIONS] IMAGE [COMMAND] [ARG...]

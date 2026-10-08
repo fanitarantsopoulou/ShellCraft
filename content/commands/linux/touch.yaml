@@ -7,8 +7,8 @@ provider: GNU coreutils
 platform: debian-13
 category: linux/file-management
 level: beginner
-summary: Δημιουργεί κενό αρχείο ή ενημερώνει την ώρα τροποποίησης.
-description: Αν το αρχείο υπάρχει, δεν αλλάζει το περιεχόμενό του — μόνο τους χρόνους πρόσβασης/τροποποίησης.
+summary: Δημιουργεί κενό αρχείο ή ενημερώνει την ώρα τελευταίας αλλαγής.
+description: Αν το αρχείο υπάρχει, δεν αλλάζει το περιεχόμενό του, μόνο την ώρα τελευταίας πρόσβασης και αλλαγής.
 synopsis:
 - touch [OPTION]... FILE...
 flag_grammar: gnu_getopt
@@ -58,7 +58,7 @@ examples:
     meaning: το αρχείο
 common_mistakes:
 - wrong: touch notes
-  why: Δημιουργεί αρχείο, όχι φάκελο — για φάκελο θέλεις `mkdir`.
+  why: 'Δημιουργεί αρχείο, όχι φάκελο: για φάκελο θέλεις `mkdir`.'
 related:
 - id: mkdir
 - id: cat
