@@ -360,3 +360,20 @@ details.more[open] { display: grid; gap: 0.85rem; }
 .theory.intro { font-size: 19px; }
 .theory.intro h2:first-child { margin-top: 0.5rem; }
 .sources { font-size: 15px; line-height: 1.8; }
+
+/* ---------- overflow guards ----------
+ * Grid/flex children default to min-width: auto, so one long line (e.g. a full-sentence
+ * answer in a code block) used to stretch the feedback past the question frame.
+ * Let them shrink, and wrap long text instead of overflowing.
+ */
+.question, .feedback > *, details.more > *, .fb-block, .q-actions, .quiz-nav { min-width: 0; }
+.feedback .terminal, .fb-block pre {
+  white-space: pre-wrap;        /* keep line breaks, but wrap long lines */
+  overflow-wrap: anywhere;
+}
+.option .text, .order-item .text, .prompt, .fb-block p, .verdict, .hint {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.prompt code, .fb-block code, .inline-code { overflow-wrap: anywhere; }
+.question .terminal { max-width: 100%; }

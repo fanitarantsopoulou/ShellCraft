@@ -234,78 +234,55 @@ questions:
     url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
     doc_version: GNU coreutils 9.7 (Debian 13)
     last_verified: 2026-10-06
-- id: cp-write-backup
+- id: cp-dir-write
   type: command_writing
   cognitive_level: apply
   skills:
   - id: linux.files.copy
-  - id: linux.files.safe-changes
-    weight: 0.5
   commands:
   - cp
-  prompt: 'Πριν αλλάξεις το `notes.txt`, κράτα αντίγραφο με όνομα `notes.bak` στον ίδιο φάκελο. Γράψε την εντολή.
-
-    '
-  hints:
-  - Ποια εντολή δημιουργεί αντίγραφο χωρίς να αφαιρεί το αρχικό;
-  - 'Σύνταξη: cp SOURCE DEST'
-  explanation: Το `cp notes.txt notes.bak` δημιουργεί αντίγραφο· το notes.txt μένει όπως ήταν.
   reference: cp
+  prompt: Φτιάξε αντίγραφο ασφαλείας **ολόκληρου του φακέλου** `config` (με όλα τα αρχεία μέσα του), με όνομα `config-backup`.
+  hints:
+  - Για φακέλους, το cp χρειάζεται μια επιλογή.
+  - 'Σύνταξη: cp -r SOURCE DEST'
+  explanation: Το `cp -r config config-backup` αντιγράφει αναδρομικά τον φάκελο και όλο το περιεχόμενό του. (Το
+    `cp -a` κάνει το ίδιο και διατηρεί επιπλέον δικαιώματα και ημερομηνίες.)
   spec:
     accepted:
-    - cp notes.txt notes.bak
+    - cp -r config config-backup
+    - cp -a config config-backup
+    - cp -r config/ config-backup
     optional_flags:
       cp:
-      - -i
       - -v
-      - -p
-      - -a
-      - -r
+      - -i
     known_mistakes:
-    - id: mv-instead-of-cp
-      match: mv notes.txt notes.bak
-      feedback: Το `mv` θα μετονόμαζε το αρχείο — δεν θα έμενε το notes.txt για να το επεξεργαστείς.
-    - id: reversed-args
-      match: cp notes.bak notes.txt
-      feedback: Πρώτα η πηγή, μετά ο προορισμός. Έτσι θα προσπαθούσες να αντιγράψεις το (ανύπαρκτο) notes.bak πάνω
-        στο notes.txt.
-    - id: symlink
-      match: cp -s notes.txt notes.bak
-      feedback: Με `-s` δημιουργείται symbolic link, όχι αντίγραφο — αν αλλάξεις το notes.txt, «αλλάζει» και το
-        notes.bak.
-    - id: hardlink
-      match: cp -l notes.txt notes.bak
-      feedback: Με `-l` δημιουργείται hard link, όχι αντίγραφο — και τα δύο ονόματα δείχνουν στα ίδια δεδομένα.
+    - id: no-r
+      match: cp config config-backup
+      feedback: 'Χωρίς -r το GNU cp αρνείται να αντιγράψει φάκελο: «cp: -r not specified; omitting directory ''config''».'
+    - id: mv
+      match: mv config config-backup
+      feedback: Το mv θα μετονόμαζε τον φάκελο — δεν θα έμενε το αρχικό config.
+    - id: reversed
+      match: cp -r config-backup config
+      feedback: Πρώτα η πηγή (config), μετά ο προορισμός (config-backup).
     test_cases:
       accept:
-      - cp notes.txt notes.bak
-      - cp   notes.txt   notes.bak
-      - cp ./notes.txt notes.bak
-      - cp ./notes.txt ./notes.bak
-      - cp 'notes.txt' "notes.bak"
-      - cp -i notes.txt notes.bak
-      - cp --interactive notes.txt notes.bak
-      - cp -iv notes.txt notes.bak
-      - cp notes.txt notes.bak -v
-      - cp -- notes.txt notes.bak
+      - cp -r config config-backup
+      - cp -R config config-backup
+      - cp --recursive config config-backup
+      - cp -a config config-backup
+      - cp -rv config config-backup
+      - cp -r ./config config-backup
+      - cp -r config/ config-backup
       reject:
-      - mv notes.txt notes.bak
-      - cp notes.bak notes.txt
-      - cp notes.txt
-      - cp notes.txt notes.backup
-      - copy notes.txt notes.bak
-      - cp -s notes.txt notes.bak
-      - cp -l notes.txt notes.bak
-      - cp -t notes.bak notes.txt
-      - cp notes.txt notes.bak; rm notes.txt
-      - cp notes.txt notes.bak && ls
-      - cp $(echo notes.txt) notes.bak
-      - CP notes.txt notes.bak
-  citations:
-  - source: gnu-coreutils
-    url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
-    doc_version: GNU coreutils 9.7 (Debian 13)
-    last_verified: 2026-10-06
+      - cp config config-backup
+      - mv config config-backup
+      - cp -r config-backup config
+      - cp -r config
+      - cp -r config config_backup
+      - cp -s config config-backup
 - id: cp-directory-output
   type: output_analysis
   cognitive_level: troubleshoot
@@ -349,17 +326,21 @@ questions:
   - id: linux.files.safe-changes
   commands:
   - cp
-  prompt: Πρέπει να αλλάξεις το `app.conf` σε ένα μηχάνημα που τρέχει. Βάλε τα βήματα στη σωστή σειρά.
-  explanation: 'Πρώτα κρατάς αντίγραφο, μετά αλλάζεις, μετά επιβεβαιώνεις. Αν η επιβεβαίωση αποτύχει, επαναφέρεις
-    από το αντίγραφο — γι'' αυτό το backup πρέπει να υπάρχει *πριν* την αλλαγή.
+  prompt: Θα αλλάξεις **απευθείας** το `app.conf` σε ένα μηχάνημα που τρέχει, και θέλεις να μπορείς να γυρίσεις
+    στην **αρχική** του μορφή αν κάτι πάει στραβά. Βάλε τα βήματα στη σωστή σειρά.
+  explanation: 'Το αντίγραφο πρέπει να γίνει **πριν** την αλλαγή: αν κάνεις πρώτα την αλλαγή και μετά `cp`, το `.bak`
+    θα περιέχει ήδη τη νέα μορφή και δεν θα έχεις πού να γυρίσεις. Μετά αλλάζεις, ελέγχεις, και αν κάτι χάλασε επαναφέρεις.
 
-    '
+
+    Υπάρχει και άλλος, εξίσου καλός τρόπος: δουλεύεις σε **αντίγραφο** (`cp app.conf app.conf.new`), αλλάζεις το
+    `app.conf.new` και μόνο όταν είναι έτοιμο το βάζεις στη θέση του με `mv app.conf.new app.conf`. Αυτή η ερώτηση
+    αφορά την περίπτωση που αλλάζεις το αρχείο απευθείας.'
   spec:
     steps:
     - id: backup
-      text: cp app.conf app.conf.bak
+      text: cp app.conf app.conf.bak  (αντίγραφο της αρχικής μορφής)
     - id: edit
-      text: Κάνεις την αλλαγή στο app.conf
+      text: Κάνεις την αλλαγή απευθείας στο app.conf
     - id: verify
       text: Ελέγχεις ότι η εφαρμογή λειτουργεί με τη νέα ρύθμιση
     - id: restore
@@ -580,6 +561,11 @@ questions:
       match: rm -r old
       feedback: Θα δούλευε, αλλά το `rm -r` διαγράφει και γεμάτους φακέλους — η άσκηση ζητά την εντολή που προστατεύει
         από αυτό.
+    - id: rm-rf
+      match: rm -rf old
+      feedback: 'Θα δούλευε κι αυτό: το -r διαγράφει αναδρομικά και το -f (force) δεν ρωτάει τίποτα και δεν βγάζει
+        σφάλμα αν κάτι δεν υπάρχει. Ακριβώς γι'' αυτό είναι επικίνδυνο — θα έσβηνε χωρίς δεύτερη σκέψη και έναν
+        γεμάτο φάκελο. Η άσκηση ζητά την εντολή που αρνείται να σβήσει φάκελο με περιεχόμενο: rmdir.'
     test_cases:
       accept:
       - rmdir old
@@ -593,6 +579,8 @@ questions:
       - rmdir
       - rmdir new
       - del old
+      - rm -rf old
+      - rm -fr old
 - id: rm-dir-output
   type: output_analysis
   cognitive_level: troubleshoot

@@ -55,13 +55,13 @@ def test_ordering_steps_are_not_sent_in_answer_order(client):
 
 
 def test_answer_is_evaluated(client):
-    url = "/api/exercises/linux.q02.cp-write-backup/answer"
+    url = "/api/exercises/linux.q02.cp-dir-write/answer"
 
     def outcome(payload):
         return client.post(url, json=payload).json()["outcome"]
 
-    assert outcome({"command": "cp notes.txt notes.bak"}) == "correct"
-    assert outcome({"command": "mv notes.txt notes.bak"}) == "incorrect"
+    assert outcome({"command": "cp -r config config-backup"}) == "correct"
+    assert outcome({"command": "mv config config-backup"}) == "incorrect"
     assert outcome({"selected": ["x"]}) == "invalid"
 
 

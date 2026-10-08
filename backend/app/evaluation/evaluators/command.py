@@ -58,6 +58,19 @@ def _diagnose(sub: CanonicalCommand, expected: CanonicalCommand) -> str | None:
     return None
 
 
+def _closest_accepted(
+    submitted: CanonicalLine, ex: CommandWritingExercise, ctx: EvalContext
+) -> CanonicalLine:
+    """The accepted answer to diagnose against: prefer one using the same command names.
+
+    Otherwise `rm -rf old` would be told "use another command" even though `rm -d old`
+    is an accepted answer.
+    """
+    candidates = [to_canonical(a, ex, ctx) for a in ex.spec.accepted]
+    names = [c.name for c in submitted.commands]
+    return next((c for c in candidates if [x.name for x in c.commands] == names), candidates[0])
+
+
 def evaluate_command(
     ex: CommandWritingExercise, sub: CommandSubmission, ctx: EvalContext
 ) -> EvaluationResult:
@@ -113,7 +126,7 @@ def evaluate_command(
             )
 
     feedback = [verdict(Outcome.INCORRECT)]
-    expected = to_canonical(ex.spec.accepted[0], ex, ctx)
+    expected = _closest_accepted(submitted, ex, ctx)
     if len(submitted.commands) == len(expected.commands):
         for got, want in zip(submitted.commands, expected.commands, strict=True):
             if (hint := _diagnose(got, want)) is not None:

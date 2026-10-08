@@ -118,3 +118,15 @@ def test_feedback_is_enriched_from_the_command_reference():
 
 def test_oversized_input_is_invalid():
     assert run("cp " + "a" * 2000).outcome is Outcome.INVALID
+
+
+def test_diagnosis_compares_with_accepted_answer_using_same_command():
+    ex = command_exercise(
+        accepted=["cp a.txt b.txt", "mv -i a.txt b.txt"],
+        test_cases={"accept": ["cp a.txt b.txt"], "reject": ["mv a.txt c.txt"]},
+    )
+    result = run("mv -i a.txt c.txt", ex)
+    mistake = next(f for f in result.feedback if f.kind is FeedbackKind.MISTAKE)
+    # `mv` is a valid command here (second accepted answer): point at the argument instead.
+    assert "άλλη εντολή" not in mistake.text
+    assert "όρισμα" in mistake.text
