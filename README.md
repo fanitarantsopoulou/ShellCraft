@@ -49,8 +49,6 @@ All learning material lives in [`content/`](content) as YAML and Markdown; no co
 needed. Every *write the command* question lists commands that must be accepted and commands
 that must be rejected, and `make content-validate` runs them through the real evaluator.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how it all fits together.
-
 ## License
 
 ShellCraft is released under the [MIT License](LICENSE).
