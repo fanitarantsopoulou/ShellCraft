@@ -50,12 +50,27 @@ def _diagnose(sub: CanonicalCommand, expected: CanonicalCommand) -> str | None:
     if len(sub.operands) != len(expected.operands):
         return f"Η εντολή χρειάζεται {len(expected.operands)} ορίσματα, έδωσες {len(sub.operands)}."
     if sorted(sub.operands) == sorted(expected.operands) and sub.operands != expected.operands:
-        return "Τα ορίσματα είναι σωστά αλλά σε λάθος σειρά — η σειρά έχει σημασία."
+        return "Τα ορίσματα είναι σωστά αλλά σε λάθος σειρά: η σειρά έχει σημασία."
     if sub.options != expected.options:
         return "Οι επιλογές (flags) δεν είναι αυτές που χρειάζονται εδώ."
     if sub.operands != expected.operands:
         return "Κάποιο όρισμα (αρχείο ή διαδρομή) δεν είναι αυτό που ζητήθηκε."
     return None
+
+
+def _shorthand_notes(submitted: CanonicalLine) -> list[FeedbackItem]:
+    return [
+        FeedbackItem(
+            kind=FeedbackKind.NOTE,
+            text=(
+                f"Έγραψες τη σύντομη μορφή `{written}`. Δουλεύει στο GNU `{cmd.name}` του Debian, "
+                f"αλλά δεν ανήκει πια στο πρότυπο POSIX: η τυπική μορφή είναι `{standard}`, "
+                "που δουλεύει παντού."
+            ),
+        )
+        for cmd in submitted.commands
+        for written, standard in cmd.shorthands
+    ]
 
 
 def _closest_accepted(
@@ -100,7 +115,7 @@ def evaluate_command(
 
     for i, accepted in enumerate(ex.spec.accepted):
         if submitted == to_canonical(accepted, ex, ctx):
-            feedback = [verdict(Outcome.CORRECT)]
+            feedback = [verdict(Outcome.CORRECT), *_shorthand_notes(submitted)]
             if i > 0:  # accepted alternative: show the canonical form too
                 feedback.append(correct_answer)
             feedback.append(why)

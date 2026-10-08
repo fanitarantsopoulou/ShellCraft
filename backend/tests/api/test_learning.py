@@ -48,6 +48,14 @@ def test_quiz_path_is_ordered_and_linked(client):
     assert last["next_quiz"] is None
 
 
+def test_questions_expose_non_decreasing_difficulty(client):
+    for quiz in client.get("/api/tracks/linux").json()["quizzes"]:
+        questions = client.get(f"/api/quizzes/{quiz['id']}").json()["questions"]
+        levels = [q["difficulty"] for q in questions]
+        assert set(levels) <= {1, 2, 3}
+        assert levels == sorted(levels), quiz["id"]
+
+
 def test_ordering_steps_are_not_sent_in_answer_order(client):
     body = client.get("/api/quizzes/linux.q02").json()
     ordering = next(q for q in body["questions"] if q["type"] == "ordering")

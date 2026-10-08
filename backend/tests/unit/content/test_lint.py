@@ -122,3 +122,40 @@ def test_skill_cycle_detected():
         ],
     )
     assert any("cycle" in m for m in messages(lint(bundle(tracks={"linux": track}), today=TODAY)))
+
+
+def _quiz(levels):
+    from app.content.schemas import Quiz
+
+    questions = [
+        {
+            "id": f"q.x{i}",
+            "type": "ordering",
+            "level": "beginner",
+            "cognitive_level": level,
+            "skills": [{"id": "a"}],
+            "prompt": "p",
+            "explanation": "e",
+            "spec": {"steps": [{"id": "a", "text": "A"}, {"id": "b", "text": "B"}]},
+        }
+        for i, level in enumerate(levels)
+    ]
+    return Quiz(
+        id="q",
+        track="t",
+        title="T",
+        description="D",
+        level="beginner",
+        order=1,
+        skills=["a"],
+        questions=questions,
+    )
+
+
+def test_quiz_questions_must_escalate():
+    track = Track(id="t", title="T", biome="b", order=1, skills=[{"id": "a", "title": "A"}])
+    ok = _quiz(["recognize", "recognize", "apply", "troubleshoot", "combine", "scenario"])
+    assert messages(lint(bundle(tracks={"t": track}, quizzes={"q": ok}), today=TODAY)) == []
+    bad = _quiz(["recognize", "apply", "recognize", "apply", "scenario"])
+    errors = messages(lint(bundle(tracks={"t": track}, quizzes={"q": bad}), today=TODAY))
+    assert len(errors) == 1 and "easy to hard" in errors[0]

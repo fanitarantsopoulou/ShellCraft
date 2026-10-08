@@ -15,6 +15,7 @@ export const TYPE_LABELS = {
 };
 
 const KEYS = "ΑΒΓΔΕΖ";
+const DIFFICULTY = { 1: ["easy", "●○○"], 2: ["medium", "●●○"], 3: ["hard", "●●●"] };
 
 /* Each builder returns { node, read(), restore(submission), focus(), lock() }. */
 
@@ -205,7 +206,12 @@ export function renderQuestion(ex, saved, onAnswered) {
   }
 
   const node = h("section", { class: "question frame" },
-    h("div", { class: "q-label" }, TYPE_LABELS[ex.type] ?? ex.type),
+    h("div", { class: "q-head" },
+      h("span", { class: "q-label" }, TYPE_LABELS[ex.type] ?? ex.type),
+      DIFFICULTY[ex.difficulty]
+        ? h("span", { class: `difficulty d${ex.difficulty}`, title: "Δυσκολία" },
+            `${DIFFICULTY[ex.difficulty][1]} ${DIFFICULTY[ex.difficulty][0]}`)
+        : null),
     trustedHtml("div", ex.prompt_html, { class: "prompt" }),
     input.node,
     hintSlot,

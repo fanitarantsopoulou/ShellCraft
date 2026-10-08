@@ -134,7 +134,6 @@ h3 { font-size: 21.333px; }
 }
 
 main { width: 100%; max-width: 52rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; outline: none; flex: 1; }
-.footer { text-align: center; color: var(--muted); font-size: 16px; padding: 1rem; }
 
 /* ---------- buttons ---------- */
 button, .btn {
@@ -416,3 +415,13 @@ details.more[open] { display: grid; gap: 0.85rem; }
 @media (prefers-reduced-motion: reduce) {
   .warp, .warp.closing, .warp.opening, .warp-card, .page-enter { animation: none; }
 }
+
+/* ---------- question difficulty ---------- */
+.q-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.difficulty {
+  font-family: var(--pixel); font-weight: 700; font-synthesis: none; font-size: 13.333px;
+  padding: 0.3rem 0.6rem; background: var(--bg-2); box-shadow: 0 0 0 2px var(--line);
+}
+.difficulty.d1 { color: var(--accent); }
+.difficulty.d2 { color: var(--gold); }
+.difficulty.d3 { color: var(--bad); }

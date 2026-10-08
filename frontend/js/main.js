@@ -125,7 +125,7 @@ function home() {
     worldScene(),
     h("section", { class: "intro" },
       h("h1", {}, "Μάθε Linux & Cloud, ένα επίπεδο τη φορά"),
-      h("p", {}, "Διάλεξε κόσμο. Λύσε quiz που ξεκινούν από τις πρώτες εντολές και φτάνουν σε πραγματικά προβλήματα — με εξήγηση για κάθε απάντηση.")),
+      h("p", {}, "Διάλεξε κόσμο. Λύσε quiz που ξεκινούν από τις πρώτες εντολές και φτάνουν σε πραγματικά προβλήματα, με εξήγηση για κάθε απάντηση.")),
     h("div", { class: "track-grid" }, tracks.map((t) =>
       h("a", { class: `track-card frame${t.available ? "" : " locked"}`, href: `#/track/${t.id}`, "data-sfx": "click" },
         sprite(TRACK_SPRITES[t.id] ?? "terminal"),
@@ -154,7 +154,7 @@ async function trackPage(id, section) {
     show(id, head, h("div", { class: "soon-box frame" },
       sprite("terminal"),
       h("h2", {}, "Έρχεται σύντομα"),
-      h("p", { class: "muted" }, "Αυτός ο κόσμος χτίζεται ακόμη. Ξεκίνα από το Linux — θα σου χρειαστεί εδώ."),
+      h("p", { class: "muted" }, "Αυτός ο κόσμος χτίζεται ακόμη. Ξεκίνα από το Linux: θα σου χρειαστεί εδώ."),
       h("a", { class: "btn", href: "#/track/linux", "data-sfx": "next" }, "Πήγαινε στο Linux ▶")));
     return;
   }
@@ -318,7 +318,7 @@ async function resultsPage(id) {
   const newBest = recordScore(id, points, total) && points > 0;
   document.title = `Αποτελέσματα · ${quiz.title}`;
 
-  const messages = ["Πάμε ξανά — η επανάληψη κάνει τον master!", "Καλή αρχή!", "Πολύ καλά!", "Τέλεια! Είσαι έτοιμος για το επόμενο επίπεδο."];
+  const messages = ["Πάμε ξανά: η επανάληψη κάνει τον master!", "Καλή αρχή!", "Πολύ καλά!", "Τέλεια! Είσαι έτοιμος για το επόμενο επίπεδο."];
 
   show(quiz.track,
     quizCrumbs(quiz),
@@ -331,7 +331,7 @@ async function resultsPage(id) {
       newBest ? h("p", { class: "new-best" }, "★ Νέο καλύτερο σκορ!") : null,
       h("ol", { class: "answer-list" }, quiz.questions.map((q, i) => {
         const outcome = run.get(q.id)?.result?.outcome ?? "skipped";
-        const mark = { correct: "✓", partial: "~", incorrect: "✗", skipped: "–" }[outcome];
+        const mark = { correct: "✓", partial: "~", incorrect: "✗", skipped: "○" }[outcome];
         return h("li", {},
           h("span", { class: `mark ${outcome}` }, mark),
           h("a", { href: `#/quiz/${id}/q/${i + 1}`, "data-sfx": "click" }, `${i + 1}. ${TYPE_LABELS[q.type]}`));

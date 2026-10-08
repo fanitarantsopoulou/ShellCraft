@@ -36,6 +36,17 @@ class CognitiveLevel(StrEnum):
     SCENARIO = "scenario"
 
 
+# Difficulty shown to learners (1 easy, 2 medium, 3 hard), derived from the cognitive level so
+# there is a single source of truth for "how hard is this question".
+DIFFICULTY = {
+    CognitiveLevel.RECOGNIZE: 1,
+    CognitiveLevel.APPLY: 2,
+    CognitiveLevel.COMBINE: 3,
+    CognitiveLevel.TROUBLESHOOT: 3,
+    CognitiveLevel.SCENARIO: 3,
+}
+
+
 class SourceKind(StrEnum):
     OFFICIAL_MANUAL = "official_manual"
     MAN_PAGE = "man_page"

@@ -11,7 +11,7 @@ Operand order always matters. Commands without a declared grammar compare litera
 """
 
 from collections.abc import Mapping
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 from app.content.schemas.command import Command, FlagGrammar, OptionValue
 from app.evaluation.context import EvalContext
@@ -26,6 +26,8 @@ class CanonicalCommand:
     redirects: tuple[tuple[str, str], ...]
     unknown_options: tuple[str, ...] = ()
     missing_values: tuple[str, ...] = ()  # options that require a value but got none
+    # (written, standard) for obsolete forms like `-3` == `-n 3`; informational, not compared.
+    shorthands: tuple[tuple[str, str], ...] = field(default=(), compare=False)
 
 
 @dataclass(frozen=True)
@@ -40,8 +42,11 @@ def _norm_path(token: str, strip_dot_slash: bool) -> str:
     return token
 
 
-def _getopt(spec: Command, args: tuple[str, ...]) -> tuple[set, list[str], list[str], list[str]]:
+def _getopt(
+    spec: Command, args: tuple[str, ...]
+) -> tuple[set, list[str], list[str], list[str], list[tuple[str, str]]]:
     options: set[tuple[str, str | None]] = set()
+    shorthands: list[tuple[str, str]] = []
     operands: list[str] = []
     unknown: list[str] = []
     missing: list[str] = []
@@ -75,6 +80,7 @@ def _getopt(spec: Command, args: tuple[str, ...]) -> tuple[set, list[str], list[
         elif spec.numeric_shorthand and tok[1:].isdigit() and tok.startswith("-"):
             opt = spec.option_for(spec.numeric_shorthand)
             options.add(((opt.flags[0] if opt else spec.numeric_shorthand), tok[1:]))
+            shorthands.append((tok, f"{spec.numeric_shorthand} {tok[1:]}"))
         elif tok.startswith("-") and tok != "-":
             chars = tok[1:]
             for j, ch in enumerate(chars):
@@ -98,7 +104,7 @@ def _getopt(spec: Command, args: tuple[str, ...]) -> tuple[set, list[str], list[
         else:
             operands.append(tok)
         i += 1
-    return options, operands, unknown, missing
+    return options, operands, unknown, missing, shorthands
 
 
 def canonical_command(
@@ -113,7 +119,7 @@ def canonical_command(
         return CanonicalCommand(
             name, frozenset(), tuple(_norm_path(a, strip_dot_slash) for a in args), redirects
         )
-    options, operands, unknown, missing = _getopt(spec, args)
+    options, operands, unknown, missing, shorthands = _getopt(spec, args)
     return CanonicalCommand(
         name=name,
         # Option values are often paths too (`-f ./app.yaml`).
@@ -124,6 +130,7 @@ def canonical_command(
         redirects=redirects,
         unknown_options=tuple(unknown),
         missing_values=tuple(missing),
+        shorthands=tuple(shorthands),
     )
 
 

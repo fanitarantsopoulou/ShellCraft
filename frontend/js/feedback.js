@@ -4,6 +4,7 @@ const PRIMARY_TITLES = {
   correct_answer: "Σωστή απάντηση",
   why: "Γιατί;",
   mistake: "Τι πήγε στραβά",
+  note: "Σημείωση",
   option: "Η επιλογή σου",
 };
 
