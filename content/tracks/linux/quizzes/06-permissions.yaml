@@ -36,6 +36,7 @@ questions:
     - id: disk
       text: Σε ποιον δίσκο βρίσκεται.
       why: Το ls -l δεν δείχνει δίσκο· ο πρώτος χαρακτήρας είναι ο τύπος.
+  cognitive_level: recognize
 - id: rwx-groups
   type: multiple_choice
   prompt: Στο `-rw-r-----`, ποιος μπορεί να **διαβάσει** το αρχείο;
@@ -51,10 +52,58 @@ questions:
       why: Η δεύτερη τριάδα (`r--`) δίνει ανάγνωση και στην ομάδα.
     - id: all
       text: Όλοι οι χρήστες.
-      why: Η τρίτη τριάδα είναι `---` — οι υπόλοιποι δεν έχουν κανένα δικαίωμα.
+      why: 'Η τρίτη τριάδα είναι `---`: οι υπόλοιποι δεν έχουν κανένα δικαίωμα.'
     - id: nobody
       text: Κανείς, μόνο ο root.
       why: Ο ιδιοκτήτης έχει `rw-`· μπορεί να διαβάσει και να γράψει.
+  cognitive_level: recognize
+- id: go-w
+  type: multiple_choice
+  prompt: Τι κάνει το `chmod go-w report.txt`;
+  explanation: '`g` = ομάδα, `o` = άλλοι, `-w` = αφαίρεσε εγγραφή. Ο ιδιοκτήτης δεν επηρεάζεται.'
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    options:
+    - id: remove
+      text: Αφαιρεί το δικαίωμα εγγραφής από την ομάδα και τους άλλους.
+      correct: true
+    - id: owner
+      text: Αφαιρεί την εγγραφή από τον ιδιοκτήτη.
+      why: 'Ο ιδιοκτήτης είναι `u`: δεν περιλαμβάνεται στο `go`.'
+    - id: add
+      text: Δίνει εγγραφή στην ομάδα και τους άλλους.
+      why: Το `-` αφαιρεί· για προσθήκη θα ήταν `go+w`.
+    - id: go
+      text: Το «go» είναι όνομα χρήστη.
+      why: 'Στο chmod τα γράμματα πριν το +/- είναι κατηγορίες: u, g, o, a.'
+  cognitive_level: recognize
+- id: chmod-777
+  type: multiple_choice
+  prompt: Ένα πρόγραμμα δεν μπορεί να γράψει σε έναν φάκελο και κάποιος προτείνει «βάλε `chmod 777`». Γιατί είναι
+    κακή ιδέα;
+  explanation: Το 777 δίνει σε **κάθε** χρήστη του συστήματος δικαίωμα να διαβάσει, να αλλάξει και να διαγράψει.
+    Η σωστή λύση είναι να δώσεις μόνο το δικαίωμα που λείπει, μόνο σε όποιον το χρειάζεται (π.χ. αλλαγή ιδιοκτήτη
+    ή ομάδας).
+  reference: chmod
+  commands:
+  - chmod
+  spec:
+    options:
+    - id: everyone
+      text: Δίνει σε όλους τους χρήστες δικαίωμα να αλλάξουν ή να διαγράψουν τα πάντα εκεί.
+      correct: true
+    - id: slow
+      text: Κάνει τον φάκελο πιο αργό.
+      why: Τα δικαιώματα δεν επηρεάζουν την ταχύτητα.
+    - id: invalid
+      text: Το 777 δεν είναι έγκυρο mode.
+      why: Είναι έγκυρο (`rwxrwxrwx`), απλώς επικίνδυνο.
+    - id: root
+      text: Μόνο ο root μπορεί να τρέξει chmod 777.
+      why: Ο ιδιοκτήτης ενός αρχείου μπορεί να αλλάξει τα δικαιώματά του, χωρίς root.
+  cognitive_level: recognize
 - id: rw-r-octal
   type: multiple_choice
   cognitive_level: apply
@@ -70,10 +119,10 @@ questions:
       correct: true
     - id: '644'
       text: '644'
-      why: Το 644 είναι `rw-r--r--` — οι άλλοι θα μπορούσαν να διαβάσουν.
+      why: 'Το 644 είναι `rw-r--r--`: οι άλλοι θα μπορούσαν να διαβάσουν.'
     - id: '755'
       text: '755'
-      why: Το 755 είναι `rwxr-xr-x` — περιέχει και εκτέλεση.
+      why: 'Το 755 είναι `rwxr-xr-x`: περιέχει και εκτέλεση.'
     - id: '460'
       text: '460'
       why: 'Η σειρά είναι ιδιοκτήτης-ομάδα-άλλοι: 6, 4, 0.'
@@ -96,10 +145,10 @@ questions:
       why: Αυτό είναι το 777.
     - id: o644
       text: -rw-r--r--
-      why: Αυτό είναι το 644 — χωρίς εκτέλεση.
+      why: 'Αυτό είναι το 644: χωρίς εκτέλεση.'
     - id: o555
       text: -r-xr-xr-x
-      why: Αυτό είναι το 555 — ο ιδιοκτήτης δεν θα μπορούσε να γράψει.
+      why: 'Αυτό είναι το 555: ο ιδιοκτήτης δεν θα μπορούσε να γράψει.'
 - id: chmod-ux-fill
   type: fill_in_command
   cognitive_level: apply
@@ -116,10 +165,10 @@ questions:
       known_mistakes:
       - id: plus-x
         match: +x
-        feedback: Το `+x` δίνει εκτέλεση σε όλους (όσο επιτρέπει το umask — στο Debian ιδιοκτήτη, ομάδα και άλλους).
+        feedback: 'Το `+x` δίνει εκτέλεση σε όλους (όσο επιτρέπει το umask: στο Debian ιδιοκτήτη, ομάδα και άλλους).'
       - id: '777'
         match: '777'
-        feedback: Το 777 δίνει τα πάντα σε όλους — και αλλάζει και τα υπόλοιπα δικαιώματα.
+        feedback: Το 777 δίνει τα πάντα σε όλους, και αλλάζει και τα υπόλοιπα δικαιώματα.
       - id: o
         match: o+x
         feedback: Το `o` είναι οι *άλλοι* (others), όχι ο ιδιοκτήτης (owner = `u`).
@@ -152,32 +201,6 @@ questions:
       - chmod o+x deploy.sh
       - chmod u+x
       - chmod x deploy.sh
-- id: script-denied
-  type: output_analysis
-  cognitive_level: troubleshoot
-  prompt: Έγραψες ένα script και προσπαθείς να το τρέξεις. Τι λείπει;
-  explanation: Για να τρέξει ένα αρχείο ως πρόγραμμα χρειάζεται δικαίωμα εκτέλεσης (`x`). Μετά το `chmod u+x run.sh`
-    το `./run.sh` δουλεύει.
-  reference: chmod
-  commands:
-  - chmod
-  spec:
-    command: ./run.sh
-    output: 'bash: ./run.sh: Permission denied'
-    captured_on: debian-13.7
-    options:
-    - id: x
-      text: Το αρχείο δεν έχει δικαίωμα εκτέλεσης (x).
-      correct: true
-    - id: sudo
-      text: Τα scripts τρέχουν μόνο με sudo.
-      why: Τα scripts τρέχουν κανονικά ως απλός χρήστης — αρκεί το δικαίωμα x.
-    - id: missing
-      text: Το αρχείο δεν υπάρχει.
-      why: Τότε το μήνυμα θα ήταν «No such file or directory».
-    - id: syntax
-      text: Υπάρχει συντακτικό λάθος στο script.
-      why: Το script δεν ξεκίνησε καν — το shell αρνήθηκε να το εκτελέσει.
 - id: chmod-600-write
   type: command_writing
   cognitive_level: apply
@@ -199,7 +222,7 @@ questions:
       feedback: Το 644 αφήνει ομάδα και άλλους να διαβάζουν (`rw-r--r--`).
     - id: '700'
       match: chmod 700 secrets.txt
-      feedback: Το 700 δίνει και εκτέλεση στον ιδιοκτήτη — δεν χρειάζεται για ένα αρχείο κειμένου.
+      feedback: 'Το 700 δίνει και εκτέλεση στον ιδιοκτήτη: δεν χρειάζεται για ένα αρχείο κειμένου.'
     - id: swapped
       match: chmod secrets.txt 600
       feedback: Πρώτα το mode, μετά το αρχείο.
@@ -269,30 +292,32 @@ questions:
       - ls -d logs
       - ls -la logs
       - ls -ld
-- id: chmod-777
-  type: multiple_choice
-  prompt: Ένα πρόγραμμα δεν μπορεί να γράψει σε έναν φάκελο και κάποιος προτείνει «βάλε `chmod 777`». Γιατί είναι
-    κακή ιδέα;
-  explanation: Το 777 δίνει σε **κάθε** χρήστη του συστήματος δικαίωμα να διαβάσει, να αλλάξει και να διαγράψει.
-    Η σωστή λύση είναι να δώσεις μόνο το δικαίωμα που λείπει, μόνο σε όποιον το χρειάζεται (π.χ. αλλαγή ιδιοκτήτη
-    ή ομάδας).
+- id: script-denied
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Έγραψες ένα script και προσπαθείς να το τρέξεις. Τι λείπει;
+  explanation: Για να τρέξει ένα αρχείο ως πρόγραμμα χρειάζεται δικαίωμα εκτέλεσης (`x`). Μετά το `chmod u+x run.sh`
+    το `./run.sh` δουλεύει.
   reference: chmod
   commands:
   - chmod
   spec:
+    command: ./run.sh
+    output: 'bash: ./run.sh: Permission denied'
+    captured_on: debian-13.7
     options:
-    - id: everyone
-      text: Δίνει σε όλους τους χρήστες δικαίωμα να αλλάξουν ή να διαγράψουν τα πάντα εκεί.
+    - id: x
+      text: Το αρχείο δεν έχει δικαίωμα εκτέλεσης (x).
       correct: true
-    - id: slow
-      text: Κάνει τον φάκελο πιο αργό.
-      why: Τα δικαιώματα δεν επηρεάζουν την ταχύτητα.
-    - id: invalid
-      text: Το 777 δεν είναι έγκυρο mode.
-      why: Είναι έγκυρο (`rwxrwxrwx`) — απλώς επικίνδυνο.
-    - id: root
-      text: Μόνο ο root μπορεί να τρέξει chmod 777.
-      why: Ο ιδιοκτήτης ενός αρχείου μπορεί να αλλάξει τα δικαιώματά του, χωρίς root.
+    - id: sudo
+      text: Τα scripts τρέχουν μόνο με sudo.
+      why: 'Τα scripts τρέχουν κανονικά ως απλός χρήστης: αρκεί το δικαίωμα x.'
+    - id: missing
+      text: Το αρχείο δεν υπάρχει.
+      why: Τότε το μήνυμα θα ήταν «No such file or directory».
+    - id: syntax
+      text: Υπάρχει συντακτικό λάθος στο script.
+      why: 'Το script δεν ξεκίνησε καν: το shell αρνήθηκε να το εκτελέσει.'
 - id: denied-read
   type: output_analysis
   cognitive_level: troubleshoot
@@ -318,25 +343,4 @@ questions:
       why: Στο Linux ένα ανοιχτό αρχείο συνήθως διαβάζεται κανονικά από άλλους· το μήνυμα αφορά δικαιώματα.
     - id: corrupt
       text: Το αρχείο είναι κατεστραμμένο.
-      why: Ένα κατεστραμμένο αρχείο θα διαβαζόταν (με περίεργο περιεχόμενο) — δεν θα έβγαζε Permission denied.
-- id: go-w
-  type: multiple_choice
-  prompt: Τι κάνει το `chmod go-w report.txt`;
-  explanation: '`g` = ομάδα, `o` = άλλοι, `-w` = αφαίρεσε εγγραφή. Ο ιδιοκτήτης δεν επηρεάζεται.'
-  reference: chmod
-  commands:
-  - chmod
-  spec:
-    options:
-    - id: remove
-      text: Αφαιρεί το δικαίωμα εγγραφής από την ομάδα και τους άλλους.
-      correct: true
-    - id: owner
-      text: Αφαιρεί την εγγραφή από τον ιδιοκτήτη.
-      why: Ο ιδιοκτήτης είναι `u` — δεν περιλαμβάνεται στο `go`.
-    - id: add
-      text: Δίνει εγγραφή στην ομάδα και τους άλλους.
-      why: Το `-` αφαιρεί· για προσθήκη θα ήταν `go+w`.
-    - id: go
-      text: Το «go» είναι όνομα χρήστη.
-      why: 'Στο chmod τα γράμματα πριν το +/- είναι κατηγορίες: u, g, o, a.'
+      why: 'Ένα κατεστραμμένο αρχείο θα διαβαζόταν (με περίεργο περιεχόμενο): δεν θα έβγαζε Permission denied.'

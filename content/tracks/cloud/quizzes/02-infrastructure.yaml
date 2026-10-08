@@ -1,147 +1,278 @@
 id: cloud.q02
 track: cloud
 title: Υποδομή και δίκτυα στο cloud
-description: VPC, subnets και CIDR, security groups, load balancers, autoscaling, αποθήκευση και Infrastructure as Code.
+description: VPC, subnets και CIDR, security groups, load balancers, autoscaling, αποθήκευση και Infrastructure
+  as Code.
 level: intermediate
 order: 2
-skills: [cloud.infra]
+skills:
+- cloud.infra
 questions:
-  - id: cidr-24
-    type: fill_in_command
-    cognitive_level: apply
-    prompt: "Πόσες διευθύνσεις IPv4 περιέχει συνολικά το block `10.0.1.0/24`;"
-    explanation: "Το /24 αφήνει 32 − 24 = 8 bits για hosts: 2⁸ = **256** διευθύνσεις. (Στην πράξη ο πάροχος κρατά κάποιες για δική του χρήση.)"
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html", doc_version: "Amazon VPC 2026", last_verified: 2026-10-06 }]
-    spec:
-      template: "____"
-      blanks:
-        - accepted: ["256"]
-          known_mistakes:
-            - { id: "254", match: "254", feedback: "Το 254 είναι οι χρησιμοποιήσιμες διευθύνσεις σε ένα κλασικό δίκτυο (χωρίς network/broadcast). Η ερώτηση ζητά το σύνολο: 256." }
-            - { id: "24", match: "24", feedback: "Το 24 είναι το μήκος του prefix σε bits, όχι ο αριθμός διευθύνσεων." }
-
-  - id: cidr-16
-    type: fill_in_command
-    cognitive_level: apply
-    prompt: "Ένα VPC με CIDR `10.0.0.0/16` — πόσες διευθύνσεις IPv4 έχει;"
-    explanation: "32 − 16 = 16 bits: 2¹⁶ = **65.536** διευθύνσεις. Στο AWS, το /16 είναι και το μεγαλύτερο μέγεθος IPv4 CIDR για ένα VPC block."
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html", doc_version: "Amazon VPC 2026", last_verified: 2026-10-06 }]
-    spec:
-      template: "____"
-      blanks:
-        - accepted: ["65536", "65.536", "65,536"]
-          known_mistakes:
-            - { id: "256", match: "256", feedback: "Αυτό ισχύει για /24. Εδώ μένουν 16 bits: 2¹⁶." }
-
-  - id: private-range
-    type: multiple_choice
-    prompt: "Ποιο από αυτά τα blocks είναι **ιδιωτικό** (RFC 1918) και κατάλληλο για VPC;"
-    explanation: "Τα ιδιωτικά ranges του RFC 1918 είναι 10.0.0.0/8, 172.16.0.0/12 και 192.168.0.0/16. Το 10.0.0.0/16 βρίσκεται μέσα στο πρώτο."
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html", doc_version: "Amazon VPC 2026", last_verified: 2026-10-06 }]
-    spec:
-      options:
-        - { id: "10", text: "10.0.0.0/16", correct: true }
-        - { id: "8-8", text: "8.8.0.0/16", why: "Είναι δημόσιες διευθύνσεις του internet." }
-        - { id: "127", text: "127.0.0.0/16", why: "Το 127.0.0.0/8 είναι loopback και δεν επιτρέπεται για VPC." }
-        - { id: "169", text: "169.254.0.0/16", why: "Είναι link-local range και δεν επιτρέπεται για VPC." }
-
-  - id: public-subnet
-    type: multiple_choice
-    prompt: "Τι κάνει ένα subnet **public** σε ένα VPC;"
-    explanation: "Ένα subnet είναι public όταν ο route table του έχει route προς internet gateway. Χωρίς αυτό είναι private — οι πόροι του δεν είναι προσβάσιμοι απευθείας από το internet."
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html", doc_version: "Amazon VPC 2026", last_verified: 2026-10-06 }]
-    spec:
-      options:
-        - { id: "route", text: "Έχει route προς internet gateway.", correct: true }
-        - { id: "name", text: "Έχει τη λέξη public στο όνομά του.", why: "Το όνομα είναι απλώς ετικέτα· αυτό που μετράει είναι η δρομολόγηση." }
-        - { id: "size", text: "Είναι μεγαλύτερο από /24.", why: "Το μέγεθος δεν το κάνει public ή private." }
-        - { id: "ipv6", text: "Χρησιμοποιεί IPv6.", why: "Υπάρχουν και private και public subnets με IPv6." }
-
-  - id: sg-stateful
-    type: multiple_choice
-    cognitive_level: apply
-    prompt: "Ένα security group επιτρέπει εισερχόμενη κίνηση στη θύρα 443. Χρειάζεται ξεχωριστό κανόνα για να **επιστρέψει** η απάντηση στον client;"
-    explanation: "Όχι. Τα security groups είναι **stateful**: η απάντηση σε μια επιτρεπτή εισερχόμενη σύνδεση επιτρέπεται αυτόματα να βγει, ανεξάρτητα από τους κανόνες εξόδου."
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html", doc_version: "Amazon VPC 2026", last_verified: 2026-10-06 }]
-    spec:
-      options:
-        - { id: "stateful", text: "Όχι — τα security groups είναι stateful.", correct: true }
-        - { id: "yes", text: "Ναι, χρειάζεται outbound κανόνας για τις απαντήσεις.", why: "Αυτό ισχύει για stateless φίλτρα (π.χ. network ACLs), όχι για security groups." }
-        - { id: "udp", text: "Μόνο για UDP.", why: "Τα security groups παρακολουθούν την κατάσταση των συνδέσεων· η απάντηση επιτρέπεται." }
-        - { id: "restart", text: "Ναι, και χρειάζεται επανεκκίνηση του server.", why: "Οι κανόνες εφαρμόζονται χωρίς επανεκκίνηση." }
-
-  - id: ssh-open
-    type: multiple_choice
-    cognitive_level: apply
-    prompt: "Ένας κανόνας επιτρέπει SSH (θύρα 22) από `0.0.0.0/0`. Τι σημαίνει και τι προτείνεται;"
-    explanation: "Το `0.0.0.0/0` σημαίνει «από οποιαδήποτε διεύθυνση». Για SSH και RDP επιτρέψε μόνο συγκεκριμένα ranges (π.χ. το δίκτυο του γραφείου σου ή ένα VPN)."
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html", doc_version: "Amazon VPC 2026", last_verified: 2026-10-06 }]
-    spec:
-      options:
-        - { id: "anyone", text: "Οποιοσδήποτε στο internet μπορεί να δοκιμάσει να συνδεθεί· περιόρισέ το σε συγκεκριμένες IP.", correct: true }
-        - { id: "nobody", text: "Κανείς δεν μπορεί να συνδεθεί — το 0.0.0.0 είναι κενή διεύθυνση.", why: "Ως CIDR, το 0.0.0.0/0 καλύπτει *όλες* τις IPv4 διευθύνσεις." }
-        - { id: "local", text: "Μόνο το ίδιο το μηχάνημα μπορεί να συνδεθεί.", why: "Αυτό θα ήταν το 127.0.0.1." }
-        - { id: "fine", text: "Είναι ασφαλές αφού το SSH έχει κωδικό.", why: "Η έκθεση σε όλο το internet φέρνει συνεχείς επιθέσεις brute-force· η καλή πρακτική είναι να περιορίζεις την πρόσβαση." }
-
-  - id: load-balancer
-    type: multiple_choice
-    prompt: "Τι κάνει ένας **load balancer**;"
-    explanation: "Μοιράζει την εισερχόμενη κίνηση σε πολλούς στόχους (π.χ. servers σε διαφορετικές AZs) και στέλνει κίνηση μόνο σε όσους περνούν τους ελέγχους υγείας (health checks)."
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html", doc_version: "Elastic Load Balancing 2026", last_verified: 2026-10-06 }]
-    spec:
-      options:
-        - { id: "distribute", text: "Μοιράζει την κίνηση σε πολλούς υγιείς servers.", correct: true }
-        - { id: "cpu", text: "Μοιράζει το φορτίο CPU μέσα σε έναν server.", why: "Αυτό το κάνει ο scheduler του λειτουργικού." }
-        - { id: "backup", text: "Κρατά αντίγραφα ασφαλείας.", why: "Δεν αποθηκεύει δεδομένα." }
-        - { id: "firewall", text: "Είναι firewall που μπλοκάρει επιθέσεις.", why: "Μπορεί να συνεργάζεται με firewall, αλλά βασική του δουλειά είναι η κατανομή κίνησης." }
-
-  - id: autoscaling
-    type: multiple_choice
-    prompt: "Η κίνηση στο site σου διπλασιάζεται κάθε βράδυ. Τι λύνει το **autoscaling**;"
-    explanation: "Προσθέτει αυτόματα instances όταν αυξάνεται το φορτίο (π.χ. CPU) και τα αφαιρεί όταν πέφτει — πληρώνεις όσο χρειάζεσαι."
-    citations: [{ source: "aws-docs", url: "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html", doc_version: "EC2 Auto Scaling 2026", last_verified: 2026-10-06 }]
-    spec:
-      options:
-        - { id: "auto", text: "Προσθέτει και αφαιρεί servers αυτόματα ανάλογα με το φορτίο.", correct: true }
-        - { id: "bigger", text: "Αναβαθμίζει μόνιμα τον server σε μεγαλύτερο.", why: "Αυτό είναι χειροκίνητο vertical scaling· το autoscaling προσθέτει/αφαιρεί instances." }
-        - { id: "cache", text: "Αποθηκεύει τις σελίδες σε cache.", why: "Αυτό το κάνει ένα CDN ή cache." }
-        - { id: "night", text: "Σβήνει το site το βράδυ.", why: "Το αντίθετο: προσθέτει χωρητικότητα όταν χρειάζεται." }
-
-  - id: object-storage
-    type: multiple_choice
-    prompt: "Θέλεις να αποθηκεύσεις εκατομμύρια φωτογραφίες χρηστών και να τις σερβίρεις μέσω HTTP. Τι ταιριάζει καλύτερα;"
-    explanation: "Το **object storage** (π.χ. Amazon S3, Azure Blob Storage) αποθηκεύει αρχεία ως objects σε buckets/containers, κλιμακώνεται σχεδόν απεριόριστα και είναι προσβάσιμο μέσω HTTP API."
-    citations:
-      - { source: "aws-docs", url: "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html", doc_version: "Amazon S3 2026", last_verified: 2026-10-06 }
-      - { source: "azure-docs", url: "https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction", doc_version: "Azure Blob Storage 2026", last_verified: 2026-10-06 }
-    spec:
-      options:
-        - { id: "object", text: "Object storage (π.χ. S3 / Blob Storage).", correct: true }
-        - { id: "block", text: "Έναν εικονικό δίσκο (block storage) σε μία VM.", why: "Ένας δίσκος συνδέεται σε μία VM και έχει σταθερό μέγεθος — δεν είναι φτιαγμένος για εκατομμύρια αρχεία μέσω HTTP." }
-        - { id: "ram", text: "Τη μνήμη RAM του server.", why: "Η RAM δεν είναι μόνιμη αποθήκευση." }
-        - { id: "db-blob", text: "Πεδία μέσα σε μια relational βάση.", why: "Δουλεύει, αλλά είναι ακριβό και δύσκολο να κλιμακωθεί για αρχεία." }
-
-  - id: iac
-    type: multiple_choice
-    prompt: "Ποιο είναι το βασικό πλεονέκτημα του **Infrastructure as Code** (π.χ. Terraform);"
-    explanation: "Περιγράφεις την υποδομή σε αρχεία κειμένου: μπαίνει σε version control, ελέγχεται σε code review και αναπαράγεται ίδια σε κάθε περιβάλλον — αντί για χειροκίνητα κλικ στην κονσόλα."
-    citations: [{ source: "terraform-docs", url: "https://developer.hashicorp.com/terraform/intro", doc_version: "Terraform docs 2026", last_verified: 2026-10-06 }]
-    spec:
-      options:
-        - { id: "repeatable", text: "Η υποδομή περιγράφεται σε αρχεία με version control και αναπαράγεται αξιόπιστα.", correct: true }
-        - { id: "free", text: "Κάνει την υποδομή δωρεάν.", why: "Οι πόροι χρεώνονται κανονικά." }
-        - { id: "no-cloud", text: "Δεν χρειάζεσαι πια πάροχο cloud.", why: "Το IaC διαχειρίζεται πόρους *στον* πάροχο." }
-        - { id: "faster-servers", text: "Κάνει τους servers πιο γρήγορους.", why: "Δεν επηρεάζει την απόδοση των servers." }
-
-  - id: ha-order
-    type: ordering
-    cognitive_level: scenario
-    prompt: "Στήνεις μια εφαρμογή υψηλής διαθεσιμότητας. Βάλε τα βήματα σε σειρά εξαρτήσεων."
-    explanation: "Το δίκτυο (VPC) πρώτα, μετά subnets σε δύο AZs μέσα σε αυτό, μετά οι servers στα subnets, μετά ο load balancer που στέλνει κίνηση σε αυτούς τους servers, και στο τέλος το DNS που δείχνει στον load balancer."
-    spec:
-      steps:
-        - { id: "vpc", text: "Δημιουργείς VPC" }
-        - { id: "subnets", text: "Δημιουργείς subnets σε δύο Availability Zones" }
-        - { id: "servers", text: "Ξεκινάς servers (ή autoscaling group) στα subnets" }
-        - { id: "lb", text: "Βάζεις load balancer με στόχους αυτούς τους servers" }
-        - { id: "dns", text: "Δείχνεις το domain (DNS) στον load balancer" }
+- id: load-balancer
+  type: multiple_choice
+  prompt: Τι κάνει ένας **load balancer**;
+  explanation: Μοιράζει την εισερχόμενη κίνηση σε πολλούς στόχους (π.χ. servers σε διαφορετικές AZs) και στέλνει
+    κίνηση μόνο σε όσους περνούν τους ελέγχους υγείας (health checks).
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html
+    doc_version: Elastic Load Balancing 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: distribute
+      text: Μοιράζει την κίνηση σε πολλούς υγιείς servers.
+      correct: true
+    - id: cpu
+      text: Μοιράζει το φορτίο CPU μέσα σε έναν server.
+      why: Αυτό το κάνει ο scheduler του λειτουργικού.
+    - id: backup
+      text: Κρατά αντίγραφα ασφαλείας.
+      why: Δεν αποθηκεύει δεδομένα.
+    - id: firewall
+      text: Είναι firewall που μπλοκάρει επιθέσεις.
+      why: Μπορεί να συνεργάζεται με firewall, αλλά βασική του δουλειά είναι η κατανομή κίνησης.
+  cognitive_level: recognize
+- id: autoscaling
+  type: multiple_choice
+  prompt: Η κίνηση στο site σου διπλασιάζεται κάθε βράδυ. Τι λύνει το **autoscaling**;
+  explanation: 'Προσθέτει αυτόματα instances όταν αυξάνεται το φορτίο (π.χ. CPU) και τα αφαιρεί όταν πέφτει: πληρώνεις όσο χρειάζεσαι.'
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html
+    doc_version: EC2 Auto Scaling 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: auto
+      text: Προσθέτει και αφαιρεί servers αυτόματα ανάλογα με το φορτίο.
+      correct: true
+    - id: bigger
+      text: Αναβαθμίζει μόνιμα τον server σε μεγαλύτερο.
+      why: Αυτό είναι χειροκίνητο vertical scaling· το autoscaling προσθέτει/αφαιρεί instances.
+    - id: cache
+      text: Αποθηκεύει τις σελίδες σε cache.
+      why: Αυτό το κάνει ένα CDN ή cache.
+    - id: night
+      text: Σβήνει το site το βράδυ.
+      why: 'Το αντίθετο: προσθέτει χωρητικότητα όταν χρειάζεται.'
+  cognitive_level: recognize
+- id: object-storage
+  type: multiple_choice
+  prompt: Θέλεις να αποθηκεύσεις εκατομμύρια φωτογραφίες χρηστών και να τις σερβίρεις μέσω HTTP. Τι ταιριάζει καλύτερα;
+  explanation: Το **object storage** (π.χ. Amazon S3, Azure Blob Storage) αποθηκεύει αρχεία ως objects σε buckets/containers,
+    μεγαλώνει σχεδόν χωρίς όριο και είναι προσβάσιμο μέσω HTTP API.
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html
+    doc_version: Amazon S3 2026
+    last_verified: 2026-10-06
+  - source: azure-docs
+    url: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction
+    doc_version: Azure Blob Storage 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: object
+      text: Object storage (π.χ. S3 / Blob Storage).
+      correct: true
+    - id: block
+      text: Έναν εικονικό δίσκο (block storage) σε μία VM.
+      why: 'Ένας δίσκος συνδέεται σε μία VM και έχει σταθερό μέγεθος: δεν είναι φτιαγμένος για εκατομμύρια αρχεία μέσω HTTP.'
+    - id: ram
+      text: Τη μνήμη RAM του server.
+      why: Η RAM δεν είναι μόνιμη αποθήκευση.
+    - id: db-blob
+      text: Πεδία μέσα σε μια relational βάση.
+      why: Δουλεύει, αλλά είναι ακριβό και δύσκολο να μεγαλώσει για πολλά αρχεία.
+  cognitive_level: recognize
+- id: iac
+  type: multiple_choice
+  prompt: Ποιο είναι το βασικό πλεονέκτημα του **Infrastructure as Code** (π.χ. Terraform);
+  explanation: 'Περιγράφεις την υποδομή σε αρχεία κειμένου: μπαίνει σε version control, ελέγχεται σε code review
+    και στήνεται ξανά ακριβώς ίδια σε κάθε περιβάλλον, αντί για χειροκίνητα κλικ στην κονσόλα.'
+  citations:
+  - source: terraform-docs
+    url: https://developer.hashicorp.com/terraform/intro
+    doc_version: Terraform docs 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: repeatable
+      text: Η υποδομή περιγράφεται σε αρχεία με version control και στήνεται ξανά ίδια κάθε φορά.
+      correct: true
+    - id: free
+      text: Κάνει την υποδομή δωρεάν.
+      why: Οι πόροι χρεώνονται κανονικά.
+    - id: no-cloud
+      text: Δεν χρειάζεσαι πια πάροχο cloud.
+      why: Το IaC διαχειρίζεται πόρους *στον* πάροχο.
+    - id: faster-servers
+      text: Κάνει τους servers πιο γρήγορους.
+      why: Δεν επηρεάζει την απόδοση των servers.
+  cognitive_level: recognize
+- id: private-range
+  type: multiple_choice
+  prompt: Ποιο από αυτά τα blocks είναι **ιδιωτικό** (RFC 1918) και κατάλληλο για VPC;
+  explanation: Τα ιδιωτικά ranges του RFC 1918 είναι 10.0.0.0/8, 172.16.0.0/12 και 192.168.0.0/16. Το 10.0.0.0/16
+    βρίσκεται μέσα στο πρώτο.
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html
+    doc_version: Amazon VPC 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: '10'
+      text: 10.0.0.0/16
+      correct: true
+    - id: 8-8
+      text: 8.8.0.0/16
+      why: Είναι δημόσιες διευθύνσεις του internet.
+    - id: '127'
+      text: 127.0.0.0/16
+      why: Το 127.0.0.0/8 είναι loopback και δεν επιτρέπεται για VPC.
+    - id: '169'
+      text: 169.254.0.0/16
+      why: Είναι link-local range και δεν επιτρέπεται για VPC.
+  cognitive_level: recognize
+- id: public-subnet
+  type: multiple_choice
+  prompt: Τι κάνει ένα subnet **public** σε ένα VPC;
+  explanation: 'Ένα subnet είναι public όταν ο route table του έχει route προς internet gateway. Χωρίς αυτό είναι private: οι πόροι του δεν είναι προσβάσιμοι απευθείας από το internet.'
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html
+    doc_version: Amazon VPC 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: route
+      text: Έχει route προς internet gateway.
+      correct: true
+    - id: name
+      text: Έχει τη λέξη public στο όνομά του.
+      why: Το όνομα είναι απλώς ετικέτα· αυτό που μετράει είναι η δρομολόγηση.
+    - id: size
+      text: Είναι μεγαλύτερο από /24.
+      why: Το μέγεθος δεν το κάνει public ή private.
+    - id: ipv6
+      text: Χρησιμοποιεί IPv6.
+      why: Υπάρχουν και private και public subnets με IPv6.
+  cognitive_level: recognize
+- id: cidr-24
+  type: fill_in_command
+  cognitive_level: apply
+  prompt: Πόσες διευθύνσεις IPv4 περιέχει συνολικά το block `10.0.1.0/24`;
+  explanation: 'Το /24 αφήνει 32 − 24 = 8 bits για hosts: 2⁸ = **256** διευθύνσεις. (Στην πράξη ο πάροχος κρατά
+    κάποιες για δική του χρήση.)'
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html
+    doc_version: Amazon VPC 2026
+    last_verified: 2026-10-06
+  spec:
+    template: ____
+    blanks:
+    - accepted:
+      - '256'
+      known_mistakes:
+      - id: '254'
+        match: '254'
+        feedback: 'Το 254 είναι οι χρησιμοποιήσιμες διευθύνσεις σε ένα κλασικό δίκτυο (χωρίς network/broadcast).
+          Η ερώτηση ζητά το σύνολο: 256.'
+      - id: '24'
+        match: '24'
+        feedback: Το 24 είναι το μήκος του prefix σε bits, όχι ο αριθμός διευθύνσεων.
+- id: cidr-16
+  type: fill_in_command
+  cognitive_level: apply
+  prompt: 'Ένα VPC με CIDR `10.0.0.0/16`: πόσες διευθύνσεις IPv4 έχει;'
+  explanation: '32 − 16 = 16 bits: 2¹⁶ = **65.536** διευθύνσεις. Στο AWS, το /16 είναι και το μεγαλύτερο μέγεθος
+    IPv4 CIDR για ένα VPC block.'
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html
+    doc_version: Amazon VPC 2026
+    last_verified: 2026-10-06
+  spec:
+    template: ____
+    blanks:
+    - accepted:
+      - '65536'
+      - '65.536'
+      - 65,536
+      known_mistakes:
+      - id: '256'
+        match: '256'
+        feedback: 'Αυτό ισχύει για /24. Εδώ μένουν 16 bits: 2¹⁶.'
+- id: sg-stateful
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Ένα security group επιτρέπει εισερχόμενη κίνηση στη θύρα 443. Χρειάζεται ξεχωριστό κανόνα για να **επιστρέψει**
+    η απάντηση στον client;
+  explanation: 'Όχι. Τα security groups είναι **stateful**: η απάντηση σε μια εισερχόμενη σύνδεση που επιτρέπεται επιτρέπεται
+    αυτόματα να βγει, ανεξάρτητα από τους κανόνες εξόδου.'
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html
+    doc_version: Amazon VPC 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: stateful
+      text: Όχι, τα security groups είναι stateful.
+      correct: true
+    - id: 'yes'
+      text: Ναι, χρειάζεται outbound κανόνας για τις απαντήσεις.
+      why: Αυτό ισχύει για stateless φίλτρα (π.χ. network ACLs), όχι για security groups.
+    - id: udp
+      text: Μόνο για UDP.
+      why: Τα security groups παρακολουθούν την κατάσταση των συνδέσεων· η απάντηση επιτρέπεται.
+    - id: restart
+      text: Ναι, και χρειάζεται επανεκκίνηση του server.
+      why: Οι κανόνες εφαρμόζονται χωρίς επανεκκίνηση.
+- id: ssh-open
+  type: multiple_choice
+  cognitive_level: apply
+  prompt: Ένας κανόνας επιτρέπει SSH (θύρα 22) από `0.0.0.0/0`. Τι σημαίνει και τι προτείνεται;
+  explanation: Το `0.0.0.0/0` σημαίνει «από οποιαδήποτε διεύθυνση». Για SSH και RDP επιτρέψε μόνο συγκεκριμένα ranges
+    (π.χ. το δίκτυο του γραφείου σου ή ένα VPN).
+  citations:
+  - source: aws-docs
+    url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html
+    doc_version: Amazon VPC 2026
+    last_verified: 2026-10-06
+  spec:
+    options:
+    - id: anyone
+      text: Οποιοσδήποτε στο internet μπορεί να δοκιμάσει να συνδεθεί· περιόρισέ το σε συγκεκριμένες IP.
+      correct: true
+    - id: nobody
+      text: 'Κανείς δεν μπορεί να συνδεθεί: το 0.0.0.0 είναι κενή διεύθυνση.'
+      why: Ως CIDR, το 0.0.0.0/0 καλύπτει *όλες* τις IPv4 διευθύνσεις.
+    - id: local
+      text: Μόνο το ίδιο το μηχάνημα μπορεί να συνδεθεί.
+      why: Αυτό θα ήταν το 127.0.0.1.
+    - id: fine
+      text: Είναι ασφαλές αφού το SSH έχει κωδικό.
+      why: Η έκθεση σε όλο το internet φέρνει συνεχείς επιθέσεις brute-force· η καλή πρακτική είναι να περιορίζεις
+        την πρόσβαση.
+- id: ha-order
+  type: ordering
+  cognitive_level: scenario
+  prompt: Στήνεις μια εφαρμογή υψηλής διαθεσιμότητας. Βάλε τα βήματα σε σειρά εξαρτήσεων.
+  explanation: Το δίκτυο (VPC) πρώτα, μετά subnets σε δύο AZs μέσα σε αυτό, μετά οι servers στα subnets, μετά ο
+    load balancer που στέλνει κίνηση σε αυτούς τους servers, και στο τέλος το DNS που δείχνει στον load balancer.
+  spec:
+    steps:
+    - id: vpc
+      text: Δημιουργείς VPC
+    - id: subnets
+      text: Δημιουργείς subnets σε δύο Availability Zones
+    - id: servers
+      text: Ξεκινάς servers (ή autoscaling group) στα subnets
+    - id: lb
+      text: Βάζεις load balancer με στόχους αυτούς τους servers
+    - id: dns
+      text: Δείχνεις το domain (DNS) στον load balancer

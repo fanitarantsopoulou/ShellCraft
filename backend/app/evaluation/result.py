@@ -20,6 +20,7 @@ class FeedbackKind(StrEnum):
     CORRECT_ANSWER = "correct_answer"
     WHY = "why"
     MISTAKE = "mistake"  # specific to what the learner submitted
+    NOTE = "note"  # accepted, but worth knowing (e.g. an obsolete spelling)
     OPTION = "option"  # explanation of a chosen (wrong) option
     SYNTAX = "syntax"
     BREAKDOWN = "breakdown"

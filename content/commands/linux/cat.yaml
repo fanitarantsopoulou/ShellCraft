@@ -59,7 +59,7 @@ examples:
     meaning: το αρχείο
 common_mistakes:
 - wrong: cat bigfile.log
-  why: Για μεγάλα αρχεία το `cat` γεμίζει την οθόνη — εκεί ταιριάζει `less` ή `tail`.
+  why: 'Για μεγάλα αρχεία το `cat` γεμίζει την οθόνη: εκεί ταιριάζει `less` ή `tail`.'
 related:
 - id: head
 - id: tail

@@ -15,10 +15,10 @@ synopsis:
   - "cp [OPTION]... -t DIRECTORY SOURCE..."
 flag_grammar: gnu_getopt
 options:
-  - { flags: ["-r", "-R", "--recursive"], summary: Αντιγραφή φακέλων αναδρομικά (μαζί με όλο το περιεχόμενό τους). }
+  - { flags: ["-r", "-R", "--recursive"], summary: Αντιγραφή φακέλων μαζί με όλο το περιεχόμενό τους (recursive). }
   - { flags: ["-i", "--interactive"], summary: Ρωτάει πριν αντικαταστήσει υπάρχον αρχείο. }
   - { flags: ["-v", "--verbose"], summary: Τυπώνει τι κάνει. }
-  - { flags: ["-a", "--archive"], summary: "Όπως -dR --preserve=all: αναδρομικά, διατηρώντας δικαιώματα, ιδιοκτήτη και χρόνους.", level: intermediate }
+  - { flags: ["-a", "--archive"], summary: "Όπως -dR --preserve=all: αντιγράφει όλο τον φάκελο και κρατά δικαιώματα, ιδιοκτήτη και ημερομηνίες.", level: intermediate }
   - { flags: ["-p"], summary: "Όπως --preserve=mode,ownership,timestamps.", level: intermediate }
   - { flags: ["-n", "--no-clobber"], summary: "Δεν αντικαθιστά υπάρχοντα αρχεία (deprecated στο coreutils 9.7· προτίμησε --update=none).", level: intermediate }
   - { flags: ["-u"], summary: "Αντιγράφει μόνο αν η πηγή είναι νεότερη (όπως --update=older).", level: intermediate }
@@ -48,14 +48,14 @@ examples:
     note: Αν ο archive είναι φάκελος, δημιουργείται το archive/report.txt.
 common_mistakes:
   - wrong: mv old.txt new.txt
-    why: Το mv μετονομάζει/μετακινεί το αρχείο — δεν δημιουργείται αντίγραφο και το old.txt παύει να υπάρχει.
+    why: 'Το mv μετονομάζει/μετακινεί το αρχείο: δεν δημιουργείται αντίγραφο και το old.txt δεν υπάρχει πια.'
   - wrong: cp project project-backup
     why: "Χωρίς -r το GNU cp αρνείται να αντιγράψει φάκελο: «cp: -r not specified; omitting directory 'project'»."
   - wrong: cp new.txt old.txt
     why: Πρώτα γράφεται η πηγή και μετά ο προορισμός. Με ανάποδη σειρά μπορεί να αντικαταστήσεις το αρχείο που ήθελες να κρατήσεις.
 when_not_to_use:
-  - Για συγχρονισμό μεγάλων δέντρων φακέλων ή αντιγραφή σε άλλο μηχάνημα — εκεί ταιριάζει το rsync.
-  - Για να αλλάξεις μόνο το όνομα ενός αρχείου — αυτό είναι δουλειά του mv.
+  - 'Για συγχρονισμό μεγάλων δέντρων φακέλων ή αντιγραφή σε άλλο μηχάνημα: εκεί ταιριάζει το rsync.'
+  - 'Για να αλλάξεις μόνο το όνομα ενός αρχείου: αυτό είναι δουλειά του mv.'
 related:
   - { id: mv, relation: confused_with }
 citations:

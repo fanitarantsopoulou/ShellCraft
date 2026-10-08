@@ -103,6 +103,8 @@ def test_numeric_shorthand():
         return canonicalize(parse(line), ctx)
 
     assert c("head -5 f") == c("head -n 5 f") == c("head --lines=5 f") == c("head -n5 f")
+    assert c("head -5 f").commands[0].shorthands == (("-5", "-n 5"),)
+    assert c("head -n 5 f").commands[0].shorthands == ()
     assert c("head -5 f") != c("head -n 6 f")
 
 

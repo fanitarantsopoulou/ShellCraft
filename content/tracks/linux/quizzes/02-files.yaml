@@ -1,7 +1,7 @@
 id: linux.q02
 track: linux
 title: Αρχεία και φάκελοι
-description: Δημιουργία, αντιγραφή, μετακίνηση και διαγραφή — mkdir, touch, cp, mv, rm, rmdir.
+description: 'Δημιουργία, αντιγραφή, μετακίνηση και διαγραφή: mkdir, touch, cp, mv, rm, rmdir.'
 level: beginner
 order: 2
 skills:
@@ -13,78 +13,12 @@ related_lessons:
 - linux.files.copying
 - linux.files.moving
 questions:
-- id: mkdir-p-write
-  type: command_writing
-  cognitive_level: apply
-  skills:
-  - id: linux.files.create
-  prompt: Δεν υπάρχει ακόμη κανένας από τους φακέλους. Δημιούργησε τη διαδρομή `projects/web/css` με **μία** εντολή.
-  hints:
-  - Το `mkdir` έχει επιλογή που δημιουργεί και τους ενδιάμεσους φακέλους.
-  explanation: Το `mkdir -p` (*parents*) δημιουργεί όσους ενδιάμεσους φακέλους λείπουν, και δεν βγάζει σφάλμα αν
-    υπάρχουν ήδη.
-  reference: mkdir
-  commands:
-  - mkdir
-  spec:
-    accepted:
-    - mkdir -p projects/web/css
-    - mkdir -p projects/web/css/
-    optional_flags:
-      mkdir:
-      - -v
-    known_mistakes:
-    - id: no-p
-      match: mkdir projects/web/css
-      feedback: 'Χωρίς `-p` αποτυγχάνει: «mkdir: cannot create directory ''projects/web/css'': No such file or directory»,
-        γιατί λείπουν οι ενδιάμεσοι φάκελοι.'
-    test_cases:
-      accept:
-      - mkdir -p projects/web/css
-      - mkdir --parents projects/web/css
-      - mkdir projects/web/css -p
-      - mkdir -pv projects/web/css
-      - mkdir -p ./projects/web/css
-      reject:
-      - mkdir projects/web/css
-      - mkdir -p projects web css
-      - touch projects/web/css
-      - mkdir -r projects/web/css
-      - mkdir -p projects/web
-- id: mkdir-exists-output
-  type: output_analysis
-  cognitive_level: troubleshoot
-  skills:
-  - id: linux.files.create
-  prompt: Τι σημαίνει αυτό το μήνυμα;
-  explanation: Ο φάκελος `sub` υπάρχει ήδη. Αν θέλεις η εντολή να μην αποτυγχάνει σε αυτή την περίπτωση, χρησιμοποίησε
-    `mkdir -p sub`.
-  reference: mkdir
-  commands:
-  - mkdir
-  spec:
-    command: mkdir sub
-    output: 'mkdir: cannot create directory ''sub'': File exists'
-    captured_on: debian-13.7
-    options:
-    - id: exists
-      text: Υπάρχει ήδη αρχείο ή φάκελος με όνομα sub.
-      correct: true
-    - id: perm
-      text: Δεν έχω δικαίωμα να δημιουργήσω φάκελο εδώ.
-      why: Τότε θα έβλεπες «Permission denied».
-    - id: parent
-      text: Λείπει ο γονικός φάκελος.
-      why: Τότε θα έβλεπες «No such file or directory».
-    - id: name
-      text: Το όνομα sub δεν επιτρέπεται.
-      why: Το `sub` είναι απολύτως έγκυρο όνομα· το μήνυμα λέει «File exists».
 - id: touch-existing
   type: multiple_choice
   skills:
   - id: linux.files.create
   prompt: Το `notes.txt` υπάρχει ήδη και έχει κείμενο. Τι γίνεται αν τρέξεις `touch notes.txt`;
-  explanation: Το `touch` σε υπάρχον αρχείο ενημερώνει μόνο τους χρόνους πρόσβασης/τροποποίησης. Το περιεχόμενο
+  explanation: Το `touch` σε υπάρχον αρχείο ενημερώνει μόνο την ώρα τελευταίας πρόσβασης και αλλαγής. Το περιεχόμενο
     μένει ανέγγιχτο.
   reference: touch
   commands:
@@ -92,44 +26,18 @@ questions:
   spec:
     options:
     - id: time
-      text: Το περιεχόμενο μένει ίδιο· αλλάζει μόνο η ώρα τροποποίησης.
+      text: Το περιεχόμενο μένει ίδιο· αλλάζει μόνο η ώρα τελευταίας αλλαγής.
       correct: true
     - id: empty
       text: Το αρχείο αδειάζει.
       why: Αυτό θα έκανε μια ανακατεύθυνση όπως `> notes.txt`, όχι το `touch`.
     - id: error
       text: Βγάζει σφάλμα ότι το αρχείο υπάρχει.
-      why: Αυτό κάνει το `mkdir` για φακέλους· το `touch` δεν διαμαρτύρεται.
+      why: Αυτό κάνει το `mkdir` για φακέλους· το `touch` δεν βγάζει σφάλμα.
     - id: copy
       text: Δημιουργεί δεύτερο αρχείο notes(1).txt.
       why: Το Linux δεν μετονομάζει αυτόματα αρχεία όπως κάποιοι file managers.
-- id: touch-write
-  type: command_writing
-  cognitive_level: apply
-  skills:
-  - id: linux.files.create
-  prompt: Δημιούργησε ένα **κενό αρχείο** με όνομα `todo.txt`.
-  explanation: Το `touch todo.txt` δημιουργεί κενό αρχείο αν δεν υπάρχει.
-  reference: touch
-  commands:
-  - touch
-  spec:
-    accepted:
-    - touch todo.txt
-    known_mistakes:
-    - id: mkdir
-      match: mkdir todo.txt
-      feedback: Το `mkdir` θα δημιουργούσε *φάκελο* με όνομα todo.txt.
-    test_cases:
-      accept:
-      - touch todo.txt
-      - touch ./todo.txt
-      - touch 'todo.txt'
-      reject:
-      - mkdir todo.txt
-      - touch todo
-      - touch todo.md
-      - cat todo.txt
+  cognitive_level: recognize
 - id: cp-purpose
   type: multiple_choice
   cognitive_level: recognize
@@ -155,7 +63,7 @@ questions:
       why: Το `cp` δημιουργεί σύνδεσμο μόνο με `-s` ή `-l`· χωρίς αυτά γράφει πραγματικό αντίγραφο.
     - id: compressed
       text: Δημιουργήθηκε συμπιεσμένο backup του app.conf.
-      why: Η κατάληξη `.bak` είναι απλώς μέρος του ονόματος — το `cp` δεν συμπιέζει.
+      why: 'Η κατάληξη `.bak` είναι απλώς μέρος του ονόματος: το `cp` δεν συμπιέζει.'
   citations:
   - source: gnu-coreutils
     url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
@@ -176,7 +84,7 @@ questions:
     options:
     - id: mv
       text: mv old.txt new.txt
-      why: Το `mv` μετονομάζει το αρχείο — το old.txt δεν θα υπάρχει πια, άρα δεν έγινε αντιγραφή.
+      why: 'Το `mv` μετονομάζει το αρχείο: το old.txt δεν θα υπάρχει πια, άρα δεν έγινε αντιγραφή.'
       distractor:
         existence: exists
         issue: wrong_semantics
@@ -186,7 +94,7 @@ questions:
       correct: true
     - id: rename
       text: rename old.txt new.txt
-      why: Ακόμη και όπου υπάρχει, το `rename` αλλάζει ονόματα αρχείων — δεν αντιγράφει.
+      why: 'Ακόμη και όπου υπάρχει, το `rename` αλλάζει ονόματα αρχείων: δεν αντιγράφει.'
       distractor:
         existence: not_installed
         issue: wrong_semantics
@@ -234,136 +142,6 @@ questions:
     url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
     doc_version: GNU coreutils 9.7 (Debian 13)
     last_verified: 2026-10-06
-- id: cp-write-backup
-  type: command_writing
-  cognitive_level: apply
-  skills:
-  - id: linux.files.copy
-  - id: linux.files.safe-changes
-    weight: 0.5
-  commands:
-  - cp
-  prompt: 'Πριν αλλάξεις το `notes.txt`, κράτα αντίγραφο με όνομα `notes.bak` στον ίδιο φάκελο. Γράψε την εντολή.
-
-    '
-  hints:
-  - Ποια εντολή δημιουργεί αντίγραφο χωρίς να αφαιρεί το αρχικό;
-  - 'Σύνταξη: cp SOURCE DEST'
-  explanation: Το `cp notes.txt notes.bak` δημιουργεί αντίγραφο· το notes.txt μένει όπως ήταν.
-  reference: cp
-  spec:
-    accepted:
-    - cp notes.txt notes.bak
-    optional_flags:
-      cp:
-      - -i
-      - -v
-      - -p
-      - -a
-      - -r
-    known_mistakes:
-    - id: mv-instead-of-cp
-      match: mv notes.txt notes.bak
-      feedback: Το `mv` θα μετονόμαζε το αρχείο — δεν θα έμενε το notes.txt για να το επεξεργαστείς.
-    - id: reversed-args
-      match: cp notes.bak notes.txt
-      feedback: Πρώτα η πηγή, μετά ο προορισμός. Έτσι θα προσπαθούσες να αντιγράψεις το (ανύπαρκτο) notes.bak πάνω
-        στο notes.txt.
-    - id: symlink
-      match: cp -s notes.txt notes.bak
-      feedback: Με `-s` δημιουργείται symbolic link, όχι αντίγραφο — αν αλλάξεις το notes.txt, «αλλάζει» και το
-        notes.bak.
-    - id: hardlink
-      match: cp -l notes.txt notes.bak
-      feedback: Με `-l` δημιουργείται hard link, όχι αντίγραφο — και τα δύο ονόματα δείχνουν στα ίδια δεδομένα.
-    test_cases:
-      accept:
-      - cp notes.txt notes.bak
-      - cp   notes.txt   notes.bak
-      - cp ./notes.txt notes.bak
-      - cp ./notes.txt ./notes.bak
-      - cp 'notes.txt' "notes.bak"
-      - cp -i notes.txt notes.bak
-      - cp --interactive notes.txt notes.bak
-      - cp -iv notes.txt notes.bak
-      - cp notes.txt notes.bak -v
-      - cp -- notes.txt notes.bak
-      reject:
-      - mv notes.txt notes.bak
-      - cp notes.bak notes.txt
-      - cp notes.txt
-      - cp notes.txt notes.backup
-      - copy notes.txt notes.bak
-      - cp -s notes.txt notes.bak
-      - cp -l notes.txt notes.bak
-      - cp -t notes.bak notes.txt
-      - cp notes.txt notes.bak; rm notes.txt
-      - cp notes.txt notes.bak && ls
-      - cp $(echo notes.txt) notes.bak
-      - CP notes.txt notes.bak
-  citations:
-  - source: gnu-coreutils
-    url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
-    doc_version: GNU coreutils 9.7 (Debian 13)
-    last_verified: 2026-10-06
-- id: cp-directory-output
-  type: output_analysis
-  cognitive_level: troubleshoot
-  skills:
-  - id: linux.files.copy
-    weight: 1.5
-  commands:
-  - cp
-  prompt: Θέλεις αντίγραφο του φακέλου `project`. Έτρεξες την παρακάτω εντολή και πήρες αυτό το μήνυμα. Τι έγινε;
-  explanation: 'Το `project` είναι φάκελος. Το GNU `cp` αντιγράφει φακέλους μόνο με `-r`, γι'' αυτό τον παρέλειψε
-    και δεν δημιουργήθηκε τίποτα. Η σωστή εντολή είναι `cp -r project project-backup`.
-
-    '
-  reference: cp
-  spec:
-    command: cp project project-backup
-    output: 'cp: -r not specified; omitting directory ''project'''
-    captured_on: debian-13.7
-    options:
-    - id: needs-r
-      text: Το project είναι φάκελος και το cp χρειάζεται -r· δεν αντιγράφηκε τίποτα.
-      correct: true
-    - id: partial
-      text: Αντιγράφηκαν τα αρχεία του project αλλά όχι οι υποφάκελοι.
-      why: Το μήνυμα λέει «omitting directory» — ο φάκελος παραλείφθηκε ολόκληρος.
-    - id: permissions
-      text: Δεν έχεις δικαίωμα ανάγνωσης στο project.
-      why: Ένα πρόβλημα δικαιωμάτων θα έδειχνε «Permission denied».
-    - id: exists
-      text: Ο project-backup υπάρχει ήδη και το cp αρνήθηκε να τον αντικαταστήσει.
-      why: Χωρίς `-i` ή `-n` το cp δεν αρνείται να αντικαταστήσει· και το μήνυμα αναφέρει το -r.
-  citations:
-  - source: gnu-coreutils
-    url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
-    doc_version: GNU coreutils 9.7 (Debian 13)
-    last_verified: 2026-10-06
-- id: safe-edit-order
-  type: ordering
-  cognitive_level: scenario
-  skills:
-  - id: linux.files.safe-changes
-  commands:
-  - cp
-  prompt: Πρέπει να αλλάξεις το `app.conf` σε ένα μηχάνημα που τρέχει. Βάλε τα βήματα στη σωστή σειρά.
-  explanation: 'Πρώτα κρατάς αντίγραφο, μετά αλλάζεις, μετά επιβεβαιώνεις. Αν η επιβεβαίωση αποτύχει, επαναφέρεις
-    από το αντίγραφο — γι'' αυτό το backup πρέπει να υπάρχει *πριν* την αλλαγή.
-
-    '
-  spec:
-    steps:
-    - id: backup
-      text: cp app.conf app.conf.bak
-    - id: edit
-      text: Κάνεις την αλλαγή στο app.conf
-    - id: verify
-      text: Ελέγχεις ότι η εφαρμογή λειτουργεί με τη νέα ρύθμιση
-    - id: restore
-      text: Αν δεν λειτουργεί, cp app.conf.bak app.conf
 - id: mv-select-rename
   type: command_selection
   cognitive_level: recognize
@@ -382,7 +160,7 @@ questions:
       correct: true
     - id: cp
       text: cp draft.txt final.txt
-      why: Το `cp` δημιουργεί αντίγραφο — θα έμεναν και τα δύο αρχεία.
+      why: Το `cp` δημιουργεί αντίγραφο, θα έμεναν και τα δύο αρχεία.
       distractor:
         existence: exists
         issue: wrong_semantics
@@ -406,6 +184,158 @@ questions:
     url: https://www.gnu.org/software/coreutils/manual/html_node/mv-invocation.html
     doc_version: GNU coreutils 9.7 (Debian 13)
     last_verified: 2026-10-06
+- id: rm-dir-select
+  type: command_selection
+  cognitive_level: recognize
+  skills:
+  - id: linux.files.delete
+  prompt: Θέλεις να διαγράψεις τον φάκελο `build` **μαζί** με όλο το περιεχόμενό του. Ποια εντολή;
+  explanation: 'Το `rm -r` διαγράφει φακέλους μαζί με όλο το περιεχόμενό τους. Δεν υπάρχει κάδος ανακύκλωσης: έλεγξε πριν το τρέξεις.'
+  reference: rm
+  commands:
+  - rm
+  - rmdir
+  spec:
+    options:
+    - id: rm-r
+      text: rm -r build
+      correct: true
+    - id: rmdir
+      text: rmdir build
+      why: 'Το `rmdir` διαγράφει μόνο άδειους φακέλους: «failed to remove ''build'': Directory not empty».'
+      distractor:
+        existence: exists
+        issue: wrong_semantics
+        command: rmdir
+    - id: rm-f
+      text: rm -f build
+      why: 'Το `-f` αγνοεί ανύπαρκτα αρχεία και δεν ρωτάει, αλλά δεν διαγράφει φακέλους: «cannot remove ''build'':
+        Is a directory».'
+      distractor:
+        existence: exists
+        issue: wrong_flag
+        command: rm
+    - id: del
+      text: del build
+      why: Δεν υπάρχει `del` στο Linux.
+      distractor:
+        existence: platform_specific
+        command: del
+        note: Το `del` είναι εντολή του `cmd.exe` στα Windows.
+- id: touch-write
+  type: command_writing
+  cognitive_level: apply
+  skills:
+  - id: linux.files.create
+  prompt: Δημιούργησε ένα **κενό αρχείο** με όνομα `todo.txt`.
+  explanation: Το `touch todo.txt` δημιουργεί κενό αρχείο αν δεν υπάρχει.
+  reference: touch
+  commands:
+  - touch
+  spec:
+    accepted:
+    - touch todo.txt
+    known_mistakes:
+    - id: mkdir
+      match: mkdir todo.txt
+      feedback: Το `mkdir` θα δημιουργούσε *φάκελο* με όνομα todo.txt.
+    test_cases:
+      accept:
+      - touch todo.txt
+      - touch ./todo.txt
+      - touch 'todo.txt'
+      reject:
+      - mkdir todo.txt
+      - touch todo
+      - touch todo.md
+      - cat todo.txt
+- id: mkdir-p-write
+  type: command_writing
+  cognitive_level: apply
+  skills:
+  - id: linux.files.create
+  prompt: Δεν υπάρχει ακόμη κανένας από τους φακέλους. Δημιούργησε τη διαδρομή `projects/web/css` με **μία** εντολή.
+  hints:
+  - Το `mkdir` έχει επιλογή που δημιουργεί και τους ενδιάμεσους φακέλους.
+  explanation: Το `mkdir -p` (*parents*) δημιουργεί όσους ενδιάμεσους φακέλους λείπουν, και δεν βγάζει σφάλμα αν
+    υπάρχουν ήδη.
+  reference: mkdir
+  commands:
+  - mkdir
+  spec:
+    accepted:
+    - mkdir -p projects/web/css
+    - mkdir -p projects/web/css/
+    optional_flags:
+      mkdir:
+      - -v
+    known_mistakes:
+    - id: no-p
+      match: mkdir projects/web/css
+      feedback: 'Χωρίς `-p` αποτυγχάνει: «mkdir: cannot create directory ''projects/web/css'': No such file or directory»,
+        γιατί λείπουν οι ενδιάμεσοι φάκελοι.'
+    test_cases:
+      accept:
+      - mkdir -p projects/web/css
+      - mkdir --parents projects/web/css
+      - mkdir projects/web/css -p
+      - mkdir -pv projects/web/css
+      - mkdir -p ./projects/web/css
+      reject:
+      - mkdir projects/web/css
+      - mkdir -p projects web css
+      - touch projects/web/css
+      - mkdir -r projects/web/css
+      - mkdir -p projects/web
+- id: cp-dir-write
+  type: command_writing
+  cognitive_level: apply
+  skills:
+  - id: linux.files.copy
+  commands:
+  - cp
+  reference: cp
+  prompt: Φτιάξε αντίγραφο ασφαλείας **ολόκληρου του φακέλου** `config` (με όλα τα αρχεία μέσα του), με όνομα `config-backup`.
+  hints:
+  - Για φακέλους, το cp χρειάζεται μια επιλογή.
+  - 'Σύνταξη: cp -r SOURCE DEST'
+  explanation: Το `cp -r config config-backup` αντιγράφει τον φάκελο μαζί με όλο το περιεχόμενό του. (Το
+    `cp -a` κάνει το ίδιο και διατηρεί επιπλέον δικαιώματα και ημερομηνίες.)
+  spec:
+    accepted:
+    - cp -r config config-backup
+    - cp -a config config-backup
+    - cp -r config/ config-backup
+    optional_flags:
+      cp:
+      - -v
+      - -i
+    known_mistakes:
+    - id: no-r
+      match: cp config config-backup
+      feedback: 'Χωρίς -r το GNU cp αρνείται να αντιγράψει φάκελο: «cp: -r not specified; omitting directory ''config''».'
+    - id: mv
+      match: mv config config-backup
+      feedback: 'Το mv θα μετονόμαζε τον φάκελο: δεν θα έμενε το αρχικό config.'
+    - id: reversed
+      match: cp -r config-backup config
+      feedback: Πρώτα η πηγή (config), μετά ο προορισμός (config-backup).
+    test_cases:
+      accept:
+      - cp -r config config-backup
+      - cp -R config config-backup
+      - cp --recursive config config-backup
+      - cp -a config config-backup
+      - cp -rv config config-backup
+      - cp -r ./config config-backup
+      - cp -r config/ config-backup
+      reject:
+      - cp config config-backup
+      - mv config config-backup
+      - cp -r config-backup config
+      - cp -r config
+      - cp -r config config_backup
+      - cp -s config config-backup
 - id: mv-write-rename
   type: command_writing
   cognitive_level: apply
@@ -429,7 +359,7 @@ questions:
     known_mistakes:
     - id: cp-instead-of-mv
       match: cp draft.txt final.txt
-      feedback: Το `cp` θα δημιουργούσε αντίγραφο — το draft.txt θα έμενε.
+      feedback: 'Το `cp` θα δημιουργούσε αντίγραφο: το draft.txt θα έμενε.'
     - id: reversed-args
       match: mv final.txt draft.txt
       feedback: Πρώτα το τρέχον όνομα (πηγή), μετά το νέο.
@@ -468,7 +398,7 @@ questions:
       correct: true
     - id: replace
       text: Αντικαθιστά τον φάκελο archive με το report.txt.
-      why: Το mv δεν αντικαθιστά φάκελο με αρχείο — όταν ο προορισμός είναι φάκελος, το αρχείο μπαίνει μέσα του.
+      why: 'Το mv δεν αντικαθιστά φάκελο με αρχείο: όταν ο προορισμός είναι φάκελος, το αρχείο μπαίνει μέσα του.'
     - id: rename
       text: Μετονομάζει το report.txt σε «archive».
       why: 'Η κάθετος στο τέλος (`archive/`) δηλώνει ότι ο προορισμός είναι φάκελος, οπότε το mv δεν μετονομάζει
@@ -478,87 +408,19 @@ questions:
         '
     - id: copy
       text: Αντιγράφει το report.txt μέσα στον archive και κρατά και το αρχικό.
-      why: Το mv δεν κρατά αντίγραφο — αυτό θα το έκανε το `cp report.txt archive/`.
+      why: 'Το mv δεν κρατά αντίγραφο: αυτό θα το έκανε το `cp report.txt archive/`.'
   citations:
   - source: gnu-coreutils
     url: https://www.gnu.org/software/coreutils/manual/html_node/mv-invocation.html
     doc_version: GNU coreutils 9.7 (Debian 13)
     last_verified: 2026-10-06
-- id: rm-dir-select
-  type: command_selection
-  cognitive_level: apply
-  skills:
-  - id: linux.files.delete
-  prompt: Θέλεις να διαγράψεις τον φάκελο `build` **μαζί** με όλο το περιεχόμενό του. Ποια εντολή;
-  explanation: Το `rm -r` διαγράφει αναδρομικά φακέλους και περιεχόμενα. Δεν υπάρχει κάδος ανακύκλωσης — έλεγξε
-    πριν το τρέξεις.
-  reference: rm
-  commands:
-  - rm
-  - rmdir
-  spec:
-    options:
-    - id: rm-r
-      text: rm -r build
-      correct: true
-    - id: rmdir
-      text: rmdir build
-      why: 'Το `rmdir` διαγράφει μόνο άδειους φακέλους: «failed to remove ''build'': Directory not empty».'
-      distractor:
-        existence: exists
-        issue: wrong_semantics
-        command: rmdir
-    - id: rm-f
-      text: rm -f build
-      why: 'Το `-f` αγνοεί ανύπαρκτα αρχεία και δεν ρωτάει, αλλά δεν διαγράφει φακέλους: «cannot remove ''build'':
-        Is a directory».'
-      distractor:
-        existence: exists
-        issue: wrong_flag
-        command: rm
-    - id: del
-      text: del build
-      why: Δεν υπάρχει `del` στο Linux.
-      distractor:
-        existence: platform_specific
-        command: del
-        note: Το `del` είναι εντολή του `cmd.exe` στα Windows.
-- id: rmdir-output
-  type: output_analysis
-  cognitive_level: troubleshoot
-  skills:
-  - id: linux.files.delete
-  prompt: Τι σημαίνει αυτό;
-  explanation: Το `rmdir` αρνείται να διαγράψει φάκελο που έχει περιεχόμενο — είναι δικλείδα ασφαλείας. Για φάκελο
-    με περιεχόμενο χρειάζεται `rm -r`.
-  reference: rmdir
-  commands:
-  - rmdir
-  spec:
-    command: rmdir project
-    output: 'rmdir: failed to remove ''project'': Directory not empty'
-    captured_on: debian-13.7
-    options:
-    - id: not-empty
-      text: Ο φάκελος έχει μέσα αρχεία ή φακέλους· το rmdir διαγράφει μόνο άδειους.
-      correct: true
-    - id: perm
-      text: Δεν έχω δικαίωμα διαγραφής.
-      why: Τότε θα έβλεπες «Permission denied».
-    - id: in-use
-      text: Κάποιο πρόγραμμα χρησιμοποιεί τον φάκελο.
-      why: Το μήνυμα λέει ρητά «Directory not empty».
-    - id: missing
-      text: Ο φάκελος δεν υπάρχει.
-      why: Τότε θα έβλεπες «No such file or directory».
 - id: rmdir-write
   type: command_writing
   cognitive_level: apply
   skills:
   - id: linux.files.delete
   prompt: Ο φάκελος `old` είναι άδειος. Διάγραψέ τον με την εντολή που διαγράφει **μόνο άδειους** φακέλους.
-  explanation: Το `rmdir old` διαγράφει τον φάκελο μόνο αν είναι άδειος — ασφαλέστερο από το `rm -r`. Το ίδιο κάνει
-    και το `rm -d old`.
+  explanation: 'Το `rmdir old` διαγράφει τον φάκελο μόνο αν είναι άδειος: ασφαλέστερο από το `rm -r`. Το ίδιο κάνει και το `rm -d old`.'
   reference: rmdir
   commands:
   - rmdir
@@ -578,8 +440,12 @@ questions:
       feedback: 'Χωρίς επιλογή, το `rm` δεν διαγράφει φακέλους: «Is a directory».'
     - id: rm-r
       match: rm -r old
-      feedback: Θα δούλευε, αλλά το `rm -r` διαγράφει και γεμάτους φακέλους — η άσκηση ζητά την εντολή που προστατεύει
-        από αυτό.
+      feedback: 'Θα δούλευε, αλλά το `rm -r` διαγράφει και γεμάτους φακέλους: η άσκηση ζητά την εντολή που προστατεύει από αυτό.'
+    - id: rm-rf
+      match: rm -rf old
+      feedback: 'Θα δούλευε κι αυτό: το -r διαγράφει μαζί με όλο το περιεχόμενο και το -f (force) δεν ρωτάει τίποτα και δεν βγάζει
+        σφάλμα αν κάτι δεν υπάρχει. Ακριβώς γι'' αυτό είναι επικίνδυνο: θα έσβηνε χωρίς δεύτερη σκέψη και έναν
+        γεμάτο φάκελο. Η άσκηση ζητά την εντολή που αρνείται να σβήσει φάκελο με περιεχόμενο: rmdir.'
     test_cases:
       accept:
       - rmdir old
@@ -593,6 +459,72 @@ questions:
       - rmdir
       - rmdir new
       - del old
+      - rm -rf old
+      - rm -fr old
+- id: mkdir-exists-output
+  type: output_analysis
+  cognitive_level: troubleshoot
+  skills:
+  - id: linux.files.create
+  prompt: Τι σημαίνει αυτό το μήνυμα;
+  explanation: Ο φάκελος `sub` υπάρχει ήδη. Αν θέλεις η εντολή να μην αποτυγχάνει σε αυτή την περίπτωση, χρησιμοποίησε
+    `mkdir -p sub`.
+  reference: mkdir
+  commands:
+  - mkdir
+  spec:
+    command: mkdir sub
+    output: 'mkdir: cannot create directory ''sub'': File exists'
+    captured_on: debian-13.7
+    options:
+    - id: exists
+      text: Υπάρχει ήδη αρχείο ή φάκελος με όνομα sub.
+      correct: true
+    - id: perm
+      text: Δεν έχω δικαίωμα να δημιουργήσω φάκελο εδώ.
+      why: Τότε θα έβλεπες «Permission denied».
+    - id: parent
+      text: Λείπει ο γονικός φάκελος.
+      why: Τότε θα έβλεπες «No such file or directory».
+    - id: name
+      text: Το όνομα sub δεν επιτρέπεται.
+      why: Το `sub` είναι απολύτως έγκυρο όνομα· το μήνυμα λέει «File exists».
+- id: cp-directory-output
+  type: output_analysis
+  cognitive_level: troubleshoot
+  skills:
+  - id: linux.files.copy
+    weight: 1.5
+  commands:
+  - cp
+  prompt: Θέλεις αντίγραφο του φακέλου `project`. Έτρεξες την παρακάτω εντολή και πήρες αυτό το μήνυμα. Τι έγινε;
+  explanation: 'Το `project` είναι φάκελος. Το GNU `cp` αντιγράφει φακέλους μόνο με `-r`, γι'' αυτό τον παρέλειψε
+    και δεν δημιουργήθηκε τίποτα. Η σωστή εντολή είναι `cp -r project project-backup`.
+
+    '
+  reference: cp
+  spec:
+    command: cp project project-backup
+    output: 'cp: -r not specified; omitting directory ''project'''
+    captured_on: debian-13.7
+    options:
+    - id: needs-r
+      text: Το project είναι φάκελος και το cp χρειάζεται -r· δεν αντιγράφηκε τίποτα.
+      correct: true
+    - id: partial
+      text: Αντιγράφηκαν τα αρχεία του project αλλά όχι οι υποφάκελοι.
+      why: 'Το μήνυμα λέει «omitting directory»: ο φάκελος δεν αντιγράφηκε καθόλου.'
+    - id: permissions
+      text: Δεν έχεις δικαίωμα ανάγνωσης στο project.
+      why: Ένα πρόβλημα δικαιωμάτων θα έδειχνε «Permission denied».
+    - id: exists
+      text: Ο project-backup υπάρχει ήδη και το cp αρνήθηκε να τον αντικαταστήσει.
+      why: Χωρίς `-i` ή `-n` το cp δεν αρνείται να αντικαταστήσει· και το μήνυμα αναφέρει το -r.
+  citations:
+  - source: gnu-coreutils
+    url: https://www.gnu.org/software/coreutils/manual/html_node/cp-invocation.html
+    doc_version: GNU coreutils 9.7 (Debian 13)
+    last_verified: 2026-10-06
 - id: rm-dir-output
   type: output_analysis
   cognitive_level: troubleshoot
@@ -617,7 +549,60 @@ questions:
       why: Θέμα δικαιωμάτων θα έδειχνε «Permission denied».
     - id: needs-f
       text: Χρειάζεται -f για να διαγράψει χωρίς ερώτηση.
-      why: Ούτε το `rm -f logs` θα δούλευε — βγάζει το ίδιο «Is a directory».
+      why: Ούτε το `rm -f logs` θα δούλευε, βγάζει το ίδιο «Is a directory».
     - id: missing
       text: Ο φάκελος logs δεν υπάρχει.
-      why: Το μήνυμα λέει ότι *είναι* φάκελος — άρα υπάρχει.
+      why: Το μήνυμα λέει ότι *είναι* φάκελος, άρα υπάρχει.
+- id: rmdir-output
+  type: output_analysis
+  cognitive_level: troubleshoot
+  skills:
+  - id: linux.files.delete
+  prompt: Τι σημαίνει αυτό;
+  explanation: 'Το `rmdir` αρνείται να διαγράψει φάκελο που έχει περιεχόμενο: είναι προστασία για να μη σβήσεις κάτι κατά λάθος. Για φάκελο με περιεχόμενο χρειάζεται `rm -r`.'
+  reference: rmdir
+  commands:
+  - rmdir
+  spec:
+    command: rmdir project
+    output: 'rmdir: failed to remove ''project'': Directory not empty'
+    captured_on: debian-13.7
+    options:
+    - id: not-empty
+      text: Ο φάκελος έχει μέσα αρχεία ή φακέλους· το rmdir διαγράφει μόνο άδειους.
+      correct: true
+    - id: perm
+      text: Δεν έχω δικαίωμα διαγραφής.
+      why: Τότε θα έβλεπες «Permission denied».
+    - id: in-use
+      text: Κάποιο πρόγραμμα χρησιμοποιεί τον φάκελο.
+      why: Το μήνυμα λέει ρητά «Directory not empty».
+    - id: missing
+      text: Ο φάκελος δεν υπάρχει.
+      why: Τότε θα έβλεπες «No such file or directory».
+- id: safe-edit-order
+  type: ordering
+  cognitive_level: scenario
+  skills:
+  - id: linux.files.safe-changes
+  commands:
+  - cp
+  prompt: Θα αλλάξεις **απευθείας** το `app.conf` σε ένα μηχάνημα που τρέχει, και θέλεις να μπορείς να γυρίσεις
+    στην **αρχική** του μορφή αν κάτι πάει στραβά. Βάλε τα βήματα στη σωστή σειρά.
+  explanation: 'Το αντίγραφο πρέπει να γίνει **πριν** την αλλαγή: αν κάνεις πρώτα την αλλαγή και μετά `cp`, το `.bak`
+    θα περιέχει ήδη τη νέα μορφή και δεν θα έχεις πού να γυρίσεις. Μετά αλλάζεις, ελέγχεις, και αν κάτι χάλασε επαναφέρεις.
+
+
+    Υπάρχει και άλλος, εξίσου καλός τρόπος: δουλεύεις σε **αντίγραφο** (`cp app.conf app.conf.new`), αλλάζεις το
+    `app.conf.new` και μόνο όταν είναι έτοιμο το βάζεις στη θέση του με `mv app.conf.new app.conf`. Αυτή η ερώτηση
+    αφορά την περίπτωση που αλλάζεις το αρχείο απευθείας.'
+  spec:
+    steps:
+    - id: backup
+      text: cp app.conf app.conf.bak  (αντίγραφο της αρχικής μορφής)
+    - id: edit
+      text: Κάνεις την αλλαγή απευθείας στο app.conf
+    - id: verify
+      text: Ελέγχεις ότι η εφαρμογή λειτουργεί με τη νέα ρύθμιση
+    - id: restore
+      text: Αν δεν λειτουργεί, cp app.conf.bak app.conf

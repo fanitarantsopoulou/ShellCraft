@@ -8,7 +8,7 @@ platform: debian-13
 category: linux/file-management
 level: beginner
 summary: Διαγράφει άδειους φακέλους.
-description: Αποτυγχάνει αν ο φάκελος έχει περιεχόμενο — αυτό είναι χαρακτηριστικό ασφαλείας, όχι πρόβλημα.
+description: 'Αποτυγχάνει αν ο φάκελος έχει περιεχόμενο: αυτό είναι χαρακτηριστικό ασφαλείας, όχι πρόβλημα.'
 synopsis:
 - rmdir [OPTION]... DIRECTORY...
 flag_grammar: gnu_getopt

@@ -70,7 +70,7 @@ examples:
     meaning: όνομα του Pod
 common_mistakes:
 - wrong: kubectl logs pod-που-δεν-ξεκίνησε
-  why: Αν το container δεν ξεκίνησε ποτέ, δεν υπάρχουν logs — τα events του describe λένε το γιατί.
+  why: 'Αν το container δεν ξεκίνησε ποτέ, δεν υπάρχουν logs: τα events του describe λένε το γιατί.'
 related:
 - id: kubectl-get
 - id: kubectl-logs

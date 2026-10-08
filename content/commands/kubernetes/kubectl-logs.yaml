@@ -7,8 +7,7 @@ platform: kubernetes-1.37
 category: kubernetes/kubectl
 level: beginner
 summary: Δείχνει τα logs ενός container σε Pod.
-description: Με `--previous` (`-p`) βλέπεις τα logs της **προηγούμενης** εκτέλεσης — χρήσιμο όταν το container κρασάρει
-  και ξαναξεκινά.
+description: 'Με `--previous` (`-p`) βλέπεις τα logs της **προηγούμενης** εκτέλεσης: χρήσιμο όταν το container κρασάρει και ξαναξεκινά.'
 synopsis:
 - kubectl logs [-f] [-p] (POD | TYPE/NAME) [-c CONTAINER] [options]
 flag_grammar: pflag

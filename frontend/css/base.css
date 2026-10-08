@@ -134,7 +134,6 @@ h3 { font-size: 21.333px; }
 }
 
 main { width: 100%; max-width: 52rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; outline: none; flex: 1; }
-.footer { text-align: center; color: var(--muted); font-size: 16px; padding: 1rem; }
 
 /* ---------- buttons ---------- */
 button, .btn {
@@ -351,12 +350,72 @@ details.more[open] { display: grid; gap: 0.85rem; }
 }
 
 /* ---------- track intro ---------- */
-.intro-hint {
-  display: block; margin: 0 var(--px) 1.25rem; padding: 0.75rem 1rem;
-  background: var(--bg-2); border-left: var(--px) solid var(--gold);
-  color: var(--fg); text-decoration: none;
-}
-.intro-hint:hover { background: var(--panel-2); }
 .theory.intro { font-size: 19px; }
 .theory.intro h2:first-child { margin-top: 0.5rem; }
 .sources { font-size: 15px; line-height: 1.8; }
+
+/* ---------- overflow guards ----------
+ * Grid/flex children default to min-width: auto, so one long line (e.g. a full-sentence
+ * answer in a code block) used to stretch the feedback past the question frame.
+ * Let them shrink, and wrap long text instead of overflowing.
+ */
+.question, .feedback > *, details.more > *, .fb-block, .q-actions, .quiz-nav { min-width: 0; }
+.feedback .terminal, .fb-block pre {
+  white-space: pre-wrap;        /* keep line breaks, but wrap long lines */
+  overflow-wrap: anywhere;
+}
+.option .text, .order-item .text, .prompt, .fb-block p, .verdict, .hint {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.prompt code, .fb-block code, .inline-code { overflow-wrap: anywhere; }
+.question .terminal { max-width: 100%; }
+
+/* ---------- zone transition (pixel iris wipe) ---------- */
+.warp {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  place-items: center;
+  pointer-events: none;
+  background-color: var(--warp-color, #1b2140);
+  /* chunky pixel grid so the wipe reads as pixel art, not a smooth gradient */
+  background-image:
+    linear-gradient(#0000001f 2px, transparent 2px),
+    linear-gradient(90deg, #0000001f 2px, transparent 2px);
+  background-size: 16px 16px;
+  clip-path: circle(0% at 50% 50%);
+}
+.warp.closing, .warp.opening { display: grid; pointer-events: all; }
+.warp.closing { animation: iris-close 280ms steps(7) forwards; }
+.warp.opening { animation: iris-open 280ms steps(7) forwards; }
+@keyframes iris-close { from { clip-path: circle(0% at 50% 50%); } to { clip-path: circle(75% at 50% 50%); } }
+@keyframes iris-open { from { clip-path: circle(75% at 50% 50%); } to { clip-path: circle(0% at 50% 50%); } }
+
+.warp-card { display: grid; justify-items: center; gap: 1rem; animation: warp-card 500ms steps(4) both; }
+.warp-icon { width: 96px; height: auto; filter: drop-shadow(4px 4px 0 #0006); }
+.warp-label {
+  font-family: var(--pixel); font-weight: 700; font-synthesis: none;
+  font-size: 32px; color: #fff; text-shadow: 4px 4px 0 #0006;
+}
+@keyframes warp-card { from { opacity: 0; transform: translateY(12px) scale(0.9); } to { opacity: 1; transform: none; } }
+
+/* small entrance for every page change within a zone */
+.page-enter { animation: page-in 180ms steps(3) both; }
+@keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+
+@media (prefers-reduced-motion: reduce) {
+  .warp, .warp.closing, .warp.opening, .warp-card, .page-enter { animation: none; }
+}
+
+/* ---------- question difficulty ---------- */
+.q-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.difficulty {
+  font-family: var(--pixel); font-weight: 700; font-synthesis: none; font-size: 13.333px;
+  padding: 0.3rem 0.6rem; background: var(--bg-2); box-shadow: 0 0 0 2px var(--line);
+}
+.difficulty.d1 { color: var(--accent); }
+.difficulty.d2 { color: var(--gold); }
+.difficulty.d3 { color: var(--bad); }

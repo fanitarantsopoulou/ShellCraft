@@ -1,7 +1,7 @@
 id: linux.q05
 track: linux
 title: Pipes και ανακατεύθυνση
-description: Σύνδεσε εντολές μεταξύ τους και αποθήκευσε αποτελέσματα σε αρχεία — |, >, >>, sort, uniq.
+description: 'Σύνδεσε εντολές μεταξύ τους και αποθήκευσε αποτελέσματα σε αρχεία: |, >, >>, sort, uniq.'
 level: intermediate
 order: 5
 skills:
@@ -22,70 +22,14 @@ questions:
       correct: true
     - id: first-line
       text: Το cat δείχνει μόνο την τελευταία γραμμή.
-      why: Το `cat` δείχνει όλο το αρχείο — απλώς έχει μόνο μία γραμμή.
+      why: Το `cat` δείχνει όλο το αρχείο, απλώς έχει μόνο μία γραμμή.
     - id: echo
       text: Το δεύτερο echo απέτυχε.
       why: Το δεύτερο echo πέτυχε· γι' αυτό υπάρχει το «second».
     - id: readonly
       text: Το αρχείο ήταν read-only.
       why: Τότε θα έβλεπες «Permission denied» και κανένα από τα δύο δεν θα γραφόταν.
-- id: append-select
-  type: command_selection
-  cognitive_level: apply
-  prompt: Θέλεις να **προσθέσεις** τη γραμμή «done» στο τέλος του `log.txt`, χωρίς να χαθούν όσα έχει ήδη. Ποια
-    εντολή;
-  explanation: Το `>>` ανοίγει το αρχείο για προσθήκη στο τέλος (*append*). Αν δεν υπάρχει, το δημιουργεί.
-  spec:
-    options:
-    - id: append
-      text: echo done >> log.txt
-      correct: true
-    - id: overwrite
-      text: echo done > log.txt
-      why: Το `>` αντικαθιστά όλο το περιεχόμενο — θα έμενε μόνο το «done».
-      distractor:
-        existence: exists
-        issue: wrong_syntax
-        command: echo
-    - id: pipe
-      text: echo done | log.txt
-      why: 'Το `|` στέλνει το output σε *εντολή*· το shell θα έψαχνε πρόγραμμα με όνομα log.txt: «log.txt: command
-        not found».'
-      distractor:
-        existence: exists
-        issue: wrong_syntax
-        command: echo
-    - id: lt
-      text: echo done < log.txt
-      why: Το `<` δίνει το αρχείο ως *είσοδο* — το echo την αγνοεί και απλώς τυπώνει «done» στην οθόνη.
-      distractor:
-        existence: exists
-        issue: wrong_syntax
-        command: echo
-- id: append-write
-  type: command_writing
-  cognitive_level: apply
-  prompt: Πρόσθεσε τη γραμμή `done` στο **τέλος** του `log.txt` (χωρίς να χαθεί ό,τι έχει ήδη).
-  explanation: Το `echo done >> log.txt` γράφει «done» στο τέλος του αρχείου. Με `>` θα αντικαθιστούσες όλο το περιεχόμενο.
-  spec:
-    accepted:
-    - echo done >> log.txt
-    allow:
-    - redirect
-    known_mistakes:
-    - id: overwrite
-      match: echo done > log.txt
-      feedback: Το `>` αδειάζει πρώτα το αρχείο — θα έμενε μόνο το «done».
-    test_cases:
-      accept:
-      - echo done >> log.txt
-      - echo "done" >> log.txt
-      - echo 'done' >>log.txt
-      reject:
-      - echo done > log.txt
-      - echo done
-      - echo log.txt >> done
-      - echo done >> log
+  cognitive_level: recognize
 - id: pipe-meaning
   type: multiple_choice
   prompt: Τι κάνει το `|` (pipe) στο `cat access.log | grep 404`;
@@ -105,6 +49,205 @@ questions:
     - id: sequence
       text: Τρέχει πρώτα το cat και μετά, ανεξάρτητα, το grep.
       why: Αυτό θα ήταν το `;`. Με `|` το grep διαβάζει ό,τι παράγει το cat.
+  cognitive_level: recognize
+- id: sort-n-fill
+  type: fill_in_command
+  prompt: Συμπλήρωσε ώστε οι αριθμοί να ταξινομηθούν **αριθμητικά** (9, 10, 100).
+  explanation: Το `sort -n` (*numeric sort*) συγκρίνει τις γραμμές ως αριθμούς.
+  reference: sort
+  commands:
+  - sort
+  spec:
+    template: sort ____ sizes.txt
+    blanks:
+    - accepted:
+      - -n
+      - --numeric-sort
+      known_mistakes:
+      - id: r
+        match: -r
+        feedback: Το `-r` αντιστρέφει τη σειρά, αλλά η σύγκριση μένει αλφαβητική.
+      - id: u
+        match: -u
+        feedback: Το `-u` αφαιρεί διπλές γραμμές· δεν αλλάζει το πώς συγκρίνονται.
+  cognitive_level: recognize
+- id: sort-rn
+  type: multiple_choice
+  prompt: Τι κάνει το `sort -rn`;
+  explanation: Το `-n` ταξινομεί αριθμητικά και το `-r` αντιστρέφει τη σειρά, άρα από τον μεγαλύτερο στον μικρότερο
+    αριθμό (π.χ. 100, 10, 9).
+  reference: sort
+  commands:
+  - sort
+  spec:
+    options:
+    - id: desc
+      text: Αριθμητική ταξινόμηση από τον μεγαλύτερο στον μικρότερο.
+      correct: true
+    - id: asc
+      text: Αριθμητική ταξινόμηση από τον μικρότερο στον μεγαλύτερο.
+      why: Αυτό είναι το σκέτο `-n`· το `-r` το αντιστρέφει.
+    - id: random
+      text: Τυχαία σειρά.
+      why: Τυχαία σειρά δίνει το `-R` (κεφαλαίο), όχι το `-r`.
+    - id: remove
+      text: Αφαιρεί τους αριθμούς.
+      why: Το sort δεν αφαιρεί τίποτα· μόνο αλλάζει τη σειρά.
+  cognitive_level: recognize
+- id: append-select
+  type: command_selection
+  cognitive_level: apply
+  prompt: Θέλεις να **προσθέσεις** τη γραμμή «done» στο τέλος του `log.txt`, χωρίς να χαθούν όσα έχει ήδη. Ποια
+    εντολή;
+  explanation: Το `>>` ανοίγει το αρχείο για προσθήκη στο τέλος (*append*). Αν δεν υπάρχει, το δημιουργεί.
+  spec:
+    options:
+    - id: append
+      text: echo done >> log.txt
+      correct: true
+    - id: overwrite
+      text: echo done > log.txt
+      why: 'Το `>` αντικαθιστά όλο το περιεχόμενο: θα έμενε μόνο το «done».'
+      distractor:
+        existence: exists
+        issue: wrong_syntax
+        command: echo
+    - id: pipe
+      text: echo done | log.txt
+      why: 'Το `|` στέλνει το output σε *εντολή*· το shell θα έψαχνε πρόγραμμα με όνομα log.txt: «log.txt: command
+        not found».'
+      distractor:
+        existence: exists
+        issue: wrong_syntax
+        command: echo
+    - id: lt
+      text: echo done < log.txt
+      why: 'Το `<` δίνει το αρχείο ως *είσοδο*: το echo την αγνοεί και απλώς τυπώνει «done» στην οθόνη.'
+      distractor:
+        existence: exists
+        issue: wrong_syntax
+        command: echo
+- id: append-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Πρόσθεσε τη γραμμή `done` στο **τέλος** του `log.txt` (χωρίς να χαθεί ό,τι έχει ήδη).
+  explanation: Το `echo done >> log.txt` γράφει «done» στο τέλος του αρχείου. Με `>` θα αντικαθιστούσες όλο το περιεχόμενο.
+  spec:
+    accepted:
+    - echo done >> log.txt
+    allow:
+    - redirect
+    known_mistakes:
+    - id: overwrite
+      match: echo done > log.txt
+      feedback: 'Το `>` αδειάζει πρώτα το αρχείο: θα έμενε μόνο το «done».'
+    test_cases:
+      accept:
+      - echo done >> log.txt
+      - echo "done" >> log.txt
+      - echo 'done' >>log.txt
+      reject:
+      - echo done > log.txt
+      - echo done
+      - echo log.txt >> done
+      - echo done >> log
+- id: redirect-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Αποθήκευσε τη λίστα των αρχείων του τρέχοντος φακέλου στο `files.txt`, **αντικαθιστώντας** ό,τι είχε πριν.
+  explanation: Το `ls > files.txt` στέλνει την έξοδο του ls στο αρχείο, αδειάζοντάς το πρώτα.
+  reference: ls
+  commands:
+  - ls
+  spec:
+    accepted:
+    - ls > files.txt
+    allow:
+    - redirect
+    - pipe
+    known_mistakes:
+    - id: append
+      match: ls >> files.txt
+      feedback: 'Το `>>` προσθέτει στο τέλος: τα παλιά περιεχόμενα θα έμεναν.'
+    - id: pipe
+      match: ls | files.txt
+      feedback: 'Το `|` στέλνει σε *εντολή*, όχι σε αρχείο: «files.txt: command not found».'
+    - id: input
+      match: ls < files.txt
+      feedback: Το `<` διαβάζει *από* το αρχείο· εδώ θέλεις να γράψεις *σε* αυτό.
+    test_cases:
+      accept:
+      - ls > files.txt
+      - ls >files.txt
+      - ls>files.txt
+      - ls > ./files.txt
+      reject:
+      - ls >> files.txt
+      - ls < files.txt
+      - ls files.txt
+      - cat > files.txt
+      - ls > file.txt
+- id: sort-alpha-output
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Το `sizes.txt` περιέχει τους αριθμούς 10, 9 και 100. Γιατί το 9 βγήκε τελευταίο;
+  explanation: Χωρίς επιλογές το `sort` ταξινομεί σαν κείμενο, έναν έναν χαρακτήρα, και το «1» είναι πριν το «9».
+    Για αριθμούς χρησιμοποίησε `sort -n`.
+  reference: sort
+  commands:
+  - sort
+  spec:
+    command: sort sizes.txt
+    output: '10
+
+      100
+
+      9'
+    captured_on: debian-13.7
+    options:
+    - id: text
+      text: Το sort ταξινομεί σαν κείμενο (αλφαβητικά), όχι σαν αριθμούς.
+      correct: true
+    - id: reverse
+      text: Το sort ταξινομεί από προεπιλογή φθίνουσα.
+      why: 'Η προεπιλογή είναι αύξουσα σειρά. Φθίνουσα αριθμητική θα έδινε 100, 10, 9: εδώ βλέπεις αλφαβητική σειρά.'
+    - id: order
+      text: Το sort κρατά τη σειρά του αρχείου.
+      why: 'Η αρχική σειρά ήταν 10, 9, 100: άλλαξε.'
+    - id: bug
+      text: Είναι bug του sort.
+      why: Είναι η τεκμηριωμένη συμπεριφορά· γι' αυτό υπάρχει το `-n`.
+- id: uniq-adjacent
+  type: output_analysis
+  cognitive_level: troubleshoot
+  prompt: Το `u.txt` περιέχει τις γραμμές b, a, b, b. Γιατί το `uniq` άφησε δύο φορές το «b»;
+  explanation: Το `uniq` αφαιρεί μόνο **διαδοχικές** ίδιες γραμμές. Γι' αυτό σχεδόν πάντα το βλέπεις ως `sort file
+    | uniq`.
+  reference: uniq
+  commands:
+  - uniq
+  - sort
+  spec:
+    command: uniq u.txt
+    output: 'b
+
+      a
+
+      b'
+    captured_on: debian-13.7
+    options:
+    - id: adjacent
+      text: Το uniq συγκρίνει μόνο γειτονικές γραμμές· τα δύο «b» δεν ήταν τη μία δίπλα στην άλλη.
+      correct: true
+    - id: first
+      text: Το uniq κρατά πάντα την πρώτη και την τελευταία εμφάνιση.
+      why: 'Δεν υπάρχει τέτοιος κανόνας: κράτησε το πρώτο b και ένα από τα δύο τελευταία που ήταν γειτονικά.'
+    - id: case
+      text: Τα δύο «b» διαφέρουν σε κεφαλαία/πεζά.
+      why: Είναι και τα δύο πεζά· το θέμα είναι ότι δεν είναι γειτονικά.
+    - id: spaces
+      text: Το ένα «b» έχει κενό στο τέλος.
+      why: Θα μπορούσε να συμβεί, αλλά εδώ η αιτία είναι ότι δεν ήταν γειτονικά.
 - id: count-errors-write
   type: command_writing
   cognitive_level: combine
@@ -113,7 +256,7 @@ questions:
   - Μπορείς να συνδυάσεις το grep με μια εντολή που μετράει γραμμές.
   - grep … | wc …
   explanation: 'Το `grep ERROR app.log | wc -l` βρίσκει τις γραμμές και τις μετράει. Το ίδιο αποτέλεσμα δίνει και
-    το `grep -c ERROR app.log` — και τα δύο είναι σωστά.
+    το `grep -c ERROR app.log`, και τα δύο είναι σωστά.
 
     '
   reference: grep
@@ -151,56 +294,6 @@ questions:
       - grep ERROR app.log
       - wc -l app.log
       - grep ERROR app.log > wc -l
-- id: sort-alpha-output
-  type: output_analysis
-  cognitive_level: troubleshoot
-  prompt: Το `sizes.txt` περιέχει τους αριθμούς 10, 9 και 100. Γιατί το 9 βγήκε τελευταίο;
-  explanation: Χωρίς επιλογές το `sort` ταξινομεί σαν κείμενο, χαρακτήρα-χαρακτήρα — και το «1» είναι πριν το «9».
-    Για αριθμούς χρησιμοποίησε `sort -n`.
-  reference: sort
-  commands:
-  - sort
-  spec:
-    command: sort sizes.txt
-    output: '10
-
-      100
-
-      9'
-    captured_on: debian-13.7
-    options:
-    - id: text
-      text: Το sort ταξινομεί σαν κείμενο (αλφαβητικά), όχι σαν αριθμούς.
-      correct: true
-    - id: reverse
-      text: Το sort ταξινομεί από προεπιλογή φθίνουσα.
-      why: Η προεπιλογή είναι αύξουσα σειρά. Φθίνουσα αριθμητική θα έδινε 100, 10, 9 — εδώ βλέπεις αλφαβητική σειρά.
-    - id: order
-      text: Το sort κρατά τη σειρά του αρχείου.
-      why: Η αρχική σειρά ήταν 10, 9, 100 — άλλαξε.
-    - id: bug
-      text: Είναι bug του sort.
-      why: Είναι η τεκμηριωμένη συμπεριφορά· γι' αυτό υπάρχει το `-n`.
-- id: sort-n-fill
-  type: fill_in_command
-  prompt: Συμπλήρωσε ώστε οι αριθμοί να ταξινομηθούν **αριθμητικά** (9, 10, 100).
-  explanation: Το `sort -n` (*numeric sort*) συγκρίνει τις γραμμές ως αριθμούς.
-  reference: sort
-  commands:
-  - sort
-  spec:
-    template: sort ____ sizes.txt
-    blanks:
-    - accepted:
-      - -n
-      - --numeric-sort
-      known_mistakes:
-      - id: r
-        match: -r
-        feedback: Το `-r` αντιστρέφει τη σειρά, αλλά η σύγκριση μένει αλφαβητική.
-      - id: u
-        match: -u
-        feedback: Το `-u` αφαιρεί διπλές γραμμές· δεν αλλάζει το πώς συγκρίνονται.
 - id: sort-save-write
   type: command_writing
   cognitive_level: combine
@@ -222,7 +315,7 @@ questions:
       feedback: Χωρίς `-n` η ταξινόμηση είναι αλφαβητική (10, 100, 9).
     - id: same-file
       match: sort -n sizes.txt > sizes.txt
-      feedback: 'Προσοχή: το `>` αδειάζει το sizes.txt *πριν* το διαβάσει το sort — θα έμενε κενό!'
+      feedback: 'Προσοχή: το `>` αδειάζει το sizes.txt *πριν* το διαβάσει το sort: θα έμενε κενό!'
     test_cases:
       accept:
       - sort -n sizes.txt > sorted.txt
@@ -236,37 +329,6 @@ questions:
       - sort -n sizes.txt
       - sort -n sizes.txt >> sorted.txt
       - sort -r sizes.txt > sorted.txt
-- id: uniq-adjacent
-  type: output_analysis
-  cognitive_level: troubleshoot
-  prompt: Το `u.txt` περιέχει τις γραμμές b, a, b, b. Γιατί το `uniq` άφησε δύο φορές το «b»;
-  explanation: Το `uniq` αφαιρεί μόνο **διαδοχικές** ίδιες γραμμές. Γι' αυτό σχεδόν πάντα το βλέπεις ως `sort file
-    | uniq`.
-  reference: uniq
-  commands:
-  - uniq
-  - sort
-  spec:
-    command: uniq u.txt
-    output: 'b
-
-      a
-
-      b'
-    captured_on: debian-13.7
-    options:
-    - id: adjacent
-      text: Το uniq συγκρίνει μόνο γειτονικές γραμμές· τα δύο «b» δεν ήταν δίπλα-δίπλα.
-      correct: true
-    - id: first
-      text: Το uniq κρατά πάντα την πρώτη και την τελευταία εμφάνιση.
-      why: Δεν υπάρχει τέτοιος κανόνας — κράτησε το πρώτο b και ένα από τα δύο τελευταία που ήταν γειτονικά.
-    - id: case
-      text: Τα δύο «b» διαφέρουν σε κεφαλαία/πεζά.
-      why: Είναι και τα δύο πεζά· το θέμα είναι ότι δεν είναι γειτονικά.
-    - id: spaces
-      text: Το ένα «b» έχει κενό στο τέλος.
-      why: Θα μπορούσε να συμβεί, αλλά εδώ η αιτία είναι ότι δεν ήταν γειτονικά.
 - id: count-lines-write
   type: command_writing
   cognitive_level: combine
@@ -274,7 +336,7 @@ questions:
   hints:
   - Το `uniq` έχει επιλογή που μετράει.
   - Το `uniq` δουλεύει σωστά μόνο σε ταξινομημένη είσοδο.
-  explanation: Το `sort ips.txt | uniq -c` φέρνει τις ίδιες IP δίπλα-δίπλα και μετά μετράει κάθε ομάδα.
+  explanation: Το `sort ips.txt | uniq -c` φέρνει τις ίδιες IP τη μία δίπλα στην άλλη και μετά μετράει κάθε ομάδα.
   reference: uniq
   commands:
   - sort
@@ -291,7 +353,7 @@ questions:
       feedback: Χωρίς sort, ίδιες IP που δεν είναι γειτονικές θα μετρηθούν σε χωριστές ομάδες.
     - id: no-c
       match: sort ips.txt | uniq
-      feedback: Αυτό δείχνει κάθε IP μία φορά, αλλά χωρίς μέτρημα — χρειάζεται `-c`.
+      feedback: 'Αυτό δείχνει κάθε IP μία φορά, αλλά χωρίς μέτρημα: χρειάζεται `-c`.'
     - id: order
       match: uniq -c ips.txt | sort
       feedback: Το sort πρέπει να γίνει *πριν* το uniq, όχι μετά.
@@ -307,47 +369,11 @@ questions:
       - uniq -c ips.txt | sort
       - sort -c ips.txt | uniq
       - sort ips.txt | wc -l
-- id: redirect-write
-  type: command_writing
-  cognitive_level: apply
-  prompt: Αποθήκευσε τη λίστα των αρχείων του τρέχοντος φακέλου στο `files.txt`, **αντικαθιστώντας** ό,τι είχε πριν.
-  explanation: Το `ls > files.txt` στέλνει την έξοδο του ls στο αρχείο, αδειάζοντάς το πρώτα.
-  reference: ls
-  commands:
-  - ls
-  spec:
-    accepted:
-    - ls > files.txt
-    allow:
-    - redirect
-    - pipe
-    known_mistakes:
-    - id: append
-      match: ls >> files.txt
-      feedback: Το `>>` προσθέτει στο τέλος — τα παλιά περιεχόμενα θα έμεναν.
-    - id: pipe
-      match: ls | files.txt
-      feedback: 'Το `|` στέλνει σε *εντολή*, όχι σε αρχείο: «files.txt: command not found».'
-    - id: input
-      match: ls < files.txt
-      feedback: Το `<` διαβάζει *από* το αρχείο· εδώ θέλεις να γράψεις *σε* αυτό.
-    test_cases:
-      accept:
-      - ls > files.txt
-      - ls >files.txt
-      - ls>files.txt
-      - ls > ./files.txt
-      reject:
-      - ls >> files.txt
-      - ls < files.txt
-      - ls files.txt
-      - cat > files.txt
-      - ls > file.txt
 - id: top-ips-order
   type: ordering
   cognitive_level: combine
   prompt: Θέλεις τις **3 πιο συχνές IP** του `ips.txt`. Βάλε τα κομμάτια του pipeline στη σωστή σειρά.
-  explanation: '`sort ips.txt | uniq -c | sort -rn | head -n 3` — ταξινομείς για να έρθουν οι ίδιες IP μαζί, μετράς,
+  explanation: '`sort ips.txt | uniq -c | sort -rn | head -n 3`: ταξινομείς για να έρθουν οι ίδιες IP μαζί, μετράς,
     ταξινομείς τα μετρήματα αριθμητικά από το μεγαλύτερο, και κρατάς τις 3 πρώτες.
 
     '
@@ -365,25 +391,3 @@ questions:
       text: sort -rn
     - id: head
       text: head -n 3
-- id: sort-rn
-  type: multiple_choice
-  prompt: Τι κάνει το `sort -rn`;
-  explanation: Το `-n` ταξινομεί αριθμητικά και το `-r` αντιστρέφει τη σειρά — άρα από τον μεγαλύτερο στον μικρότερο
-    αριθμό (π.χ. 100, 10, 9).
-  reference: sort
-  commands:
-  - sort
-  spec:
-    options:
-    - id: desc
-      text: Αριθμητική ταξινόμηση από τον μεγαλύτερο στον μικρότερο.
-      correct: true
-    - id: asc
-      text: Αριθμητική ταξινόμηση από τον μικρότερο στον μεγαλύτερο.
-      why: Αυτό είναι το σκέτο `-n`· το `-r` το αντιστρέφει.
-    - id: random
-      text: Τυχαία σειρά.
-      why: Τυχαία σειρά δίνει το `-R` (κεφαλαίο), όχι το `-r`.
-    - id: remove
-      text: Αφαιρεί τους αριθμούς.
-      why: Το sort δεν αφαιρεί τίποτα· μόνο αλλάζει τη σειρά.

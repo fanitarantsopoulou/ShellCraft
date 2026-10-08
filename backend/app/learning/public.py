@@ -6,6 +6,7 @@ from typing import Any
 from app.content.loader import ContentBundle
 from app.content.render import render_block, render_inline
 from app.content.schemas import Exercise
+from app.content.schemas.common import DIFFICULTY
 from app.content.schemas.exercise import (
     BLANK,
     ChoiceSpec,
@@ -21,6 +22,7 @@ def public_exercise(ex: Exercise) -> dict[str, Any]:
         "id": ex.id,
         "type": ex.type,
         "level": ex.level,
+        "difficulty": DIFFICULTY[ex.cognitive_level],
         "prompt_html": render_inline(ex.prompt.strip()),
         "hints": list(ex.hints),
     }

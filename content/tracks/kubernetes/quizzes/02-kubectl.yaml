@@ -1,157 +1,273 @@
 id: k8s.q02
 track: kubernetes
 title: kubectl στην πράξη
-description: Δημιούργησε, κλιμάκωσε, εκθέσε και εξέτασε εφαρμογές με kubectl.
+description: Δημιούργησε εφαρμογές, άλλαξε πόσα αντίγραφα τρέχουν, κάν' τες προσβάσιμες και έλεγξέ τες με kubectl.
 level: intermediate
 order: 2
-skills: [k8s.kubectl]
+skills:
+- k8s.kubectl
 questions:
-  - id: create-deploy-write
-    type: command_writing
-    cognitive_level: apply
-    prompt: "Δημιούργησε ένα Deployment με όνομα `web`, image `nginx` και **3 replicas**."
-    hints:
-      - "kubectl create deployment ΟΝΟΜΑ …"
-    explanation: "`kubectl create deployment web --image=nginx --replicas=3`."
-    reference: kubectl-create-deployment
-    spec:
-      accepted: ["kubectl create deployment web --image=nginx --replicas=3"]
+- id: apply-fill
+  type: fill_in_command
+  prompt: Συμπλήρωσε την εντολή που δημιουργεί **ή ενημερώνει** πόρους από αρχείο.
+  explanation: 'Το `kubectl apply -f` δουλεύει με την περιγραφή στο αρχείο: φέρνει το cluster στην κατάσταση του αρχείου, είτε ο πόρος
+    υπάρχει είτε όχι.'
+  reference: kubectl-apply
+  spec:
+    template: kubectl ____ -f app.yaml
+    blanks:
+    - accepted:
+      - apply
       known_mistakes:
-        - { id: "run", match: "kubectl run web --image=nginx", feedback: "Το `kubectl run` δημιουργεί ένα μεμονωμένο Pod, όχι Deployment." }
-        - { id: "no-replicas", match: "kubectl create deployment web --image=nginx", feedback: "Χωρίς `--replicas` δημιουργείται 1 Pod." }
-      test_cases:
-        accept: ["kubectl create deployment web --image=nginx --replicas=3", "kubectl create deployment web --replicas=3 --image=nginx", "kubectl create deployment web --image nginx --replicas 3", "kubectl create deployment --image=nginx web --replicas=3"]
-        reject: ["kubectl create deployment web --image=nginx", "kubectl run web --image=nginx", "kubectl create deployment nginx --image=web --replicas=3", "kubectl create deploy web --image=nginx --replicas=3x"]
+      - id: create
+        match: create
+        feedback: 'Το `create` αποτυγχάνει αν ο πόρος υπάρχει ήδη: δεν ενημερώνει.'
+      - id: run
+        match: run
+        feedback: Το `run` δημιουργεί Pod από image, δεν διαβάζει αρχεία.
+  cognitive_level: recognize
+- id: all-namespaces
+  type: multiple_choice
+  prompt: Τι κάνει το `kubectl get pods -A`;
+  explanation: Το `-A` (`--all-namespaces`) δείχνει Pods από όλα τα namespaces, με επιπλέον στήλη NAMESPACE.
+  reference: kubectl-get
+  spec:
+    options:
+    - id: all-ns
+      text: Δείχνει τα Pods όλων των namespaces.
+      correct: true
+    - id: all-fields
+      text: Δείχνει όλα τα πεδία κάθε Pod.
+      why: 'Για πλήρη πεδία: `-o yaml`.'
+    - id: apply
+      text: Εφαρμόζει όλες τις αλλαγές.
+      why: Το `get` μόνο διαβάζει.
+    - id: stopped
+      text: Δείχνει και τα σταματημένα Pods.
+      why: Το `get pods` δείχνει ήδη όλα τα Pods του namespace, ό,τι κατάσταση κι αν έχουν.
+  cognitive_level: recognize
+- id: wide
+  type: output_analysis
+  prompt: Τι επιπλέον δείχνει το `-o wide`;
+  explanation: 'Το `-o wide` προσθέτει στήλες όπως την IP του Pod και τον Node όπου τρέχει: χρήσιμο για να δεις αν τα Pods μαζεύτηκαν σε έναν Node.'
+  reference: kubectl-get
+  spec:
+    command: kubectl get pods -o wide
+    output: NAME                   READY   STATUS             RESTARTS      AGE   IP           NODE           NOMINATED
+      NODE   READINESS GATES
+    captured_on: kubernetes-1.37.1
+    options:
+    - id: ip-node
+      text: Την IP κάθε Pod και τον Node όπου τρέχει (και άλλες στήλες).
+      correct: true
+    - id: logs
+      text: Τις τελευταίες γραμμές των logs.
+      why: Τα logs φαίνονται με `kubectl logs`.
+    - id: yaml
+      text: Το πλήρες YAML κάθε Pod.
+      why: Αυτό είναι το `-o yaml`.
+    - id: all-ns
+      text: Τα Pods όλων των namespaces.
+      why: Αυτό είναι το `-A`.
+  cognitive_level: recognize
+- id: create-deploy-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δημιούργησε ένα Deployment με όνομα `web`, image `nginx` και **3 replicas**.
+  hints:
+  - kubectl create deployment ΟΝΟΜΑ …
+  explanation: '`kubectl create deployment web --image=nginx --replicas=3`.'
+  reference: kubectl-create-deployment
+  spec:
+    accepted:
+    - kubectl create deployment web --image=nginx --replicas=3
+    known_mistakes:
+    - id: run
+      match: kubectl run web --image=nginx
+      feedback: Το `kubectl run` δημιουργεί ένα μεμονωμένο Pod, όχι Deployment.
+    - id: no-replicas
+      match: kubectl create deployment web --image=nginx
+      feedback: Χωρίς `--replicas` δημιουργείται 1 Pod.
+    test_cases:
+      accept:
+      - kubectl create deployment web --image=nginx --replicas=3
+      - kubectl create deployment web --replicas=3 --image=nginx
+      - kubectl create deployment web --image nginx --replicas 3
+      - kubectl create deployment --image=nginx web --replicas=3
+      reject:
+      - kubectl create deployment web --image=nginx
+      - kubectl run web --image=nginx
+      - kubectl create deployment nginx --image=web --replicas=3
+      - kubectl create deploy web --image=nginx --replicas=3x
+- id: scale-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Κάνε το Deployment `web` να έχει **5** Pods.
+  explanation: '`kubectl scale deployment web --replicas=5` (ή `deployment/web`).'
+  reference: kubectl-scale
+  spec:
+    accepted:
+    - kubectl scale deployment web --replicas=5
+    - kubectl scale deployment/web --replicas=5
+    - kubectl scale deploy web --replicas=5
+    - kubectl scale deploy/web --replicas=5
+    - kubectl scale deployments web --replicas=5
+    known_mistakes:
+    - id: no-type
+      match: kubectl scale web --replicas=5
+      feedback: 'Λείπει ο τύπος πόρου: `deployment web` ή `deployment/web`.'
+    test_cases:
+      accept:
+      - kubectl scale deployment web --replicas=5
+      - kubectl scale deployment/web --replicas=5
+      - kubectl scale deploy web --replicas 5
+      - kubectl scale --replicas=5 deployment web
+      reject:
+      - kubectl scale web --replicas=5
+      - kubectl scale deployment web --replicas=3
+      - kubectl scale deployment web
+      - kubectl create deployment web --replicas=5
+- id: expose-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δημιούργησε Service που κάνει το Deployment `web` προσβάσιμο στη θύρα **80**.
+  explanation: '`kubectl expose deployment web --port=80`: δημιουργεί Service (από προεπιλογή ClusterIP) για τα
+    Pods του web.'
+  reference: kubectl-expose
+  spec:
+    accepted:
+    - kubectl expose deployment web --port=80
+    - kubectl expose deployment/web --port=80
+    - kubectl expose deploy web --port=80
+    - kubectl expose deploy/web --port=80
+    optional_flags:
+      kubectl expose:
+      - --target-port
+    known_mistakes:
+    - id: no-type
+      match: kubectl expose web --port=80
+      feedback: Λείπει ο τύπος πόρου (π.χ. `deployment`).
+    test_cases:
+      accept:
+      - kubectl expose deployment web --port=80
+      - kubectl expose deployment web --port 80
+      - kubectl expose deployment/web --port=80 --target-port=80
+      reject:
+      - kubectl expose web --port=80
+      - kubectl expose deployment web
+      - kubectl expose deployment web --port=8080
+      - kubectl create service web --port=80
+- id: apply-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Εφάρμοσε στο cluster τους πόρους που περιγράφονται στο αρχείο `deployment.yaml`.
+  explanation: '`kubectl apply -f deployment.yaml`: δημιουργεί ή ενημερώνει τους πόρους ώστε να ταιριάζουν με το
+    αρχείο.'
+  reference: kubectl-apply
+  spec:
+    accepted:
+    - kubectl apply -f deployment.yaml
+    known_mistakes:
+    - id: no-f
+      match: kubectl apply deployment.yaml
+      feedback: Το αρχείο δίνεται με `-f`.
+    test_cases:
+      accept:
+      - kubectl apply -f deployment.yaml
+      - kubectl apply --filename=deployment.yaml
+      - kubectl apply -f ./deployment.yaml
+      - kubectl apply --filename deployment.yaml
+      reject:
+      - kubectl apply deployment.yaml
+      - kubectl apply -f deployment.yml
+      - kubectl create deployment.yaml
+      - kubectl apply -k deployment.yaml
+- id: describe-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Δείξε αναλυτικές πληροφορίες και τα **events** του Pod `web-7d4b9`.
+  explanation: '`kubectl describe pod web-7d4b9`: στο τέλος υπάρχει η ενότητα Events.'
+  reference: kubectl-describe
+  spec:
+    accepted:
+    - kubectl describe pod web-7d4b9
+    - kubectl describe pods web-7d4b9
+    - kubectl describe po web-7d4b9
+    - kubectl describe pod/web-7d4b9
+    known_mistakes:
+    - id: get
+      match: kubectl get pod web-7d4b9
+      feedback: 'Το `get` δείχνει μια σύντομη γραμμή κατάστασης: χωρίς events.'
+    - id: logs
+      match: kubectl logs web-7d4b9
+      feedback: Τα logs είναι η έξοδος της εφαρμογής, όχι τα events του Kubernetes.
+    test_cases:
+      accept:
+      - kubectl describe pod web-7d4b9
+      - kubectl describe po web-7d4b9
+      - kubectl describe pod/web-7d4b9
+      reject:
+      - kubectl get pod web-7d4b9
+      - kubectl logs web-7d4b9
+      - kubectl describe web-7d4b9
+      - kubectl describe deployment web-7d4b9
+- id: logs-previous-write
+  type: command_writing
+  cognitive_level: apply
+  prompt: Το container του Pod `api` κρασάρει και ξαναξεκινά. Δείξε τα logs της **προηγούμενης** εκτέλεσής του.
+  explanation: '`kubectl logs api --previous` (ή `-p`) δείχνει τι έγραψε το container πριν πέσει την προηγούμενη
+    φορά.'
+  reference: kubectl-logs
+  spec:
+    accepted:
+    - kubectl logs api --previous
+    - kubectl logs pod/api --previous
+    known_mistakes:
+    - id: current
+      match: kubectl logs api
+      feedback: 'Αυτό δείχνει την τρέχουσα εκτέλεση: αν μόλις ξανάρχισε, μπορεί να μην έχει γράψει ακόμη το σφάλμα.'
+    - id: describe
+      match: kubectl describe pod api
+      feedback: Το describe δείχνει events, όχι την έξοδο της εφαρμογής.
+    test_cases:
+      accept:
+      - kubectl logs api --previous
+      - kubectl logs api -p
+      - kubectl logs --previous api
+      - kubectl logs pod/api --previous
+      reject:
+      - kubectl logs api
+      - kubectl logs api -f
+      - kubectl describe pod api
+      - kubectl logs --previous
+- id: clusterip
+  type: output_analysis
+  cognitive_level: apply
+  prompt: Δημιούργησες το Service `web`. Από πού είναι προσβάσιμο;
+  explanation: Ο τύπος `ClusterIP` (προεπιλογή) δίνει διεύθυνση προσβάσιμη **μόνο μέσα** στο cluster. Για πρόσβαση
+    απ' έξω χρειάζεσαι π.χ. τύπο NodePort/LoadBalancer ή Ingress/Gateway.
+  reference: kubectl-expose
+  citations:
+  - source: kubernetes-docs
+    url: https://kubernetes.io/docs/concepts/services-networking/service/
+    doc_version: Kubernetes v1.37
+    last_verified: 2026-10-06
+  spec:
+    command: kubectl get svc web
+    output: 'NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
 
-  - id: scale-write
-    type: command_writing
-    cognitive_level: apply
-    prompt: "Κάνε το Deployment `web` να έχει **5** Pods."
-    explanation: "`kubectl scale deployment web --replicas=5` (ή `deployment/web`)."
-    reference: kubectl-scale
-    spec:
-      accepted: ["kubectl scale deployment web --replicas=5", "kubectl scale deployment/web --replicas=5", "kubectl scale deploy web --replicas=5", "kubectl scale deploy/web --replicas=5", "kubectl scale deployments web --replicas=5"]
-      known_mistakes:
-        - { id: "no-type", match: "kubectl scale web --replicas=5", feedback: "Λείπει ο τύπος πόρου: `deployment web` ή `deployment/web`." }
-      test_cases:
-        accept: ["kubectl scale deployment web --replicas=5", "kubectl scale deployment/web --replicas=5", "kubectl scale deploy web --replicas 5", "kubectl scale --replicas=5 deployment web"]
-        reject: ["kubectl scale web --replicas=5", "kubectl scale deployment web --replicas=3", "kubectl scale deployment web", "kubectl create deployment web --replicas=5"]
-
-  - id: expose-write
-    type: command_writing
-    cognitive_level: apply
-    prompt: "Δημιούργησε Service που εκθέτει το Deployment `web` στη θύρα **80**."
-    explanation: "`kubectl expose deployment web --port=80` — δημιουργεί Service (από προεπιλογή ClusterIP) για τα Pods του web."
-    reference: kubectl-expose
-    spec:
-      accepted: ["kubectl expose deployment web --port=80", "kubectl expose deployment/web --port=80", "kubectl expose deploy web --port=80", "kubectl expose deploy/web --port=80"]
-      optional_flags: { "kubectl expose": ["--target-port"] }
-      known_mistakes:
-        - { id: "no-type", match: "kubectl expose web --port=80", feedback: "Λείπει ο τύπος πόρου (π.χ. `deployment`)." }
-      test_cases:
-        accept: ["kubectl expose deployment web --port=80", "kubectl expose deployment web --port 80", "kubectl expose deployment/web --port=80 --target-port=80"]
-        reject: ["kubectl expose web --port=80", "kubectl expose deployment web", "kubectl expose deployment web --port=8080", "kubectl create service web --port=80"]
-
-  - id: apply-write
-    type: command_writing
-    cognitive_level: apply
-    prompt: "Εφάρμοσε στο cluster τους πόρους που περιγράφονται στο αρχείο `deployment.yaml`."
-    explanation: "`kubectl apply -f deployment.yaml` — δημιουργεί ή ενημερώνει τους πόρους ώστε να ταιριάζουν με το αρχείο."
-    reference: kubectl-apply
-    spec:
-      accepted: ["kubectl apply -f deployment.yaml"]
-      known_mistakes:
-        - { id: "no-f", match: "kubectl apply deployment.yaml", feedback: "Το αρχείο δίνεται με `-f`." }
-      test_cases:
-        accept: ["kubectl apply -f deployment.yaml", "kubectl apply --filename=deployment.yaml", "kubectl apply -f ./deployment.yaml", "kubectl apply --filename deployment.yaml"]
-        reject: ["kubectl apply deployment.yaml", "kubectl apply -f deployment.yml", "kubectl create deployment.yaml", "kubectl apply -k deployment.yaml"]
-
-  - id: describe-write
-    type: command_writing
-    cognitive_level: apply
-    prompt: "Δείξε αναλυτικές πληροφορίες και τα **events** του Pod `web-7d4b9`."
-    explanation: "`kubectl describe pod web-7d4b9` — στο τέλος υπάρχει η ενότητα Events."
-    reference: kubectl-describe
-    spec:
-      accepted: ["kubectl describe pod web-7d4b9", "kubectl describe pods web-7d4b9", "kubectl describe po web-7d4b9", "kubectl describe pod/web-7d4b9"]
-      known_mistakes:
-        - { id: "get", match: "kubectl get pod web-7d4b9", feedback: "Το `get` δείχνει μια σύντομη γραμμή κατάστασης — χωρίς events." }
-        - { id: "logs", match: "kubectl logs web-7d4b9", feedback: "Τα logs είναι η έξοδος της εφαρμογής, όχι τα events του Kubernetes." }
-      test_cases:
-        accept: ["kubectl describe pod web-7d4b9", "kubectl describe po web-7d4b9", "kubectl describe pod/web-7d4b9"]
-        reject: ["kubectl get pod web-7d4b9", "kubectl logs web-7d4b9", "kubectl describe web-7d4b9", "kubectl describe deployment web-7d4b9"]
-
-  - id: logs-previous-write
-    type: command_writing
-    cognitive_level: apply
-    prompt: "Το container του Pod `api` κρασάρει και ξαναξεκινά. Δείξε τα logs της **προηγούμενης** εκτέλεσής του."
-    explanation: "`kubectl logs api --previous` (ή `-p`) δείχνει τι έγραψε το container πριν πέσει την προηγούμενη φορά."
-    reference: kubectl-logs
-    spec:
-      accepted: ["kubectl logs api --previous", "kubectl logs pod/api --previous"]
-      known_mistakes:
-        - { id: "current", match: "kubectl logs api", feedback: "Αυτό δείχνει την τρέχουσα εκτέλεση — αν μόλις ξανάρχισε, μπορεί να μην έχει γράψει ακόμη το σφάλμα." }
-        - { id: "describe", match: "kubectl describe pod api", feedback: "Το describe δείχνει events, όχι την έξοδο της εφαρμογής." }
-      test_cases:
-        accept: ["kubectl logs api --previous", "kubectl logs api -p", "kubectl logs --previous api", "kubectl logs pod/api --previous"]
-        reject: ["kubectl logs api", "kubectl logs api -f", "kubectl describe pod api", "kubectl logs --previous"]
-
-  - id: wide
-    type: output_analysis
-    prompt: "Τι επιπλέον δείχνει το `-o wide`;"
-    explanation: "Το `-o wide` προσθέτει στήλες όπως την IP του Pod και τον Node όπου τρέχει — χρήσιμο για να δεις αν τα Pods μαζεύτηκαν σε έναν Node."
-    reference: kubectl-get
-    spec:
-      command: kubectl get pods -o wide
-      output: |-
-        NAME                   READY   STATUS             RESTARTS      AGE   IP           NODE           NOMINATED NODE   READINESS GATES
-      captured_on: kubernetes-1.37.1
-      options:
-        - { id: "ip-node", text: "Την IP κάθε Pod και τον Node όπου τρέχει (και άλλες στήλες).", correct: true }
-        - { id: "logs", text: "Τις τελευταίες γραμμές των logs.", why: "Τα logs φαίνονται με `kubectl logs`." }
-        - { id: "yaml", text: "Το πλήρες YAML κάθε Pod.", why: "Αυτό είναι το `-o yaml`." }
-        - { id: "all-ns", text: "Τα Pods όλων των namespaces.", why: "Αυτό είναι το `-A`." }
-
-  - id: all-namespaces
-    type: multiple_choice
-    prompt: "Τι κάνει το `kubectl get pods -A`;"
-    explanation: "Το `-A` (`--all-namespaces`) δείχνει Pods από όλα τα namespaces, με επιπλέον στήλη NAMESPACE."
-    reference: kubectl-get
-    spec:
-      options:
-        - { id: "all-ns", text: "Δείχνει τα Pods όλων των namespaces.", correct: true }
-        - { id: "all-fields", text: "Δείχνει όλα τα πεδία κάθε Pod.", why: "Για πλήρη πεδία: `-o yaml`." }
-        - { id: "apply", text: "Εφαρμόζει όλες τις αλλαγές.", why: "Το `get` μόνο διαβάζει." }
-        - { id: "stopped", text: "Δείχνει και τα σταματημένα Pods.", why: "Το `get pods` δείχνει ήδη όλα τα Pods του namespace, ό,τι κατάσταση κι αν έχουν." }
-
-  - id: clusterip
-    type: output_analysis
-    cognitive_level: apply
-    prompt: "Δημιούργησες το Service `web`. Από πού είναι προσβάσιμο;"
-    explanation: "Ο τύπος `ClusterIP` (προεπιλογή) δίνει διεύθυνση προσβάσιμη **μόνο μέσα** στο cluster. Για πρόσβαση απ' έξω χρειάζεσαι π.χ. τύπο NodePort/LoadBalancer ή Ingress/Gateway."
-    reference: kubectl-expose
-    citations: [{ source: "kubernetes-docs", url: "https://kubernetes.io/docs/concepts/services-networking/service/", doc_version: "Kubernetes v1.37", last_verified: 2026-10-06 }]
-    spec:
-      command: kubectl get svc web
-      output: |-
-        NAME   TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
-        web    ClusterIP   10.43.100.180   <none>        80/TCP    0s
-      captured_on: kubernetes-1.37.1
-      options:
-        - { id: "inside", text: "Μόνο από μέσα από το cluster.", correct: true }
-        - { id: "internet", text: "Από όλο το internet στη θύρα 80.", why: "Το EXTERNAL-IP είναι <none> — δεν υπάρχει εξωτερική πρόσβαση." }
-        - { id: "laptop", text: "Από το laptop σου στη 10.43.100.180.", why: "Η Cluster IP δεν δρομολογείται εκτός cluster." }
-        - { id: "nowhere", text: "Από πουθενά — πρέπει πρώτα να το ενεργοποιήσεις.", why: "Λειτουργεί αμέσως για Pods μέσα στο cluster." }
-
-  - id: apply-fill
-    type: fill_in_command
-    prompt: "Συμπλήρωσε την εντολή που δημιουργεί **ή ενημερώνει** πόρους από αρχείο."
-    explanation: "Το `kubectl apply -f` είναι δηλωτικό: φέρνει το cluster στην κατάσταση του αρχείου, είτε ο πόρος υπάρχει είτε όχι."
-    reference: kubectl-apply
-    spec:
-      template: "kubectl ____ -f app.yaml"
-      blanks:
-        - accepted: ["apply"]
-          known_mistakes:
-            - { id: "create", match: "create", feedback: "Το `create` αποτυγχάνει αν ο πόρος υπάρχει ήδη — δεν ενημερώνει." }
-            - { id: "run", match: "run", feedback: "Το `run` δημιουργεί Pod από image, δεν διαβάζει αρχεία." }
+      web    ClusterIP   10.43.100.180   <none>        80/TCP    0s'
+    captured_on: kubernetes-1.37.1
+    options:
+    - id: inside
+      text: Μόνο από μέσα από το cluster.
+      correct: true
+    - id: internet
+      text: Από όλο το internet στη θύρα 80.
+      why: 'Το EXTERNAL-IP είναι <none>: δεν υπάρχει εξωτερική πρόσβαση.'
+    - id: laptop
+      text: Από το laptop σου στη 10.43.100.180.
+      why: Η Cluster IP δεν δρομολογείται εκτός cluster.
+    - id: nowhere
+      text: Από πουθενά, πρέπει πρώτα να το ενεργοποιήσεις.
+      why: Λειτουργεί αμέσως για Pods μέσα στο cluster.

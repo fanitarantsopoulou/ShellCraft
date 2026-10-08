@@ -50,12 +50,40 @@ def _diagnose(sub: CanonicalCommand, expected: CanonicalCommand) -> str | None:
     if len(sub.operands) != len(expected.operands):
         return f"Η εντολή χρειάζεται {len(expected.operands)} ορίσματα, έδωσες {len(sub.operands)}."
     if sorted(sub.operands) == sorted(expected.operands) and sub.operands != expected.operands:
-        return "Τα ορίσματα είναι σωστά αλλά σε λάθος σειρά — η σειρά έχει σημασία."
+        return "Τα ορίσματα είναι σωστά αλλά σε λάθος σειρά: η σειρά έχει σημασία."
     if sub.options != expected.options:
         return "Οι επιλογές (flags) δεν είναι αυτές που χρειάζονται εδώ."
     if sub.operands != expected.operands:
         return "Κάποιο όρισμα (αρχείο ή διαδρομή) δεν είναι αυτό που ζητήθηκε."
     return None
+
+
+def _shorthand_notes(submitted: CanonicalLine) -> list[FeedbackItem]:
+    return [
+        FeedbackItem(
+            kind=FeedbackKind.NOTE,
+            text=(
+                f"Έγραψες τη σύντομη μορφή `{written}`. Δουλεύει στο GNU `{cmd.name}` του Debian, "
+                f"αλλά δεν ανήκει πια στο πρότυπο POSIX: η τυπική μορφή είναι `{standard}`, "
+                "που δουλεύει παντού."
+            ),
+        )
+        for cmd in submitted.commands
+        for written, standard in cmd.shorthands
+    ]
+
+
+def _closest_accepted(
+    submitted: CanonicalLine, ex: CommandWritingExercise, ctx: EvalContext
+) -> CanonicalLine:
+    """The accepted answer to diagnose against: prefer one using the same command names.
+
+    Otherwise `rm -rf old` would be told "use another command" even though `rm -d old`
+    is an accepted answer.
+    """
+    candidates = [to_canonical(a, ex, ctx) for a in ex.spec.accepted]
+    names = [c.name for c in submitted.commands]
+    return next((c for c in candidates if [x.name for x in c.commands] == names), candidates[0])
 
 
 def evaluate_command(
@@ -87,7 +115,7 @@ def evaluate_command(
 
     for i, accepted in enumerate(ex.spec.accepted):
         if submitted == to_canonical(accepted, ex, ctx):
-            feedback = [verdict(Outcome.CORRECT)]
+            feedback = [verdict(Outcome.CORRECT), *_shorthand_notes(submitted)]
             if i > 0:  # accepted alternative: show the canonical form too
                 feedback.append(correct_answer)
             feedback.append(why)
@@ -113,7 +141,7 @@ def evaluate_command(
             )
 
     feedback = [verdict(Outcome.INCORRECT)]
-    expected = to_canonical(ex.spec.accepted[0], ex, ctx)
+    expected = _closest_accepted(submitted, ex, ctx)
     if len(submitted.commands) == len(expected.commands):
         for got, want in zip(submitted.commands, expected.commands, strict=True):
             if (hint := _diagnose(got, want)) is not None:

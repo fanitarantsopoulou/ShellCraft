@@ -13,10 +13,22 @@ from urllib.parse import urlparse
 
 from app.content.loader import ContentBundle
 from app.content.schemas import Citation
+from app.content.schemas.common import CognitiveLevel
 
 MAX_CITATION_AGE = timedelta(days=365)
 # Authors may be a timezone ahead of the machine running lint (e.g. EEST vs UTC).
 CLOCK_SKEW = timedelta(days=1)
+
+
+# Quizzes must escalate: concepts first, then using commands, then combining/troubleshooting,
+# then full scenarios. Combine and troubleshoot share a tier so they can interleave.
+DIFFICULTY_TIER = {
+    CognitiveLevel.RECOGNIZE: 1,
+    CognitiveLevel.APPLY: 2,
+    CognitiveLevel.COMBINE: 3,
+    CognitiveLevel.TROUBLESHOOT: 3,
+    CognitiveLevel.SCENARIO: 4,
+}
 
 
 class Severity(StrEnum):
@@ -142,6 +154,13 @@ class _Linter:
             self.refs(loc, "track", [quiz.track], b.tracks)
             self.refs(loc, "skill", quiz.skills, skills)
             self.refs(loc, "related lesson", quiz.related_lessons, b.lessons)
+            for prev, cur in zip(quiz.questions, quiz.questions[1:], strict=False):
+                if DIFFICULTY_TIER[cur.cognitive_level] < DIFFICULTY_TIER[prev.cognitive_level]:
+                    self.error(
+                        loc,
+                        f"question {cur.id!r} ({cur.cognitive_level}) comes after harder "
+                        f"{prev.id!r} ({prev.cognitive_level}); order questions from easy to hard",
+                    )
             if (other := orders.get((quiz.track, quiz.order))) is not None:
                 self.error(loc, f"quiz order {quiz.order} already used by {other!r}")
             orders[(quiz.track, quiz.order)] = quiz.id

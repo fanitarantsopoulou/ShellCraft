@@ -8,7 +8,7 @@ platform: debian-13
 category: linux/text
 level: intermediate
 summary: Αφαιρεί (ή μετράει) διαδοχικές διπλές γραμμές.
-description: Συγκρίνει μόνο **γειτονικές** γραμμές — γι' αυτό σχεδόν πάντα χρησιμοποιείται μετά από `sort`.
+description: Συγκρίνει μόνο **γειτονικές** γραμμές, γι' αυτό σχεδόν πάντα χρησιμοποιείται μετά από `sort`.
 synopsis:
 - uniq [OPTION]... [INPUT [OUTPUT]]
 flag_grammar: gnu_getopt
@@ -68,7 +68,7 @@ examples:
 - cmd: sort ips.txt | uniq -c
   explain:
   - token: sort ips.txt
-    meaning: φέρε τις ίδιες γραμμές δίπλα-δίπλα
+    meaning: φέρε τις ίδιες γραμμές τη μία δίπλα στην άλλη
   - token: '|'
     meaning: δώσε το output στην επόμενη εντολή
   - token: uniq -c

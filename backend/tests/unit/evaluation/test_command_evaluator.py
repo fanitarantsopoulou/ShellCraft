@@ -118,3 +118,36 @@ def test_feedback_is_enriched_from_the_command_reference():
 
 def test_oversized_input_is_invalid():
     assert run("cp " + "a" * 2000).outcome is Outcome.INVALID
+
+
+def test_diagnosis_compares_with_accepted_answer_using_same_command():
+    ex = command_exercise(
+        accepted=["cp a.txt b.txt", "mv -i a.txt b.txt"],
+        test_cases={"accept": ["cp a.txt b.txt"], "reject": ["mv a.txt c.txt"]},
+    )
+    result = run("mv -i a.txt c.txt", ex)
+    mistake = next(f for f in result.feedback if f.kind is FeedbackKind.MISTAKE)
+    # `mv` is a valid command here (second accepted answer): point at the argument instead.
+    assert "άλλη εντολή" not in mistake.text
+    assert "όρισμα" in mistake.text
+
+
+def test_obsolete_shorthand_is_accepted_with_a_note():
+    head = cp_command(
+        id="head",
+        name="head",
+        numeric_shorthand="-n",
+        options=[{"flags": ["-n", "--lines"], "summary": "lines", "value": "required"}],
+        related=[],
+    )
+    ctx = EvalContext(commands={"head": head})
+    ex = command_exercise(
+        accepted=["head -n 3 data.csv"],
+        test_cases={"accept": ["head -3 data.csv"], "reject": ["head data.csv"]},
+    )
+    short = evaluate(ex, {"command": "head -3 data.csv"}, ctx)
+    assert short.outcome is Outcome.CORRECT
+    note = next(f for f in short.feedback if f.kind is FeedbackKind.NOTE)
+    assert "`-3`" in note.text and "`-n 3`" in note.text
+    standard = evaluate(ex, {"command": "head -n 3 data.csv"}, ctx)
+    assert FeedbackKind.NOTE not in kinds(standard)

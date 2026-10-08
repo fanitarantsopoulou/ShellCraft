@@ -11,7 +11,7 @@ from app.evaluation.result import FeedbackItem, FeedbackKind, Outcome
 
 VERDICTS = {
     Outcome.CORRECT: "Σωστό!",
-    Outcome.PARTIAL: "Σχεδόν — μέρος της απάντησης είναι σωστό.",
+    Outcome.PARTIAL: "Σχεδόν, μέρος της απάντησης είναι σωστό.",
     Outcome.INCORRECT: "Όχι ακριβώς.",
     Outcome.INVALID: "Η απάντηση δεν μπόρεσε να αξιολογηθεί.",
 }

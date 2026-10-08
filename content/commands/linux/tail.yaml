@@ -8,7 +8,7 @@ platform: debian-13
 category: linux/text
 level: beginner
 summary: 'Δείχνει τις τελευταίες γραμμές ενός αρχείου (προεπιλογή: 10).'
-description: Με `-f` συνεχίζει να δείχνει νέες γραμμές καθώς γράφονται — ιδανικό για logs.
+description: 'Με `-f` συνεχίζει να δείχνει νέες γραμμές καθώς γράφονται: ιδανικό για logs.'
 synopsis:
 - tail [OPTION]... [FILE]...
 flag_grammar: gnu_getopt
