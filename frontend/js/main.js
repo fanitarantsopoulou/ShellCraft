@@ -4,23 +4,32 @@ import { sprite, worldScene } from "./pixelart.js";
 import { bestScore, recordScore, solvedCount, starsFor } from "./progress.js";
 import { renderQuestion, TYPE_LABELS } from "./question.js";
 import { isMuted, setMuted, sfx } from "./sound.js";
+import { pageEnter, zoneTransition } from "./transition.js";
 
 const app = document.getElementById("app");
 const LEVELS = { beginner: "Αρχάριο", intermediate: "Μεσαίο", advanced: "Προχωρημένο" };
 const TRACK_SPRITES = { linux: "penguin", docker: "container", kubernetes: "wheel", cloud: "cloud" };
+// Colour of each zone's transition, matching its biome.
+const ZONE_COLORS = { home: "#1b2140", linux: "#2b6e36", docker: "#1f6aa8", kubernetes: "#3a62c4", cloud: "#465a9a" };
 
 /* ---------------------------------------------------------------- shell */
 
 let tracks = [];
 
 function renderTabs(activeTrack) {
-  document.getElementById("tabs").replaceChildren(...tracks.map((t) =>
+  const onHome = activeTrack === null;
+  document.getElementById("tabs").replaceChildren(
     h("a", {
-      class: `tab${t.id === activeTrack ? " active" : ""}${t.available ? "" : " soon"}`,
-      href: `#/track/${t.id}`,
-      "data-sfx": "click",
-      "aria-current": t.id === activeTrack ? "page" : null,
-    }, t.title)));
+      class: `tab home${onHome ? " active" : ""}`,
+      href: "#/",
+      "aria-current": onHome ? "page" : null,
+    }, "Home"),
+    ...tracks.map((t) =>
+      h("a", {
+        class: `tab${t.id === activeTrack ? " active" : ""}${t.available ? "" : " soon"}`,
+        href: `#/track/${t.id}`,
+        "aria-current": t.id === activeTrack ? "page" : null,
+      }, t.title)));
 }
 
 function renderHud() {
@@ -42,11 +51,36 @@ document.addEventListener("click", (e) => {
   if (el && !el.disabled) sfx[el.dataset.sfx]?.();
 });
 
+let currentZone; // "home" or a track id; undefined until the first page is shown
+let pending = Promise.resolve(); // serialises transitions when navigating quickly
+
+function zoneInfo(zone) {
+  if (zone === "home") return { color: ZONE_COLORS.home, icon: sprite("terminal", "warp-icon"), label: "ShellCraft" };
+  const track = tracks.find((t) => t.id === zone);
+  return {
+    color: ZONE_COLORS[zone] ?? ZONE_COLORS.home,
+    icon: sprite(TRACK_SPRITES[zone] ?? "terminal", "warp-icon"),
+    label: track?.title ?? zone,
+  };
+}
+
 function show(activeTrack, ...nodes) {
-  renderTabs(activeTrack);
-  app.replaceChildren(...nodes.flat(Infinity).filter(Boolean));
-  app.focus({ preventScroll: true });
-  window.scrollTo(0, 0);
+  const zone = activeTrack ?? "home";
+  const swap = () => {
+    renderTabs(activeTrack);
+    app.replaceChildren(...nodes.flat(Infinity).filter(Boolean));
+    app.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+    pageEnter(app);
+  };
+  const entering = currentZone !== undefined && zone !== currentZone;
+  currentZone = zone;
+  pending = pending.then(() => {
+    if (!entering) return swap();
+    sfx.warp();
+    return zoneTransition(zoneInfo(zone), swap);
+  });
+  return pending;
 }
 
 function starRow(stars, cls = "star-row") {
@@ -262,7 +296,7 @@ async function questionPage(id, n) {
     next.focus();
   });
 
-  show(quiz.track,
+  const shown = show(quiz.track,
     quizCrumbs(quiz),
     h("div", { class: "quiz-top" },
       h("span", { class: "quiz-title" }, `QUIZ ${quiz.number} · ${quiz.title} · ${n}/${total}`),
@@ -272,7 +306,7 @@ async function questionPage(id, n) {
     h("div", { class: "quiz-nav" }, back, next),
   );
   refresh();
-  question.focus();
+  shown.then(() => question.focus());
 }
 
 async function resultsPage(id) {
