@@ -138,10 +138,10 @@ function home() {
 function trackTabs(id, active, hasIntro) {
   return h("nav", { class: "subtabs", "aria-label": "Ενότητες" },
     hasIntro
-      ? h("a", { href: `#/track/${id}/intro`, class: active === "intro" ? "active" : "", "data-sfx": "click" }, "Εισαγωγή")
+      ? h("a", { href: `#/track/${id}`, class: active === "intro" ? "active" : "", "data-sfx": "click" }, "Εισαγωγή")
       : null,
-    h("a", { href: `#/track/${id}`, class: active === "quiz" ? "active" : "", "data-sfx": "click" }, "Quiz"),
-    h("a", { href: `#/track/${id}/theory`, class: active === "theory" ? "active" : "", "data-sfx": "click" }, "Θεωρία"));
+    h("a", { href: `#/track/${id}/theory`, class: active === "theory" ? "active" : "", "data-sfx": "click" }, "Θεωρία"),
+    h("a", { href: `#/track/${id}/quiz`, class: active === "quiz" ? "active" : "", "data-sfx": "click" }, "Quiz"));
 }
 
 async function trackPage(id, section) {
@@ -165,7 +165,10 @@ async function trackPage(id, section) {
     show(id, head, trackTabs(id, "intro", hasIntro),
       trustedHtml("article", track.intro.body_html, { class: "theory intro" }),
       h("div", { class: "start-box" },
-        h("a", { class: "btn gold", href: `#/track/${id}`, "data-sfx": "start" }, "Πάμε στα quiz ▶")),
+        // Next step follows the tab order: theory if this section has any, otherwise the quizzes.
+        track.modules.length
+          ? h("a", { class: "btn gold", href: `#/track/${id}/theory`, "data-sfx": "start" }, "Συνέχεια στη θεωρία ▶")
+          : h("a", { class: "btn gold", href: `#/track/${id}/quiz`, "data-sfx": "start" }, "Πάμε στα quiz ▶")),
       h("p", { class: "muted sources" }, "Πηγές: ",
         track.intro.sources.map((s, i) => [i ? " · " : "", h("a", { href: s.url, target: "_blank", rel: "noopener noreferrer" }, s.label)])));
     return;
@@ -181,15 +184,13 @@ async function trackPage(id, section) {
             h("li", {}, h("a", { class: "lesson-link", href: `#/lesson/${l.id}`, "data-sfx": "click" },
               h("span", { class: "badge" }, String(i + 1)),
               h("span", {}, l.title),
-              h("span", { class: "meta" }, `~${l.est_minutes}′ ανάγνωση`))))))) : h("p", { class: "muted" }, "Δεν υπάρχει ακόμη θεωρία εδώ."));
+              h("span", { class: "meta" }, `~${l.est_minutes}′ ανάγνωση`))))))) : h("p", { class: "muted" }, "Δεν υπάρχει ακόμη θεωρία εδώ."),
+      h("div", { class: "start-box" },
+        h("a", { class: "btn gold", href: `#/track/${id}/quiz`, "data-sfx": "start" }, "Πάμε στα quiz ▶")));
     return;
   }
 
   show(id, head, trackTabs(id, "quiz", hasIntro),
-    hasIntro
-      ? h("a", { class: "intro-hint", href: `#/track/${id}/intro`, "data-sfx": "click" },
-          `📖 Πρώτη φορά εδώ; Διάβασε πρώτα «${track.intro.title}» ▶`)
-      : null,
     h("ol", { class: "quiz-path" }, track.quizzes.map((q) => {
       const best = bestScore(q.id);
       const stars = best ? starsFor(best.points, best.total) : 0;
@@ -224,7 +225,7 @@ async function lessonPage(id) {
 }
 
 function quizCrumbs(quiz) {
-  return h("nav", { class: "crumbs" }, h("a", { href: `#/track/${quiz.track}`, "data-sfx": "click" }, "◀ Όλα τα quiz"));
+  return h("nav", { class: "crumbs" }, h("a", { href: `#/track/${quiz.track}/quiz`, "data-sfx": "click" }, "◀ Όλα τα quiz"));
 }
 
 async function quizIntro(id) {
@@ -343,7 +344,7 @@ async function resultsPage(id) {
         }, "↺ Ξανά"),
         quiz.next_quiz
           ? h("a", { class: "btn gold", href: `#/quiz/${quiz.next_quiz.id}`, "data-sfx": "next" }, `Quiz ${quiz.next_quiz.number} ▶`)
-          : h("a", { class: "btn", href: `#/track/${quiz.track}`, "data-sfx": "next" }, "Όλα τα quiz ▶"))),
+          : h("a", { class: "btn", href: `#/track/${quiz.track}/quiz`, "data-sfx": "next" }, "Όλα τα quiz ▶"))),
   );
   if (stars >= 2) sfx.complete();
 }
@@ -352,10 +353,11 @@ async function resultsPage(id) {
 
 const ROUTES = [
   [/^\/$/, () => home()],
-  [/^\/track\/([\w-]+)$/, (m) => trackPage(m[1], "quiz")],
+  // A section opens on its intro (falls back to the quiz list if it has none).
+  [/^\/track\/([\w-]+)$/, (m) => trackPage(m[1], "intro")],
+  [/^\/track\/([\w-]+)\/intro$/, (m) => trackPage(m[1], "intro")],
+  [/^\/track\/([\w-]+)\/quiz$/, (m) => trackPage(m[1], "quiz")],
   [/^\/track\/([\w-]+)\/theory$/, (m) => trackPage(m[1], "theory")],
-  [/^\/track\/([\w-]+)\/intro$/, (m) => trackPage(m[1], "intro")],
-  [/^\/track\/([\w-]+)\/intro$/, (m) => trackPage(m[1], "intro")],
   [/^\/lesson\/([\w.-]+)$/, (m) => lessonPage(m[1])],
   [/^\/quiz\/([\w.-]+)$/, (m) => quizIntro(m[1])],
   [/^\/quiz\/([\w.-]+)\/q\/(\d+)$/, (m) => questionPage(m[1], Number(m[2]))],
