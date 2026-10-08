@@ -1,7 +1,8 @@
 [project]
 name = "shellcraft"
 version = "0.1.0"
-description = "Interactive learning platform for Linux, networking, containers and cloud."
+description = "Interactive learning platform for Linux, Docker, Kubernetes and cloud."
+license = "MIT"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.140,<1",
@@ -24,7 +25,7 @@ dev = [
 ]
 
 [build-system]
-requires = ["setuptools>=75"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
