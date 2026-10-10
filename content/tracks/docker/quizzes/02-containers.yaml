@@ -6,6 +6,9 @@ level: beginner
 order: 2
 skills:
 - docker.containers
+related_lessons:
+- docker.basics.running
+- docker.basics.volumes
 questions:
 - id: port-meaning
   type: multiple_choice
@@ -84,7 +87,8 @@ questions:
 - id: rm-flag
   type: multiple_choice
   prompt: Τι κάνει το `--rm` στο `docker run --rm alpine:3 echo bye`;
-  explanation: 'Με `--rm` το container διαγράφεται αυτόματα μόλις τερματίσει: ιδανικό για εντολές μίας χρήσης. Χωρίς αυτό θα έμενε στο `docker ps -a` ως Exited.'
+  explanation: 'Με `--rm` το container διαγράφεται αυτόματα μόλις τερματίσει: ιδανικό για εντολές μίας χρήσης. Χωρίς
+    αυτό θα έμενε στο `docker ps -a` ως Exited.'
   reference: docker-container-run
   spec:
     options:
@@ -206,8 +210,8 @@ questions:
   type: output_analysis
   cognitive_level: troubleshoot
   prompt: Τι σημαίνει αυτό το σφάλμα;
-  explanation: Υπάρχει ήδη container με αυτό το όνομα, ίσως σταματημένο (φαίνεται με `docker ps -a`). Διάγραψέ
-    το (`docker rm web`) ή δώσε άλλο όνομα.
+  explanation: Υπάρχει ήδη container με αυτό το όνομα, ίσως σταματημένο (φαίνεται με `docker ps -a`). Διάγραψέ το
+    (`docker rm web`) ή δώσε άλλο όνομα.
   reference: docker-container-run
   spec:
     command: docker run -d --name web nginx:alpine

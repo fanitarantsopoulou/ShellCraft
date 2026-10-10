@@ -6,12 +6,15 @@ level: intermediate
 order: 2
 skills:
 - k8s.kubectl
+related_lessons:
+- k8s.basics.kubectl
+- k8s.basics.services-namespaces
 questions:
 - id: apply-fill
   type: fill_in_command
   prompt: Συμπλήρωσε την εντολή που δημιουργεί **ή ενημερώνει** πόρους από αρχείο.
-  explanation: 'Το `kubectl apply -f` δουλεύει με την περιγραφή στο αρχείο: φέρνει το cluster στην κατάσταση του αρχείου, είτε ο πόρος
-    υπάρχει είτε όχι.'
+  explanation: 'Το `kubectl apply -f` δουλεύει με την περιγραφή στο αρχείο: φέρνει το cluster στην κατάσταση του
+    αρχείου, είτε ο πόρος υπάρχει είτε όχι.'
   reference: kubectl-apply
   spec:
     template: kubectl ____ -f app.yaml
@@ -49,7 +52,8 @@ questions:
 - id: wide
   type: output_analysis
   prompt: Τι επιπλέον δείχνει το `-o wide`;
-  explanation: 'Το `-o wide` προσθέτει στήλες όπως την IP του Pod και τον Node όπου τρέχει: χρήσιμο για να δεις αν τα Pods μαζεύτηκαν σε έναν Node.'
+  explanation: 'Το `-o wide` προσθέτει στήλες όπως την IP του Pod και τον Node όπου τρέχει: χρήσιμο για να δεις
+    αν τα Pods μαζεύτηκαν σε έναν Node.'
   reference: kubectl-get
   spec:
     command: kubectl get pods -o wide

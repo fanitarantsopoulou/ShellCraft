@@ -1,0 +1,12 @@
+id: docker.basics
+track: docker
+title: Βασικά του Docker
+summary: Images, containers, Dockerfile και volumes, με παραδείγματα που τρέχουν πραγματικά.
+order: 1
+level: beginner
+map: { x: 6, y: 4 }
+lessons:
+  - docker.basics.images-containers
+  - docker.basics.running
+  - docker.basics.dockerfile
+  - docker.basics.volumes

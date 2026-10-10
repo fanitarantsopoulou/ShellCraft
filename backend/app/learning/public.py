@@ -113,7 +113,9 @@ def lesson_view(bundle: ContentBundle, lesson_id: str) -> dict[str, Any] | None:
             if lesson_id in q.related_lessons
         ],
         "next_lesson": siblings[index + 1] if index + 1 < len(siblings) else None,
-        "sources": [{"url": str(c.url), "label": c.doc_version} for c in meta.citations],
+        "sources": [
+            {"url": str(c.url), "label": c.section or c.doc_version} for c in meta.citations
+        ],
     }
 
 

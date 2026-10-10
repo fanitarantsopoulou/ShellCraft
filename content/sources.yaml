@@ -107,3 +107,39 @@
   kind: project_docs
   url: https://source.android.com/
   allowed_domains: [source.android.com]
+- id: ubuntu
+  name: Ubuntu
+  publisher: Canonical
+  kind: project_docs
+  url: https://ubuntu.com/
+  allowed_domains: [ubuntu.com]
+- id: centos
+  name: The CentOS Project
+  publisher: CentOS Project
+  kind: project_docs
+  url: https://www.centos.org/
+  allowed_domains: [centos.org]
+- id: rpm
+  name: RPM Package Manager
+  publisher: rpm.org
+  kind: project_docs
+  url: https://rpm.org/
+  allowed_domains: [rpm.org]
+- id: alpine
+  name: Alpine Linux
+  publisher: Alpine Linux Development Team
+  kind: project_docs
+  url: https://www.alpinelinux.org/
+  allowed_domains: [alpinelinux.org]
+- id: opensuse
+  name: openSUSE Documentation
+  publisher: SUSE / openSUSE Project
+  kind: official_manual
+  url: https://doc.opensuse.org/
+  allowed_domains: [doc.opensuse.org]
+- id: dnf
+  name: DNF (RPM Software Management)
+  publisher: RPM Software Management project
+  kind: project_docs
+  url: https://github.com/rpm-software-management/dnf
+  allowed_domains: [github.com]

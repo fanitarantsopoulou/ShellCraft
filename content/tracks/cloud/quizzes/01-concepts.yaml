@@ -6,6 +6,9 @@ level: beginner
 order: 1
 skills:
 - cloud.concepts
+related_lessons:
+- cloud.basics.models
+- cloud.basics.regions
 questions:
 - id: iaas
   type: multiple_choice
@@ -57,8 +60,8 @@ questions:
   type: fill_in_command
   prompt: Ανεβάζεις μόνο τον κώδικά σου· ο πάροχος διαχειρίζεται servers, λειτουργικό και runtime. Πώς λέγεται αυτό
     το μοντέλο; (συντομογραφία)
-  explanation: '**PaaS**: Platform as a Service. Ελέγχεις την εφαρμογή (και ίσως ρυθμίσεις του περιβάλλοντος),
-    όχι το λειτουργικό ή το δίκτυο.'
+  explanation: '**PaaS**: Platform as a Service. Ελέγχεις την εφαρμογή (και ίσως ρυθμίσεις του περιβάλλοντος), όχι
+    το λειτουργικό ή το δίκτυο.'
   spec:
     template: ____
     blanks:

@@ -1,0 +1,9 @@
+id: linux.start
+track: linux
+title: Γνωριμία με το Linux
+summary: Τι είναι μια διανομή Linux και ποιες οικογένειες διανομών υπάρχουν.
+order: 1
+level: beginner
+map: { x: 4, y: 4 }
+lessons:
+  - linux.start.distributions

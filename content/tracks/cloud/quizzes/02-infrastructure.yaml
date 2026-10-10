@@ -7,6 +7,9 @@ level: intermediate
 order: 2
 skills:
 - cloud.infra
+related_lessons:
+- cloud.basics.networking
+- cloud.basics.storage-scaling
 questions:
 - id: load-balancer
   type: multiple_choice
@@ -36,7 +39,8 @@ questions:
 - id: autoscaling
   type: multiple_choice
   prompt: Η κίνηση στο site σου διπλασιάζεται κάθε βράδυ. Τι λύνει το **autoscaling**;
-  explanation: 'Προσθέτει αυτόματα instances όταν αυξάνεται το φορτίο (π.χ. CPU) και τα αφαιρεί όταν πέφτει: πληρώνεις όσο χρειάζεσαι.'
+  explanation: 'Προσθέτει αυτόματα instances όταν αυξάνεται το φορτίο (π.χ. CPU) και τα αφαιρεί όταν πέφτει: πληρώνεις
+    όσο χρειάζεσαι.'
   citations:
   - source: aws-docs
     url: https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html
@@ -78,7 +82,8 @@ questions:
       correct: true
     - id: block
       text: Έναν εικονικό δίσκο (block storage) σε μία VM.
-      why: 'Ένας δίσκος συνδέεται σε μία VM και έχει σταθερό μέγεθος: δεν είναι φτιαγμένος για εκατομμύρια αρχεία μέσω HTTP.'
+      why: 'Ένας δίσκος συνδέεται σε μία VM και έχει σταθερό μέγεθος: δεν είναι φτιαγμένος για εκατομμύρια αρχεία
+        μέσω HTTP.'
     - id: ram
       text: Τη μνήμη RAM του server.
       why: Η RAM δεν είναι μόνιμη αποθήκευση.
@@ -139,7 +144,8 @@ questions:
 - id: public-subnet
   type: multiple_choice
   prompt: Τι κάνει ένα subnet **public** σε ένα VPC;
-  explanation: 'Ένα subnet είναι public όταν ο route table του έχει route προς internet gateway. Χωρίς αυτό είναι private: οι πόροι του δεν είναι προσβάσιμοι απευθείας από το internet.'
+  explanation: 'Ένα subnet είναι public όταν ο route table του έχει route προς internet gateway. Χωρίς αυτό είναι
+    private: οι πόροι του δεν είναι προσβάσιμοι απευθείας από το internet.'
   citations:
   - source: aws-docs
     url: https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html
@@ -211,8 +217,8 @@ questions:
   cognitive_level: apply
   prompt: Ένα security group επιτρέπει εισερχόμενη κίνηση στη θύρα 443. Χρειάζεται ξεχωριστό κανόνα για να **επιστρέψει**
     η απάντηση στον client;
-  explanation: 'Όχι. Τα security groups είναι **stateful**: η απάντηση σε μια εισερχόμενη σύνδεση που επιτρέπεται επιτρέπεται
-    αυτόματα να βγει, ανεξάρτητα από τους κανόνες εξόδου.'
+  explanation: 'Όχι. Τα security groups είναι **stateful**: η απάντηση σε μια εισερχόμενη σύνδεση που επιτρέπεται
+    επιτρέπεται αυτόματα να βγει, ανεξάρτητα από τους κανόνες εξόδου.'
   citations:
   - source: aws-docs
     url: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html

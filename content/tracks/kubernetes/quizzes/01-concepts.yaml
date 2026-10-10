@@ -6,6 +6,10 @@ level: beginner
 order: 1
 skills:
 - k8s.concepts
+related_lessons:
+- k8s.basics.architecture
+- k8s.basics.pods-deployments
+- k8s.basics.services-namespaces
 questions:
 - id: pod
   type: multiple_choice

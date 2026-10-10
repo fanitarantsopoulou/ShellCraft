@@ -83,6 +83,15 @@ function show(activeTrack, ...nodes) {
   return pending;
 }
 
+/** References at the end of a page: a heading and a numbered list of official sources. */
+function sourcesList(sources) {
+  if (!sources?.length) return null;
+  return h("section", { class: "sources" },
+    h("h2", {}, "Πηγές"),
+    h("ol", {}, sources.map((s) =>
+      h("li", {}, h("a", { href: s.url, target: "_blank", rel: "noopener noreferrer" }, s.label)))));
+}
+
 function starRow(stars, cls = "star-row") {
   return h("div", { class: cls, "aria-label": `${stars} από 3 αστέρια` },
     [0, 1, 2].map((i) => sprite("star", `sprite${i < stars ? "" : " off"}`)));
@@ -169,8 +178,7 @@ async function trackPage(id, section) {
         track.modules.length
           ? h("a", { class: "btn gold", href: `#/track/${id}/theory`, "data-sfx": "start" }, "Συνέχεια στη θεωρία ▶")
           : h("a", { class: "btn gold", href: `#/track/${id}/quiz`, "data-sfx": "start" }, "Πάμε στα quiz ▶")),
-      h("p", { class: "muted sources" }, "Πηγές: ",
-        track.intro.sources.map((s, i) => [i ? " · " : "", h("a", { href: s.url, target: "_blank", rel: "noopener noreferrer" }, s.label)])));
+      sourcesList(track.intro.sources));
     return;
   }
 
@@ -219,8 +227,7 @@ async function lessonPage(id) {
       ? h("div", { class: "start-box" }, lesson.quizzes.map((q) =>
           h("a", { class: "btn secondary", href: `#/quiz/${q.id}`, "data-sfx": "click" }, `Εξάσκηση: ${q.title} ▶`)))
       : null,
-    h("p", { class: "muted" }, "Πηγές: ",
-      lesson.sources.map((s, i) => [i ? ", " : "", h("a", { href: s.url, target: "_blank", rel: "noopener noreferrer" }, s.label)])),
+    sourcesList(lesson.sources),
   );
 }
 

@@ -1,0 +1,12 @@
+id: k8s.basics
+track: kubernetes
+title: Βασικά του Kubernetes
+summary: Από τι αποτελείται ένα cluster, Pods και Deployments, Services και Namespaces, και τα βασικά του kubectl.
+order: 1
+level: beginner
+map: { x: 6, y: 4 }
+lessons:
+  - k8s.basics.architecture
+  - k8s.basics.pods-deployments
+  - k8s.basics.services-namespaces
+  - k8s.basics.kubectl

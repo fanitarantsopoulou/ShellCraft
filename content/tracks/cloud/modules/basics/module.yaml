@@ -1,0 +1,12 @@
+id: cloud.basics
+track: cloud
+title: Βασικά του cloud
+summary: Μοντέλα υπηρεσιών, regions και availability zones, δίκτυα, αποθήκευση και κλιμάκωση.
+order: 1
+level: beginner
+map: { x: 6, y: 4 }
+lessons:
+  - cloud.basics.models
+  - cloud.basics.regions
+  - cloud.basics.networking
+  - cloud.basics.storage-scaling

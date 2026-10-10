@@ -4,6 +4,8 @@ biome: shell-woods
 order: 1
 summary: Το σύστημα αρχείων, το shell και τα βασικά εργαλεία ενός Linux συστήματος.
 skills:
+  - id: linux.distros
+    title: Διανομές Linux
   - id: linux.nav
     title: Πλοήγηση στο σύστημα αρχείων
   - id: linux.files.create

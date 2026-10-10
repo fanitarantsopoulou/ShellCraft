@@ -91,6 +91,8 @@ def test_tracks(client):
     assert all(t["available"] and t["quiz_count"] >= 2 for t in tracks[:4])
     linux = client.get("/api/tracks/linux").json()
     assert linux["modules"] and all(m["id"].startswith("linux") for m in linux["modules"])
-    docker = client.get("/api/tracks/docker").json()
-    assert docker["modules"] == [] and docker["quizzes"]
+    # Every section has theory, quizzes and an intro.
+    for track_id in ("docker", "kubernetes", "cloud"):
+        track = client.get(f"/api/tracks/{track_id}").json()
+        assert track["modules"] and track["quizzes"] and track["intro"]
     assert client.get("/api/tracks/nope").status_code == 404
