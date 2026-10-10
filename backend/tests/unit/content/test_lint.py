@@ -110,6 +110,15 @@ def test_one_day_clock_skew_is_tolerated():
     assert lint(bundle(commands={"cp": cmd}), today=TODAY) == []
 
 
+def test_dashes_in_greek_text_are_rejected():
+    ok = cp_command(related=[], summary="Αντιγράφει αρχεία: η πηγή μένει ίδια.")
+    assert messages(lint(bundle(commands={"cp": ok}), today=TODAY)) == []
+    bad = cp_command(related=[], summary="Αντιγράφει αρχεία \u2014 η πηγή μένει ίδια.")
+    assert "dash in Greek text" in messages(lint(bundle(commands={"cp": bad}), today=TODAY))[0]
+    english = cp_command(related=[], summary="Copies files \u2014 the source stays.")
+    assert messages(lint(bundle(commands={"cp": english}), today=TODAY)) == []
+
+
 def test_skill_cycle_detected():
     track = Track(
         id="linux",

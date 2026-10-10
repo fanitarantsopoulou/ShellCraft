@@ -352,7 +352,9 @@ details.more[open] { display: grid; gap: 0.85rem; }
 /* ---------- track intro ---------- */
 .theory.intro { font-size: 19px; }
 .theory.intro h2:first-child { margin-top: 0.5rem; }
-.sources { font-size: 15px; line-height: 1.8; }
+.sources { margin-top: 2.5rem; padding-top: 1rem; border-top: var(--px) dotted var(--line); font-size: 16px; }
+.sources h2 { color: var(--muted); }
+.sources ol { margin: 0.5rem 0 0; padding-left: 1.5rem; line-height: 1.8; }
 
 /* ---------- overflow guards ----------
  * Grid/flex children default to min-width: auto, so one long line (e.g. a full-sentence

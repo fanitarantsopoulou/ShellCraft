@@ -6,13 +6,15 @@ level: advanced
 order: 3
 skills:
 - k8s.troubleshooting
-related_lessons: []
+related_lessons:
+- k8s.basics.kubectl
 questions:
 - id: typo-resource
   type: output_analysis
   cognitive_level: troubleshoot
   prompt: Τι πήγε στραβά;
-  explanation: 'Το kubectl δεν αναγνωρίζει τον τύπο πόρου «pod5»: τυπογραφικό λάθος. Τα ονόματα πόρων (pods, po, deployments…) τα βλέπεις με `kubectl api-resources`.'
+  explanation: 'Το kubectl δεν αναγνωρίζει τον τύπο πόρου «pod5»: τυπογραφικό λάθος. Τα ονόματα πόρων (pods, po,
+    deployments…) τα βλέπεις με `kubectl api-resources`.'
   reference: kubectl-get
   spec:
     command: kubectl get pod5
@@ -158,7 +160,8 @@ questions:
   type: multiple_choice
   cognitive_level: troubleshoot
   prompt: Γιατί το `kubectl logs` δεν βοηθά σε ένα Pod με `ImagePullBackOff`;
-  explanation: 'Τα logs είναι η έξοδος του container. Αν το image δεν κατέβηκε, το container δεν ξεκίνησε ποτέ:  δεν υπάρχει έξοδος. Η πληροφορία βρίσκεται στα events (`kubectl describe`).'
+  explanation: 'Τα logs είναι η έξοδος του container. Αν το image δεν κατέβηκε, το container δεν ξεκίνησε ποτέ:  δεν
+    υπάρχει έξοδος. Η πληροφορία βρίσκεται στα events (`kubectl describe`).'
   spec:
     options:
     - id: never-started
@@ -254,7 +257,8 @@ questions:
   type: multiple_choice
   cognitive_level: troubleshoot
   prompt: Ένα Pod ενός Deployment κρασάρει συνεχώς λόγω λάθους στο config. Βοηθά να το διαγράψεις;
-  explanation: 'Όχι. Το Deployment θα δημιουργήσει νέο Pod από το **ίδιο** template: με το ίδιο λάθος. Η διόρθωση γίνεται στο manifest (ή στο ConfigMap) και εφαρμόζεται με `kubectl apply`.'
+  explanation: 'Όχι. Το Deployment θα δημιουργήσει νέο Pod από το **ίδιο** template: με το ίδιο λάθος. Η διόρθωση
+    γίνεται στο manifest (ή στο ConfigMap) και εφαρμόζεται με `kubectl apply`.'
   spec:
     options:
     - id: 'no'

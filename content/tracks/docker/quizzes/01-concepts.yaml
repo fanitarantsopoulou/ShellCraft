@@ -6,11 +6,14 @@ level: beginner
 order: 1
 skills:
 - docker.concepts
+related_lessons:
+- docker.basics.images-containers
 questions:
 - id: image-vs-container
   type: multiple_choice
   prompt: Ποια είναι η σχέση **image** και **container**;
-  explanation: 'Το image είναι ένα πακέτο μόνο για ανάγνωση με ό,τι χρειάζεται μια εφαρμογή. Το container είναι μια εκτέλεση (instance) αυτού του image: από ένα image μπορείς να τρέξεις πολλά containers.'
+  explanation: 'Το image είναι ένα πακέτο μόνο για ανάγνωση με ό,τι χρειάζεται μια εφαρμογή. Το container είναι
+    μια εκτέλεση (instance) αυτού του image: από ένα image μπορείς να τρέξεις πολλά containers.'
   citations:
   - source: docker-docs
     url: https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/
@@ -60,8 +63,8 @@ questions:
 - id: registry
   type: multiple_choice
   prompt: Τι είναι ένα **registry** (π.χ. το Docker Hub);
-  explanation: Ένα registry αποθηκεύει images και από εκεί τα κατεβάζει όποιος τα χρειάζεται. Το `docker pull` κατεβάζει από αυτό και το `docker push`
-    ανεβάζει.
+  explanation: Ένα registry αποθηκεύει images και από εκεί τα κατεβάζει όποιος τα χρειάζεται. Το `docker pull` κατεβάζει
+    από αυτό και το `docker push` ανεβάζει.
   spec:
     options:
     - id: store

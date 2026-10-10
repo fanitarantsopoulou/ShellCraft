@@ -4,6 +4,7 @@ Schema validation (loader) checks each file in isolation; lint checks the bundle
 dangling references, cycles, citation sources, staleness.
 """
 
+import re
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
@@ -29,6 +30,21 @@ DIFFICULTY_TIER = {
     CognitiveLevel.TROUBLESHOOT: 3,
     CognitiveLevel.SCENARIO: 4,
 }
+
+
+GREEK = re.compile("[\u0370-\u03ff\u1f00-\u1fff]")
+DASHES = ("\u2014", "\u2013")  # em dash, en dash: Greek text uses ":", "," or parentheses instead
+
+
+def _strings(value: object) -> Iterable[str]:
+    if isinstance(value, str):
+        yield value
+    elif isinstance(value, dict):
+        for v in value.values():
+            yield from _strings(v)
+    elif isinstance(value, (list, tuple)):
+        for v in value:
+            yield from _strings(v)
 
 
 class Severity(StrEnum):
@@ -177,6 +193,25 @@ class _Linter:
             loc = self.where("command", cmd.id)
             self.refs(loc, "related command", [r.id for r in cmd.related], b.commands)
             self.citations(loc, cmd.citations)
+
+        # Learner-facing Greek text must not use dashes (style rule).
+        kinds = (
+            ("track", b.tracks),
+            ("module", b.modules),
+            ("lesson", b.lessons),
+            ("intro", b.intros),
+            ("quiz", b.quizzes),
+            ("command", b.commands),
+            ("path", b.paths),
+        )
+        for kind, store in kinds:
+            for obj in store.values():
+                for text in _strings(obj.model_dump(mode="json")):
+                    if GREEK.search(text) and any(d in text for d in DASHES):
+                        line = next(ln for ln in text.splitlines() if any(d in ln for d in DASHES))
+                        message = f"dash in Greek text: {line.strip()[:80]!r}"
+                        self.error(self.where(kind, obj.id), message)
+                        break
 
         for path in b.paths.values():
             self.refs(self.where("path", path.id), "module", path.modules, b.modules)

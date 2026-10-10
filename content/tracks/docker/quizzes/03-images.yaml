@@ -6,6 +6,8 @@ level: intermediate
 order: 3
 skills:
 - docker.images
+related_lessons:
+- docker.basics.dockerfile
 questions:
 - id: from
   type: multiple_choice
@@ -105,7 +107,8 @@ questions:
 - id: dockerignore
   type: multiple_choice
   prompt: Τι κάνει ένα αρχείο `.dockerignore`;
-  explanation: 'Αφήνει έξω αρχεία και φακέλους από το build context: π.χ. `.git`, `node_modules`, αρχεία με κωδικούς. Το build γίνεται πιο γρήγορο και δεν μπαίνουν κατά λάθος μυστικά στο image.'
+  explanation: 'Αφήνει έξω αρχεία και φακέλους από το build context: π.χ. `.git`, `node_modules`, αρχεία με κωδικούς.
+    Το build γίνεται πιο γρήγορο και δεν μπαίνουν κατά λάθος μυστικά στο image.'
   citations:
   - source: docker-docs
     url: https://docs.docker.com/reference/dockerfile/
